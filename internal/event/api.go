@@ -3,10 +3,13 @@ package event
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"net/url"
+	"strconv"
 
+	"github.com/go-chi/chi"
 	"github.com/jackc/pgx/v4"
 
 	"photo/internal/errors"
@@ -42,8 +45,37 @@ func List(w http.ResponseWriter, r *http.Request) {
 	_ = json.NewEncoder(w).Encode(events)
 }
 
-func Retrieve(w http.ResponseWriter, r *http.Request) {
+type filterRetrieve struct {
+	ID int
+}
 
+func newFilterRetrieve(r *http.Request) (f filterRetrieve, err error) {
+	baseErr := "newFilterRetrieve fails: %v"
+	raw := chi.URLParam(r, "id")
+	if raw == "" {
+		return f, fmt.Errorf(baseErr, "`id` param doesn't present")
+	}
+	f.ID, err = strconv.Atoi(raw)
+	if err != nil {
+		return f, fmt.Errorf(baseErr, err)
+	}
+	return f, err
+}
+
+func Retrieve(w http.ResponseWriter, r *http.Request) {
+	filter, err := newFilterRetrieve(r)
+	if err != nil {
+		errors.APIError(w, err, http.StatusBadRequest)
+		return
+	}
+
+	event, err := modelRetrieve(r.Context(), filter)
+	if err != nil {
+		errors.APIError(w, err, http.StatusBadRequest)
+		return
+	}
+
+	_ = json.NewEncoder(w).Encode(event)
 }
 
 func Create(w http.ResponseWriter, r *http.Request) {
@@ -53,12 +85,12 @@ func Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := event.ValidateForCreate(); err != nil {
+	if err := validateForCreate(event); err != nil {
 		errors.APIError(w, err, http.StatusBadRequest)
 		return
 	}
 
-	if err := event.Insert(r.Context()); err != nil {
+	if err := event.Create(r.Context()); err != nil {
 		errors.APIError(w, err, http.StatusBadRequest)
 		return
 	}

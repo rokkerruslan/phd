@@ -15,7 +15,7 @@ func TestEvent_Validate_Positive(t *testing.T) {
 		Timelines: []Timeline{{Start: time.Now(), End: time.Now().Add(2 * time.Hour)}},
 		Point:     geo.Point{Lt: 1.1, Ln: 2.2},
 	}
-	got := event.ValidateForCreate()
+	got := validateForCreate(event)
 
 	if got != nil {
 		t.Errorf("expected nil, got: %v", got)
@@ -29,7 +29,7 @@ func TestEvent_Validate_Negative_EmptyName(t *testing.T) {
 		Timelines: []Timeline{{Start: time.Now(), End: time.Now().Add(2 * time.Hour)}},
 		Point:     geo.Point{Lt: 1.1, Ln: 2.2},
 	}
-	got := event.ValidateForCreate()
+	got := validateForCreate(event)
 
 	if got == nil {
 		t.Fatalf("expected error, got nil")
@@ -46,7 +46,7 @@ func TestEvent_Validate_Negative_EmptyTimelines(t *testing.T) {
 		Timelines: []Timeline{},
 		Point:     geo.Point{Lt: 1.1, Ln: 2.2},
 	}
-	got := event.ValidateForCreate()
+	got := validateForCreate(event)
 
 	if got == nil {
 		t.Fatalf("expected error, got nil")

@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-func (e *Event) ValidateForCreate() error {
+func validateForCreate(e Event) error {
 	errors := e.baseValidation()
 
 	if e.OwnerID == 0 {
@@ -16,7 +16,7 @@ func (e *Event) ValidateForCreate() error {
 		return nil
 	}
 
-	return fmt.Errorf("event.ValidateForCreate fails %v", strings.Join(errors, ", "))
+	return fmt.Errorf("validateForCreate fails %v", strings.Join(errors, ", "))
 }
 
 func (e *Event) ValidateForUpdate() error {
