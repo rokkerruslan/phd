@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"net/url"
 	"strconv"
 
 	"photo/internal/errors"
@@ -28,10 +29,21 @@ func Create(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+type Filter struct {
+	AccountID int
+}
+
+func NewFilterFromQuery(values url.Values) (f Filter, err error) {
+	defErr := "filter creating fails: %v"
+	if f.AccountID, err = strconv.Atoi(values.Get("account_id")); err != nil {
+		return f, fmt.Errorf(defErr, fmt.Errorf("account_id parsing fails: %v", err))
+	}
+	return f, nil
+}
+
 func List(w http.ResponseWriter, r *http.Request) {
-	var err error
-	var filter Filter
-	if filter.AccountID, err = strconv.Atoi(r.URL.Query().Get("account_id")); err != nil {
+	filter, err := NewFilterFromQuery(r.URL.Query())
+	if err != nil {
 		errors.APIError(w, fmt.Errorf("account_id parsing fails: %v", err), http.StatusBadRequest)
 		return
 	}

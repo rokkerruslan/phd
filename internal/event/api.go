@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"net/url"
 
 	"github.com/jackc/pgx/v4"
 
@@ -22,8 +23,17 @@ func init() {
 	}
 }
 
+type Filter struct {
+}
+
+func NewFilterFromQuery(_ url.Values) Filter {
+	return Filter{}
+}
+
 func List(w http.ResponseWriter, r *http.Request) {
-	events, err := ModelList(r.Context(), Filter{})
+	filter := NewFilterFromQuery(r.URL.Query())
+
+	events, err := ModelList(r.Context(), filter)
 	if err != nil {
 		errors.APIError(w, err, http.StatusInternalServerError)
 		return

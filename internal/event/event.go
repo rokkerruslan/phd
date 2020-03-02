@@ -56,10 +56,6 @@ func (e *Event) Insert(ctx context.Context) error {
 	return nil
 }
 
-type Filter struct {
-}
-
-// todo: use filter
 func ModelList(ctx context.Context, _ Filter) ([]Event, error) {
 	defErr := "event.List fails: %v"
 

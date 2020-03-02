@@ -40,10 +40,6 @@ func (o *Offer) Insert(ctx context.Context) error {
 	return nil
 }
 
-type Filter struct {
-	AccountID int
-}
-
 func ModelList(ctx context.Context, f Filter) ([]Offer, error) {
 	defErr := "offer.List fails: %v"
 
