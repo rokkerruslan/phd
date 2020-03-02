@@ -1,0 +1,118 @@
+openapi: 3.0.2
+info:
+  title: Photographer
+  version: 0.0.1
+paths:
+  /api/v1/events:
+    get:
+      description: Show all available Events
+      responses:
+        200:
+          description: Success Event list retrieve
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EventRetrievePublic'
+    post:
+      description: Create new Event
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateEvent'
+      responses:
+        200:
+          description: Success Event creating
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: number
+  /api/v1/events/{id}:
+    get:
+      description: Retrieve information about Event
+      parameters:
+        - $ref: '#/components/parameters/event_id'
+      responses:
+        200:
+          description: Success Retrieve info
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventRetrievePublic'
+    delete:
+      description: Delete event
+      parameters:
+        - $ref: '#/components/parameters/event_id'
+      responses:
+        204:
+          description: Success deleting
+  /api/v1/accounts/{id}:
+    get:
+      description: Retrieve info about yourself
+      parameters:
+        - $ref: '#/components/parameters/account_id'
+      responses:
+        200:
+          description: Success retrive info
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountRetrievePrivate'
+components:
+  schemas:
+    CreateEvent:
+      type: object
+      properties:
+        name:
+          type: string
+        timelines:
+          type: array
+          items:
+            $ref: '#/components/schemas/CreateTimeline'
+    EventRetrievePublic:
+      type: object
+      properties:
+        id:
+          type: number
+        name:
+          type: string
+    AccountRetrievePrivate:
+      type: object
+      properties:
+        id:
+          type: number
+        name:
+          type: string
+        email:
+          type: string
+    CreateTimeline:
+      type: object
+      properties:
+        start:
+          type: string
+        end:
+          type: string
+        place:
+          type: string
+  parameters:
+    event_id:
+      in: path
+      required: true
+      name: id
+      description: Event ID
+      schema:
+        type: number
+        example: 1
+    account_id:
+      in: path
+      required: true
+      name: id
+      schema:
+        type: number
+        example: 1
