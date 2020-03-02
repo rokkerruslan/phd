@@ -23,7 +23,7 @@ func Run() {
 	r.Route("/api/v1/events", func(apiV1 chi.Router) {
 		apiV1.Get("/", event.List)
 		apiV1.Post("/", event.Create)
-		apiV1.Patch("/", event.Update)
+		apiV1.Put("/", event.Update)
 	})
 	r.Route("/api/v1/offers", func(apiV1 chi.Router) {
 		apiV1.Get("/", offer.List)

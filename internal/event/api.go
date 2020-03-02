@@ -42,6 +42,10 @@ func List(w http.ResponseWriter, r *http.Request) {
 	_ = json.NewEncoder(w).Encode(events)
 }
 
+func Retrieve(w http.ResponseWriter, r *http.Request) {
+
+}
+
 func Create(w http.ResponseWriter, r *http.Request) {
 	var event Event
 	if err := json.NewDecoder(r.Body).Decode(&event); err != nil {
@@ -49,14 +53,33 @@ func Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := event.Validate(); err != nil {
+	if err := event.ValidateForCreate(); err != nil {
 		errors.APIError(w, err, http.StatusBadRequest)
 		return
 	}
 
-	log.Println("Create result:", event.Insert(r.Context()))
+	if err := event.Insert(r.Context()); err != nil {
+		errors.APIError(w, err, http.StatusBadRequest)
+		return
+	}
 }
 
 func Update(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("updated"))
+	var event Event
+	if err := json.NewDecoder(r.Body).Decode(&event); err != nil {
+		log.Println(err)
+		return
+	}
+
+	if err := event.ValidateForUpdate(); err != nil {
+		errors.APIError(w, err, http.StatusBadRequest)
+		return
+	}
+
+	if err := event.Update(r.Context()); err != nil {
+		errors.APIError(w, err, http.StatusBadRequest)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
 }

@@ -1,0 +1,52 @@
+package event
+
+import (
+	"fmt"
+	"strings"
+)
+
+func (e *Event) ValidateForCreate() error {
+	errors := e.baseValidation()
+
+	if e.OwnerID == 0 {
+		errors = append(errors, "`OwnerID` can't be empty")
+	}
+
+	if len(errors) == 0 {
+		return nil
+	}
+
+	return fmt.Errorf("event.ValidateForCreate fails %v", strings.Join(errors, ", "))
+}
+
+func (e *Event) ValidateForUpdate() error {
+	errors := e.baseValidation()
+
+	if e.ID == 0 {
+		errors = append(errors, "`ID` can't be empty")
+	}
+
+	if len(errors) == 0 {
+		return nil
+	}
+
+	return fmt.Errorf("event.ValidateForUpdate fails: %v", strings.Join(errors, ", "))
+}
+
+func (e *Event) baseValidation() []string {
+	var errors []string
+
+	if e.Name == "" {
+		errors = append(errors, "`Name` can't be empty")
+	}
+	if e.Timelines == nil || len(e.Timelines) == 0 {
+		errors = append(errors, "`Timelines` can't be empty")
+	}
+	for _, timeline := range e.Timelines {
+		if tError := timeline.Validate(); tError != nil {
+			errors = append(errors, tError.Error())
+		}
+	}
+
+	return errors
+}

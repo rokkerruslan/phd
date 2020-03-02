@@ -10,6 +10,11 @@ Create Event
 $ curl -X POST -d '{"Name":"Event X","Timelines":[{"Start":"2006-01-02T15:05:05Z","End":"2006-01-02T16:06:05Z"}],"Point":{"Lt":1.1,"Ln":2.2}}' -s localhost:3000/api/v1/events/ | jq
 ```
 
+Update Event
+```shell script
+$ curl -X PUT -d '{"ID":8,"Name":"Event X8","Timelines":[{"Start":"2006-01-02T15:05:05Z","End":"2006-01-02T16:06:05Z"}]}' -s localhost:3000/api/v1/events/ | jq
+```
+
 Offer list:
 ```shell script
 $ curl -s localhost:3000/api/v1/offers/ | jq

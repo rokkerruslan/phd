@@ -33,5 +33,5 @@ func (t *Timeline) Validate() error {
 		return nil
 	}
 
-	return fmt.Errorf("timeline.Validate fails %v", strings.Join(errors, ", "))
+	return fmt.Errorf("timeline.ValidateForCreate fails %v", strings.Join(errors, ", "))
 }
