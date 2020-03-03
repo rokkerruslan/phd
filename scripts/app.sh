@@ -49,7 +49,12 @@ start() {
 }
 
 showEnv() {
-    echo $ENV_LOCAL
+    while IFS=' ' read -ra ARRAY; do
+        echo "\nENVIRONMENT VARIABLES:\n"
+        for i in "${ARRAY[@]}"; do
+            echo "    $i\n"
+        done
+    done <<< "$ENV_LOCAL"
 }
 
 # ==== Entrypoint =========================================== #
