@@ -12,12 +12,11 @@ loc() {
     if [ ! -f "$ENV_FILE_LOCAL" ]; then
         echo "Can't operate with local environment, file $ENV_FILE_LOCAL does"
         echo "not exist. Please copy example file and fill the variable values."
-        echo "$ cp .example.env $ENV_FILE_LOCAL"
-        echo
+        echo "$ cp .env.example $ENV_FILE_LOCAL"
         exit 1
     fi
 
-    ENV_LOCAL=$(xargs <$ENV_FILE_LOCAL)
+    ENV_LOCAL=$(cat $ENV_FILE_LOCAL | grep '^[a-zA-z]' | xargs)
 
     case $1 in
     t | test)
@@ -25,6 +24,9 @@ loc() {
         ;;
     f | fmt)
         fmt
+        ;;
+    e | env)
+        showEnv
         ;;
     s | start | "")
         start
@@ -46,6 +48,10 @@ start() {
     env $ENV_LOCAL ./dist/$DAEMON_NAME
 }
 
+showEnv() {
+    echo $ENV_LOCAL
+}
+
 # ==== Entrypoint =========================================== #
 
 USAGE=$(
@@ -61,6 +67,8 @@ COMMANDS
 
     SUBCOMMANDS
 
+        env         show local environment variables
+        fmt         format code (go fmt and goreturns)
         test        run tests
         start       start daemon
 

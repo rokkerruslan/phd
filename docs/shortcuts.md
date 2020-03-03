@@ -7,7 +7,7 @@ $ curl -s localhost:3000/api/v1/events/ | jq
 
 Create Event
 ```shell script
-$ curl -X POST -d '{"Name":"Event X","Timelines":[{"Start":"2006-01-02T15:05:05Z","End":"2006-01-02T16:06:05Z"}],"Point":{"Lt":1.1,"Ln":2.2}}' -s localhost:3000/api/v1/events/ | jq
+echo '{"Name":"Event X","OwnerID": 1,"Timelines":[{"Start":"2006-01-02T15:05:05Z","End":"2006-01-02T16:06:05Z"}],"Point":{"Lt":1.1,"Ln":2.2}}' | curl -X POST -d @- -s localhost:3000/api/v1/events/ | jq
 ```
 
 Update Event

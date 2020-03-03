@@ -8,10 +8,12 @@ import (
 	"github.com/jackc/pgx/v4"
 )
 
-const createQuery = `insert into events (name, owner_id, created, updated) values($1, $2, now(), now())`
+const createQuery = `
+	INSERT INTO events (name, description owner_id, created, updated) VALUES($1, $2, $3, NOW(), NOW())
+`
 
 func (e *Event) Create(ctx context.Context) error {
-	if _, err := db.Exec(ctx, createQuery, e.Name, e.OwnerID); err != nil {
+	if _, err := db.Exec(ctx, createQuery, e.Name, e.Description, e.OwnerID); err != nil {
 		return err
 	}
 	return nil

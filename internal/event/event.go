@@ -7,11 +7,12 @@ import (
 )
 
 type Event struct {
-	ID        int
-	Name      string
-	OwnerID   int
-	Created   time.Time
-	Updated   time.Time
-	Timelines []Timeline
-	Point     geo.Point
+	ID          int
+	Name        string
+	Description string
+	OwnerID     int
+	Created     time.Time
+	Updated     time.Time
+	Timelines   []Timeline
+	Point       geo.Point
 }

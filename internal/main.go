@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 
@@ -17,6 +18,13 @@ import (
 func Run() {
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
+
+	opts, err := newOptions()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	log.Printf("Start with options: %+v", opts)
 
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("welcome"))
@@ -41,8 +49,8 @@ func Run() {
 		apiV1.Post("/sign-up", auth.SignUp)
 	})
 
-	log.Println("photo starts on :3000")
-	if err := http.ListenAndServe(":3000", r); err != nil {
+	log.Println(fmt.Sprintf("daemon bind socket on %s", opts.addr))
+	if err := http.ListenAndServe(opts.addr, r); err != nil {
 		log.Fatal(err)
 	}
 }

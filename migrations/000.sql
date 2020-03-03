@@ -1,23 +1,27 @@
 
-create table events (
-    id      serial primary key,
-    name    text   not null
+CREATE TABLE events (
+    id          SERIAL PRIMARY KEY,
+    name        TEXT   NOT NULL,
+    description TEXT   NOT NULL,
+    owner_id    INT    NOT NULL,
+
+    created     TIMESTAMP NOT NULL,
+    updated     TIMESTAMP NOT NULL,
+
+    FOREIGN KEY (owner_id) REFERENCES accounts(id)
 );
 
-create table timelines (
+CREATE TABLE timelines (
     id       serial primary key,
     event_id int    not null,
 
     start timestamp not null,
     "end" timestamp not null,
 
+    point point not null,
+
     foreign key (event_id) references events(id)
 );
-
-alter table timelines add column "point" point not null;
-
-alter table events add column created timestamp not null;
-alter table events add column updated timestamp not null;
 
 create table accounts (
     id int primary key generated always as identity,
@@ -39,7 +43,3 @@ create table offers (
 
     constraint "only_one_offer_to_event_with_one_account" unique (event_id, account_id)
 );
-
-alter table events add column owner_id int;
-
-alter table events add foreign key (owner_id) references accounts(id);
