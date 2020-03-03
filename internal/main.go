@@ -24,7 +24,7 @@ func Run() {
 		log.Fatal(err)
 	}
 
-	log.Printf("Start with options: %+v", opts)
+	log.Printf("start with options: %+v", opts)
 
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("welcome"))

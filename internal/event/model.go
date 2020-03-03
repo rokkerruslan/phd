@@ -45,9 +45,13 @@ func modelRetrieve(ctx context.Context, f filterRetrieve) (e Event, err error) {
 	return e, nil
 }
 
+const selectQuery = `
+	SELECT id, name, description, owner_id, created, updated FROM events LIMIT 10
+`
+
 func ModelList(ctx context.Context, _ Filter) ([]Event, error) {
 	defErr := "event.List fails: %v"
-	rows, err := db.Query(ctx, "SELECT id, name, owner_id, created, updated FROM events")
+	rows, err := db.Query(ctx, selectQuery)
 	if err != nil {
 		return nil, fmt.Errorf(defErr, err)
 	}
@@ -61,18 +65,20 @@ func construct(rows pgx.Rows) (events []Event, err error) {
 	for rows.Next() {
 		var id int
 		var name string
+		var description string
 		var ownerID int
 		var created time.Time
 		var updated time.Time
-		if err := rows.Scan(&id, &name, &ownerID, &created, &updated); err != nil {
+		if err := rows.Scan(&id, &name, &description, &ownerID, &created, &updated); err != nil {
 			return nil, fmt.Errorf(baseErr, err)
 		}
 		events = append(events, Event{
-			ID:      id,
-			Name:    name,
-			OwnerID: ownerID,
-			Created: created,
-			Updated: updated,
+			ID:          id,
+			Name:        name,
+			Description: description,
+			OwnerID:     ownerID,
+			Created:     created,
+			Updated:     updated,
 		})
 	}
 
