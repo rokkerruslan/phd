@@ -1,6 +1,13 @@
 
+CREATE TABLE accounts (
+    id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+
+    email TEXT NOT NULL
+);
+
 CREATE TABLE events (
-    id          SERIAL PRIMARY KEY,
+    id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+
     name        TEXT   NOT NULL,
     description TEXT   NOT NULL,
     owner_id    INT    NOT NULL,
@@ -12,34 +19,29 @@ CREATE TABLE events (
 );
 
 CREATE TABLE timelines (
-    id       serial primary key,
-    event_id int    not null,
+    id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
 
-    start timestamp not null,
-    "end" timestamp not null,
+    event_id INT    NOT NULL,
 
-    point point not null,
+    start TIMESTAMP NOT NULL,
+    "end" TIMESTAMP NOT NULL,
 
-    foreign key (event_id) references events(id)
+    place TEXT NOT NULL,
+
+    FOREIGN KEY (event_id) REFERENCES events(id)
 );
 
-create table accounts (
-    id int primary key generated always as identity,
+CREATE TABLE offers (
+    id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
 
-    email text not null
-);
+    event_id   INT NOT NULL,
+    account_id INT NOT NULL,
 
-create table offers (
-    id int primary key generated always as identity,
+    created TIMESTAMP NOT NULL,
+    updated TIMESTAMP NOT NULL,
 
-    event_id   int not null,
-    account_id int not null,
+    FOREIGN KEY (event_id) REFERENCES events(id),
+    FOREIGN KEY (account_id) REFERENCES accounts(id),
 
-    created timestamp not null,
-    updated timestamp not null,
-
-    foreign key (event_id) references events(id),
-    foreign key (account_id) references accounts(id),
-
-    constraint "only_one_offer_to_event_with_one_account" unique (event_id, account_id)
+    CONSTRAINT "only_one_offer_to_event_with_one_account" UNIQUE (event_id, account_id)
 );
