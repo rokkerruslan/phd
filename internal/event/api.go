@@ -1,7 +1,6 @@
 package event
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -10,20 +9,22 @@ import (
 	"strconv"
 
 	"github.com/go-chi/chi"
-	"github.com/jackc/pgx/v4"
+	"github.com/jackc/pgx/v4/pgxpool"
 
 	"photo/internal/errors"
 )
 
-// todo: use pool
-var db *pgx.Conn
+var db *pgxpool.Pool
 
-func init() {
-	var err error
-	db, err = pgx.Connect(context.Background(), "postgres://postgres:postgres@localhost:10003/postgres?sslmode=disable")
-	if err != nil {
-		log.Fatal(err)
-	}
+func Mount(router chi.Router, pool *pgxpool.Pool) {
+	router.Route("/api/v1/events", func(apiV1 chi.Router) {
+		apiV1.Get("/", List)
+		apiV1.Get("/{id}", Retrieve)
+		apiV1.Post("/", Create)
+		apiV1.Put("/{id}", Update)
+	})
+
+	db = pool
 }
 
 type Filter struct {

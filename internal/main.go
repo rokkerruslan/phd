@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
@@ -9,10 +10,16 @@ import (
 	"github.com/go-chi/chi/middleware"
 	"photo/internal/account"
 	"photo/internal/auth"
+	"photo/internal/event"
 	"photo/internal/offer"
 
-	"photo/internal/event"
+	"github.com/jackc/pgx/v4/pgxpool"
 )
+
+type app struct {
+	pool *pgxpool.Pool
+	r    chi.Router
+}
 
 // Run - entry point for internal package
 func Run() {
@@ -30,12 +37,14 @@ func Run() {
 		w.Write([]byte("welcome"))
 	})
 
-	r.Route("/api/v1/events", func(apiV1 chi.Router) {
-		apiV1.Get("/", event.List)
-		apiV1.Get("/{id}", event.Retrieve)
-		apiV1.Post("/", event.Create)
-		apiV1.Put("/{id}", event.Update)
-	})
+	ctx := context.Background()
+	pool, err := pgxpool.Connect(ctx, opts.databaseURL)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	event.Mount(r, pool)
+
 	r.Route("/api/v1/offers", func(apiV1 chi.Router) {
 		apiV1.Get("/", offer.List)
 		apiV1.Post("/", offer.Create)
