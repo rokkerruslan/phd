@@ -2,8 +2,6 @@ package event
 
 import (
 	"time"
-
-	"photo/internal/geo"
 )
 
 type Event struct {
@@ -14,5 +12,4 @@ type Event struct {
 	Created     time.Time
 	Updated     time.Time
 	Timelines   []Timeline
-	Point       geo.Point
 }
