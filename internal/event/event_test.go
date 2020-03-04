@@ -3,7 +3,6 @@ package event
 import (
 	"strings"
 	"testing"
-	"time"
 
 	"photo/internal/geo"
 )
@@ -12,7 +11,7 @@ func TestEvent_Validate_Positive(t *testing.T) {
 	event := Event{
 		Name:      "Event Positive",
 		OwnerID:   1,
-		Timelines: []Timeline{{Start: time.Now(), End: time.Now().Add(2 * time.Hour)}},
+		Timelines: []Timeline{newValidTimeline()},
 		Point:     geo.Point{Lt: 1.1, Ln: 2.2},
 	}
 	got := validateForCreate(event)
@@ -26,7 +25,7 @@ func TestEvent_Validate_Negative_EmptyName(t *testing.T) {
 	event := Event{
 		Name:      "",
 		OwnerID:   1,
-		Timelines: []Timeline{{Start: time.Now(), End: time.Now().Add(2 * time.Hour)}},
+		Timelines: []Timeline{newValidTimeline()},
 		Point:     geo.Point{Lt: 1.1, Ln: 2.2},
 	}
 	got := validateForCreate(event)

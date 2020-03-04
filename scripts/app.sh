@@ -31,6 +31,9 @@ loc() {
     s | start | "")
         start
         ;;
+    *)
+        echo command $1 does not exist, check help
+        ;;
     esac
 }
 

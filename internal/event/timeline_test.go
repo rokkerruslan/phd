@@ -1,15 +1,13 @@
 package event
 
 import (
+	"strings"
 	"testing"
 	"time"
 )
 
 func TestTimeline_Validate_Positive(t *testing.T) {
-	src := Timeline{
-		Start: time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC),
-		End:   time.Date(2020, 1, 1, 2, 0, 0, 0, time.UTC),
-	}
+	src := newValidTimeline()
 	got := src.Validate()
 
 	if got != nil {
@@ -60,5 +58,23 @@ func TestTimeline_Validate_EndZero(t *testing.T) {
 
 	if got == nil {
 		t.Error("expected error, got: nil")
+	}
+}
+
+func TestTimeline_Validate_EmptyPlace(t *testing.T) {
+	src := newValidTimeline()
+	src.Place = ""
+	got := src.Validate()
+
+	if got == nil || !strings.Contains(got.Error(), "`Place`") {
+		t.Errorf("expected error with `Place`, got: %v", got)
+	}
+}
+
+func newValidTimeline() Timeline {
+	return Timeline{
+		Start: time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC),
+		End:   time.Date(2020, 1, 1, 2, 0, 0, 0, time.UTC),
+		Place: "San Andreas",
 	}
 }

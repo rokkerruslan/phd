@@ -14,19 +14,23 @@ type Timeline struct {
 	ID    int
 	Start time.Time
 	End   time.Time
+	Place string
 }
 
 func (t *Timeline) Validate() error {
 	var errors []string
 
 	if t.Start.IsZero() {
-		errors = append(errors, "start is zero")
+		errors = append(errors, "`Start` is zero")
 	}
 	if t.End.IsZero() {
-		errors = append(errors, "end is zero")
+		errors = append(errors, "`End` is zero")
 	}
 	if t.Start.Add(TimelineStartOffset).After(t.End) {
-		errors = append(errors, "start after end")
+		errors = append(errors, "`Start` after end")
+	}
+	if t.Place == "" {
+		errors = append(errors, "`Place` is empty")
 	}
 
 	if len(errors) == 0 {
