@@ -22,6 +22,7 @@ func Mount(router chi.Router, pool *pgxpool.Pool) {
 		apiV1.Get("/{id}", Retrieve)
 		apiV1.Post("/", Create)
 		apiV1.Put("/{id}", Update)
+		apiV1.Delete("/{id}", Delete)
 	})
 
 	db = pool
@@ -110,6 +111,21 @@ func Update(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := event.Update(r.Context()); err != nil {
+		errors.APIError(w, err, http.StatusBadRequest)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}
+
+func Delete(w http.ResponseWriter, r *http.Request) {
+	filter, err := newFilterRetrieve(r)
+	if err != nil {
+		errors.APIError(w, err, http.StatusBadRequest)
+		return
+	}
+
+	if err := modelDelete(r.Context(), filter); err != nil {
 		errors.APIError(w, err, http.StatusBadRequest)
 		return
 	}

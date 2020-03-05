@@ -43,6 +43,19 @@ func modelRetrieve(ctx context.Context, f filterRetrieve) (e Event, err error) {
 	return e, nil
 }
 
+const deleteQuery = `
+	DELETE FROM events WHERE id == $1
+`
+
+func modelDelete(ctx context.Context, f filterRetrieve) error {
+	defErr := "modelDelete fails: %v"
+	_, err := db.Exec(ctx, deleteQuery, f.ID)
+	if err != nil {
+		return fmt.Errorf(defErr, err)
+	}
+	return nil
+}
+
 const selectQuery = `
 	SELECT id, name, description, owner_id, created, updated FROM events LIMIT 10
 `

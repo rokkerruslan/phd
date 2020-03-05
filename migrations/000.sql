@@ -14,6 +14,7 @@ CREATE TABLE events (
 
     created     TIMESTAMP NOT NULL,
     updated     TIMESTAMP NOT NULL,
+    is_deleted  BOOL      NOT NULL DEFAULT FALSE,
 
     FOREIGN KEY (owner_id) REFERENCES accounts(id)
 );
