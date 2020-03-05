@@ -1,9 +1,10 @@
 <template>
   <div id="app">
     <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link> |
-      <router-link to="/events">Events</router-link>
+      <router-link to="/">События</router-link> |
+      <router-link to="/about">Как это работает?</router-link> |
+      <router-link to="/blog">Блог</router-link> |
+      <router-link to="/profile">Аккаунт</router-link>
     </div>
     <router-view/>
   </div>
@@ -13,9 +14,7 @@
 @import "styles/main.css";
 
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  font-family: 'Oswald', sans-serif;
   text-align: center;
   color: #2c3e50;
 }
