@@ -8,8 +8,15 @@ import (
 	"net/url"
 	"strconv"
 
+	"github.com/go-chi/chi"
+	"github.com/jackc/pgx/v4/pgxpool"
 	"photo/internal/errors"
 )
+
+func Mount(r chi.Router, pool *pgxpool.Pool) {
+	r.Get("/", List)
+	r.Post("/", Create)
+}
 
 func Create(w http.ResponseWriter, r *http.Request) {
 	var offer Offer

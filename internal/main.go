@@ -16,11 +16,6 @@ import (
 	"github.com/jackc/pgx/v4/pgxpool"
 )
 
-type app struct {
-	pool *pgxpool.Pool
-	r    chi.Router
-}
-
 // Run - entry point for internal package
 func Run() {
 	r := chi.NewRouter()
@@ -43,19 +38,21 @@ func Run() {
 		log.Fatal(err)
 	}
 
-	event.Mount(r, pool)
-
-	r.Route("/api/v1/offers", func(apiV1 chi.Router) {
-		apiV1.Get("/", offer.List)
-		apiV1.Post("/", offer.Create)
-	})
-	r.Route("/api/v1/accounts", func(apiV1 chi.Router) {
-		apiV1.Get("/{id}", account.Retrieve)
-		apiV1.Delete("/{id}", account.Delete)
-	})
-	r.Route("/api/v1/auth", func(apiV1 chi.Router) {
-		apiV1.Post("/sign-in", auth.SignIn)
-		apiV1.Post("/sign-up", auth.SignUp)
+	// We mount all our sub-applications for root
+	// router. Consistency isn't important.
+	r.Route("/api/v1", func(apiV1 chi.Router) {
+		apiV1.Route("/events", func(r chi.Router) {
+			event.Mount(r, pool)
+		})
+		apiV1.Route("/auth", func(r chi.Router) {
+			auth.Mount(r, pool)
+		})
+		apiV1.Route("/offers", func(r chi.Router) {
+			offer.Mount(r, pool)
+		})
+		apiV1.Route("/accounts", func(r chi.Router) {
+			account.Mount(r, pool)
+		})
 	})
 
 	log.Println(fmt.Sprintf("daemon bind socket on %s", opts.addr))

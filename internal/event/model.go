@@ -65,7 +65,7 @@ const selectTimelinesQuery = `
 `
 
 func ModelList(ctx context.Context, _ Filter) ([]Event, error) {
-	baseErr := "event.List fails: %v"
+	baseErr := "event.eventList fails: %v"
 	rows, err := db.Query(ctx, selectQuery)
 	if err != nil {
 		return nil, fmt.Errorf(baseErr, err)

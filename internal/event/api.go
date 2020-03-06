@@ -16,14 +16,12 @@ import (
 
 var db *pgxpool.Pool
 
-func Mount(router chi.Router, pool *pgxpool.Pool) {
-	router.Route("/api/v1/events", func(apiV1 chi.Router) {
-		apiV1.Get("/", List)
-		apiV1.Get("/{id}", Retrieve)
-		apiV1.Post("/", Create)
-		apiV1.Put("/{id}", Update)
-		apiV1.Delete("/{id}", Delete)
-	})
+func Mount(r chi.Router, pool *pgxpool.Pool) {
+	r.Get("/", eventList)
+	r.Get("/{id}", Retrieve)
+	r.Post("/", Create)
+	r.Put("/{id}", Update)
+	r.Delete("/{id}", Delete)
 
 	db = pool
 }
@@ -35,7 +33,7 @@ func NewFilterFromQuery(_ url.Values) Filter {
 	return Filter{}
 }
 
-func List(w http.ResponseWriter, r *http.Request) {
+func eventList(w http.ResponseWriter, r *http.Request) {
 	filter := NewFilterFromQuery(r.URL.Query())
 
 	events, err := ModelList(r.Context(), filter)
