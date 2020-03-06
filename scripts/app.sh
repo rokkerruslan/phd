@@ -1,5 +1,8 @@
 #!/usr/bin/env sh
 
+# TODO: add goda tool
+# goda graph -cluster  ./cmd/photogramd | dot -Tsvg -o ./dist/graph.svg && open ./dist/graph.svg
+
 APP_NAME=photogram
 
 # ==== app.sh =============================================== #
@@ -31,6 +34,9 @@ loc() {
     s | start | "")
         start
         ;;
+    u | update)
+        update
+        ;;
     *)
         echo command $1 does not exist, check help
         ;;
@@ -49,6 +55,11 @@ start() {
     go build -o ./dist/$DAEMON_NAME ./cmd/$DAEMON_NAME
 
     env $ENV_LOCAL ./dist/$DAEMON_NAME
+}
+
+update() {
+    go get -u ./...
+    go mod vendor
 }
 
 showEnv() {
@@ -79,6 +90,7 @@ COMMANDS
         fmt         format code (go fmt and goreturns)
         test        run tests
         start       start daemon
+        update      update all deps (minor/patch) and vendor it
 
     help        print this docs
 
