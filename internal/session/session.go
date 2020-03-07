@@ -5,6 +5,7 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 	"fmt"
+	"log"
 
 	"github.com/jackc/pgx/v4/pgxpool"
 )
@@ -37,4 +38,13 @@ func RetrieveSession(ctx context.Context, db *pgxpool.Pool, session string) (id 
 	}
 
 	return id, nil
+}
+
+func DropSession(ctx context.Context, db *pgxpool.Pool, session string) {
+	baseErr := "session.DropSession fails: %v"
+
+	_, err := db.Exec(ctx, "DELETE FROM sessions WHERE session = $1", session)
+	if err != nil {
+		log.Printf(baseErr, err)
+	}
 }
