@@ -21,7 +21,7 @@ const selectQuery = `
 	SELECT id, password FROM accounts WHERE email = $1
 `
 
-func RetrieveAccount(ctx context.Context, email string) (Account, error) {
+func RetrieveAccountByEmail(ctx context.Context, email string) (Account, error) {
 	baseErr := "retrieveAccount fails: %v"
 
 	var acc Account
@@ -30,4 +30,14 @@ func RetrieveAccount(ctx context.Context, email string) (Account, error) {
 	}
 	acc.Email = email
 	return acc, nil
+}
+
+func RetrieveByID(ctx context.Context, id int) (Account, error) {
+	baseErr := "account.RetrieveByID fails: %v"
+
+	a := Account{ID: id}
+	if err := db.QueryRow(ctx, "SELECT email FROM accounts WHERE id = $1", id).Scan(&a.Email); err != nil {
+		return a, fmt.Errorf(baseErr, err)
+	}
+	return a, nil
 }

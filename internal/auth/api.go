@@ -8,6 +8,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"photo/internal/account"
 	"photo/internal/errors"
+	"photo/internal/session"
 )
 
 const minimalPasswordLength = 10
@@ -28,7 +29,7 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// TODO: hash password anyway
-	acc, err := account.RetrieveAccount(r.Context(), signData.Email)
+	acc, err := account.RetrieveAccountByEmail(r.Context(), signData.Email)
 	if err != nil {
 		errors.APIError(w, fmt.Errorf(baseErr, err), http.StatusBadRequest)
 		return
@@ -40,14 +41,14 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Authenticate user
-	session, err := createSession(r.Context(), acc.ID)
+	token, err := session.Create(r.Context(), db, acc.ID)
 	if err != nil {
 		errors.APIError(w, fmt.Errorf(baseErr, err), http.StatusInternalServerError)
 		return
 	}
 
 	_ = json.NewEncoder(w).Encode(signUpResponse{
-		Token: session,
+		Token: token,
 	})
 }
 
@@ -92,14 +93,14 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Authenticate
-	session, err := createSession(r.Context(), acc.ID)
+	token, err := session.Create(r.Context(), db, acc.ID)
 	if err != nil {
 		errors.APIError(w, fmt.Errorf(baseErr, err), http.StatusInternalServerError)
 		return
 	}
 
 	_ = json.NewEncoder(w).Encode(signUpResponse{
-		Token: session,
+		Token: token,
 	})
 }
 
