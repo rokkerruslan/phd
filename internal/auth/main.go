@@ -5,10 +5,19 @@ import (
 	"github.com/jackc/pgx/v4/pgxpool"
 )
 
-func Mount(router chi.Router, pool *pgxpool.Pool) {
-	router.Route("/api/v1/auth", func(apiV1 chi.Router) {
-		apiV1.Post("/sign-in", SignIn)
-		apiV1.Post("/sign-up", SignUp)
-		apiV1.Delete("/sign-out", SignOut)
-	})
+type Options struct {
+	GlobalSalt       []byte
+	BcryptWorkFactor int
+}
+
+var db *pgxpool.Pool
+var options Options
+
+func Mount(r chi.Router, pool *pgxpool.Pool, opts Options) {
+	r.Post("/sign-in", SignIn)
+	r.Post("/sign-up", SignUp)
+	r.Delete("/sign-out", SignOut)
+
+	db = pool
+	options = opts
 }

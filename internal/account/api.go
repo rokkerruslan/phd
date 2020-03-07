@@ -7,9 +7,19 @@ import (
 	"github.com/jackc/pgx/v4/pgxpool"
 )
 
-func Mount(r chi.Router, pool *pgxpool.Pool) {
+type Options struct {
+	GlobalSalt []byte
+}
+
+var db *pgxpool.Pool
+var options Options
+
+func Mount(r chi.Router, pool *pgxpool.Pool, o Options) {
 	r.Get("/{id}", Retrieve)
 	r.Delete("/{id}", Delete)
+
+	db = pool
+	options = o
 }
 
 func Retrieve(w http.ResponseWriter, r *http.Request) {

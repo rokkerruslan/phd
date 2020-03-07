@@ -26,8 +26,6 @@ func Run() {
 		log.Fatal(err)
 	}
 
-	log.Printf("start with options: %+v", opts)
-
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("welcome"))
 	})
@@ -45,13 +43,18 @@ func Run() {
 			event.Mount(r, pool)
 		})
 		apiV1.Route("/auth", func(r chi.Router) {
-			auth.Mount(r, pool)
+			auth.Mount(r, pool, auth.Options{
+				GlobalSalt:       opts.globalSalt,
+				BcryptWorkFactor: opts.bcryptWorkFactor,
+			})
 		})
 		apiV1.Route("/offers", func(r chi.Router) {
 			offer.Mount(r, pool)
 		})
 		apiV1.Route("/accounts", func(r chi.Router) {
-			account.Mount(r, pool)
+			account.Mount(r, pool, account.Options{
+				GlobalSalt: opts.globalSalt,
+			})
 		})
 	})
 

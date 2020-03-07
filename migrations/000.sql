@@ -2,7 +2,21 @@
 CREATE TABLE accounts (
     id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
 
-    email TEXT NOT NULL
+    email    TEXT NOT NULL,
+    password TEXT NOT NULL,
+
+    created TIMESTAMP NOT NULL,
+    updated TIMESTAMP NOT NULL
+);
+
+CREATE TABLE sessions (
+    id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+
+    session    TEXT NOT NULL,
+    account_id INT NOT NULL,
+    created    TIMESTAMP NOT NULL,
+
+    FOREIGN KEY (account_id) REFERENCES accounts(id)
 );
 
 CREATE TABLE events (

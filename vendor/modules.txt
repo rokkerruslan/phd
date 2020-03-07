@@ -25,6 +25,8 @@ github.com/jackc/pgx/v4/pgxpool
 github.com/jackc/puddle
 # golang.org/x/crypto v0.0.0-20200302210943-78000ba7a073
 ## explicit
+golang.org/x/crypto/bcrypt
+golang.org/x/crypto/blowfish
 golang.org/x/crypto/pbkdf2
 # golang.org/x/text v0.3.2
 golang.org/x/text/cases

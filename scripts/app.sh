@@ -44,7 +44,11 @@ loc() {
 }
 
 tests() {
-    env $ENV_LOCAL go test -coverprofile=./dist/coverage.out ./internal/...
+    go test ./internal/...
+}
+
+cover() {
+    go test -coverprofile=./dist/coverage.out ./internal/...
 }
 
 fmt() {
