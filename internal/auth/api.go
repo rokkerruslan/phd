@@ -7,7 +7,7 @@ import (
 
 	"golang.org/x/crypto/bcrypt"
 	"photo/internal/account"
-	"photo/internal/errors"
+	"photo/internal/api"
 	"photo/internal/session"
 )
 
@@ -24,26 +24,26 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 
 	var signData signInRequest
 	if err := json.NewDecoder(r.Body).Decode(&signData); err != nil {
-		errors.APIError(w, fmt.Errorf(baseErr, err), http.StatusBadRequest)
+		api.Error(w, fmt.Errorf(baseErr, err), http.StatusBadRequest)
 		return
 	}
 
 	// TODO: hash password anyway
 	acc, err := account.RetrieveAccountByEmail(r.Context(), signData.Email)
 	if err != nil {
-		errors.APIError(w, fmt.Errorf(baseErr, err), http.StatusBadRequest)
+		api.Error(w, fmt.Errorf(baseErr, err), http.StatusBadRequest)
 		return
 	}
 
 	if err := acc.CheckPassword(signData.Password); err != nil {
-		errors.APIError(w, fmt.Errorf(baseErr, err), http.StatusBadRequest)
+		api.Error(w, fmt.Errorf(baseErr, err), http.StatusBadRequest)
 		return
 	}
 
 	// Authenticate user
 	token, err := session.Create(r.Context(), db, acc.ID)
 	if err != nil {
-		errors.APIError(w, fmt.Errorf(baseErr, err), http.StatusInternalServerError)
+		api.Error(w, fmt.Errorf(baseErr, err), http.StatusInternalServerError)
 		return
 	}
 
@@ -67,35 +67,35 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 
 	var signData signUpRequest
 	if err := json.NewDecoder(r.Body).Decode(&signData); err != nil {
-		errors.APIError(w, fmt.Errorf(baseErr, err), http.StatusBadRequest)
+		api.Error(w, fmt.Errorf(baseErr, err), http.StatusBadRequest)
 		return
 	}
 	if len(signData.Password) < minimalPasswordLength {
-		errors.APIError(w, fmt.Errorf(baseErr, "`Password` length check fails"), http.StatusBadRequest)
+		api.Error(w, fmt.Errorf(baseErr, "`Password` length check fails"), http.StatusBadRequest)
 		return
 	}
 	if signData.Email == "" {
-		errors.APIError(w, fmt.Errorf(baseErr, "`Email` is empty"), http.StatusBadRequest)
+		api.Error(w, fmt.Errorf(baseErr, "`Email` is empty"), http.StatusBadRequest)
 		return
 	}
 
 	hash, err := bcrypt.GenerateFromPassword(append([]byte(signData.Password), options.GlobalSalt...), options.BcryptWorkFactor)
 	if err != nil {
-		errors.APIError(w, fmt.Errorf(baseErr, err), http.StatusInternalServerError)
+		api.Error(w, fmt.Errorf(baseErr, err), http.StatusInternalServerError)
 		return
 	}
 
 	acc, err := account.New(r.Context(), signData.Email, string(hash))
 	if err != nil {
 		// TODO: dispatch by type (for example duplicate email it's BadRequest)
-		errors.APIError(w, fmt.Errorf(baseErr, err), http.StatusInternalServerError)
+		api.Error(w, fmt.Errorf(baseErr, err), http.StatusInternalServerError)
 		return
 	}
 
 	// Authenticate
 	token, err := session.Create(r.Context(), db, acc.ID)
 	if err != nil {
-		errors.APIError(w, fmt.Errorf(baseErr, err), http.StatusInternalServerError)
+		api.Error(w, fmt.Errorf(baseErr, err), http.StatusInternalServerError)
 		return
 	}
 
@@ -109,7 +109,7 @@ func SignOut(w http.ResponseWriter, r *http.Request) {
 
 	token := r.Header.Get("X-Auth-Token")
 	if token == "" {
-		errors.APIError(w, fmt.Errorf(baseErr, fmt.Sprintf("`X-Auth-token` isn't set")), http.StatusForbidden)
+		api.Error(w, fmt.Errorf(baseErr, fmt.Sprintf("`X-Auth-token` isn't set")), http.StatusForbidden)
 		return
 	}
 	fmt.Println(token)

@@ -1,4 +1,4 @@
-package errors
+package api
 
 import (
 	"encoding/json"
@@ -9,7 +9,7 @@ type ErrorResponse struct {
 	Error string
 }
 
-func APIError(w http.ResponseWriter, err error, statusCode int) {
+func Error(w http.ResponseWriter, err error, statusCode int) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
 	_ = json.NewEncoder(w).Encode(ErrorResponse{Error: err.Error()})

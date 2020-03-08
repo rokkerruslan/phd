@@ -4,9 +4,11 @@ import (
 	"context"
 	"crypto/rand"
 	"encoding/base64"
+	"errors"
 	"fmt"
 	"log"
 
+	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
 )
 
@@ -32,8 +34,17 @@ func Create(ctx context.Context, db *pgxpool.Pool, accountID int) (session strin
 	return session, nil
 }
 
-func RetrieveSession(ctx context.Context, db *pgxpool.Pool, session string) (id int, err error) {
+var ErrDoesNotExist = errors.New("token doesn't exist")
+
+func Retrieve(ctx context.Context, db *pgxpool.Pool, session string) (id int, err error) {
+	baseErr := "session.Retrieve fails: %w"
+
 	if err = db.QueryRow(ctx, "SELECT account_id FROM sessions WHERE session = $1", session).Scan(&id); err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			err = fmt.Errorf(baseErr, ErrDoesNotExist)
+		} else {
+			err = fmt.Errorf(baseErr, err)
+		}
 		return 0, err
 	}
 

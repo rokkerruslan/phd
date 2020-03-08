@@ -2,12 +2,13 @@ package account
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 
 	"github.com/go-chi/chi"
 	"github.com/jackc/pgx/v4/pgxpool"
-	"photo/internal/errors"
+	"photo/internal/api"
 	"photo/internal/session"
 )
 
@@ -33,19 +34,25 @@ func Retrieve(w http.ResponseWriter, r *http.Request) {
 
 	token := r.Header.Get(AuthTokenName)
 	if token == "" {
-		errors.APIError(w, fmt.Errorf(baseErr, fmt.Sprintf("`%s` isn't set", AuthTokenName)), http.StatusForbidden)
+		api.Error(w, fmt.Errorf(baseErr, fmt.Sprintf("`%s` isn't set", AuthTokenName)), http.StatusForbidden)
 		return
 	}
 
-	id, err := session.RetrieveSession(r.Context(), db, token)
+	id, err := session.Retrieve(r.Context(), db, token)
 	if err != nil {
-		errors.APIError(w, fmt.Errorf(baseErr, err), http.StatusBadRequest)
-		return
+		switch {
+		case errors.Is(err, session.ErrDoesNotExist):
+			api.Error(w, fmt.Errorf(baseErr, err), http.StatusBadRequest)
+			return
+		default:
+			api.Error(w, fmt.Errorf(baseErr, err), http.StatusInternalServerError)
+			return
+		}
 	}
 
 	acc, err := RetrieveByID(r.Context(), id)
 	if err != nil {
-		errors.APIError(w, fmt.Errorf(baseErr, err), http.StatusBadRequest)
+		api.Error(w, fmt.Errorf(baseErr, err), http.StatusBadRequest)
 		return
 	}
 

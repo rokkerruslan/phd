@@ -11,7 +11,7 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/jackc/pgx/v4/pgxpool"
 
-	"photo/internal/errors"
+	"photo/internal/api"
 )
 
 var db *pgxpool.Pool
@@ -38,7 +38,7 @@ func eventList(w http.ResponseWriter, r *http.Request) {
 
 	events, err := ModelList(r.Context(), filter)
 	if err != nil {
-		errors.APIError(w, err, http.StatusInternalServerError)
+		api.Error(w, err, http.StatusInternalServerError)
 		return
 	}
 
@@ -65,13 +65,13 @@ func newFilterRetrieve(r *http.Request) (f filterRetrieve, err error) {
 func Retrieve(w http.ResponseWriter, r *http.Request) {
 	filter, err := newFilterRetrieve(r)
 	if err != nil {
-		errors.APIError(w, err, http.StatusBadRequest)
+		api.Error(w, err, http.StatusBadRequest)
 		return
 	}
 
 	event, err := modelRetrieve(r.Context(), filter)
 	if err != nil {
-		errors.APIError(w, err, http.StatusBadRequest)
+		api.Error(w, err, http.StatusBadRequest)
 		return
 	}
 
@@ -86,12 +86,12 @@ func Create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := validateForCreate(event); err != nil {
-		errors.APIError(w, err, http.StatusBadRequest)
+		api.Error(w, err, http.StatusBadRequest)
 		return
 	}
 
 	if err := event.Create(r.Context()); err != nil {
-		errors.APIError(w, err, http.StatusBadRequest)
+		api.Error(w, err, http.StatusBadRequest)
 		return
 	}
 }
@@ -104,12 +104,12 @@ func Update(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := event.ValidateForUpdate(); err != nil {
-		errors.APIError(w, err, http.StatusBadRequest)
+		api.Error(w, err, http.StatusBadRequest)
 		return
 	}
 
 	if err := event.Update(r.Context()); err != nil {
-		errors.APIError(w, err, http.StatusBadRequest)
+		api.Error(w, err, http.StatusBadRequest)
 		return
 	}
 
@@ -119,12 +119,12 @@ func Update(w http.ResponseWriter, r *http.Request) {
 func Delete(w http.ResponseWriter, r *http.Request) {
 	filter, err := newFilterRetrieve(r)
 	if err != nil {
-		errors.APIError(w, err, http.StatusBadRequest)
+		api.Error(w, err, http.StatusBadRequest)
 		return
 	}
 
 	if err := modelDelete(r.Context(), filter); err != nil {
-		errors.APIError(w, err, http.StatusBadRequest)
+		api.Error(w, err, http.StatusBadRequest)
 		return
 	}
 

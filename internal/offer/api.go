@@ -10,7 +10,7 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/jackc/pgx/v4/pgxpool"
-	"photo/internal/errors"
+	"photo/internal/api"
 )
 
 func Mount(r chi.Router, pool *pgxpool.Pool) {
@@ -26,12 +26,12 @@ func Create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := offer.Validate(); err != nil {
-		errors.APIError(w, err, http.StatusBadRequest)
+		api.Error(w, err, http.StatusBadRequest)
 		return
 	}
 
 	if err := offer.Insert(r.Context()); err != nil {
-		errors.APIError(w, err, http.StatusInternalServerError)
+		api.Error(w, err, http.StatusInternalServerError)
 		return
 	}
 }
@@ -51,13 +51,13 @@ func NewFilterFromQuery(values url.Values) (f Filter, err error) {
 func List(w http.ResponseWriter, r *http.Request) {
 	filter, err := NewFilterFromQuery(r.URL.Query())
 	if err != nil {
-		errors.APIError(w, fmt.Errorf("account_id parsing fails: %v", err), http.StatusBadRequest)
+		api.Error(w, fmt.Errorf("account_id parsing fails: %v", err), http.StatusBadRequest)
 		return
 	}
 
 	offers, err := ModelList(r.Context(), filter)
 	if err != nil {
-		errors.APIError(w, err, http.StatusInternalServerError)
+		api.Error(w, err, http.StatusInternalServerError)
 		return
 	}
 
