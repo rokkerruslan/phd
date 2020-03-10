@@ -52,7 +52,7 @@ func Retrieve(w http.ResponseWriter, r *http.Request) {
 
 	acc, err := RetrieveByID(r.Context(), id)
 	if err != nil {
-		api.Error(w, fmt.Errorf(baseErr, err), http.StatusBadRequest)
+		api.Error(w, fmt.Errorf(baseErr, err), http.StatusInternalServerError)
 		return
 	}
 

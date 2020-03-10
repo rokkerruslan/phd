@@ -107,7 +107,7 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 func SignOut(w http.ResponseWriter, r *http.Request) {
 	baseErr := "account.Retrieve fails: %v"
 
-	token := r.Header.Get("X-Auth-Token")
+	token := r.Header.Get(account.AuthTokenName)
 	if token == "" {
 		api.Error(w, fmt.Errorf(baseErr, fmt.Sprintf("`X-Auth-token` isn't set")), http.StatusForbidden)
 		return

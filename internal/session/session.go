@@ -7,9 +7,11 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"net/http"
 
 	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
+	"photo/internal/account"
 )
 
 const insertQuery = `
@@ -49,6 +51,21 @@ func Retrieve(ctx context.Context, db *pgxpool.Pool, session string) (id int, er
 	}
 
 	return id, nil
+}
+
+type Session struct {
+	Token     string
+	AccountID int
+}
+
+func GetFromRequest(r *http.Request) (Session, error) {
+	var s Session
+	token := r.Header.Get(account.AuthTokenName)
+	if token == "" {
+		return s, errors.New("Token is empty")
+	}
+	var err = errors.New("h")
+	return s, err
 }
 
 func DropSession(ctx context.Context, db *pgxpool.Pool, session string) {
