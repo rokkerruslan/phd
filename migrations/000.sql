@@ -6,7 +6,9 @@ CREATE TABLE accounts (
     password TEXT NOT NULL,
 
     created TIMESTAMP NOT NULL,
-    updated TIMESTAMP NOT NULL
+    updated TIMESTAMP NOT NULL,
+
+    UNIQUE (email)
 );
 
 CREATE TABLE sessions (

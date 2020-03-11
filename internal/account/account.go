@@ -2,7 +2,6 @@ package account
 
 import (
 	"context"
-	"fmt"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -14,22 +13,15 @@ type Account struct {
 	password string
 }
 
-func New(ctx context.Context, email, password string) (*Account, error) {
-	baseErr := "account.New fails: %v"
-
+func New(ctx context.Context, email, password string) (Account, error) {
 	a := Account{
 		Email:    email,
 		password: password,
 	}
 
-	err := a.create(ctx)
-	if err != nil {
-		return nil, fmt.Errorf(baseErr, err)
-	}
-
-	return &a, nil
+	return a, nil
 }
 
-func (a Account) CheckPassword(password string) error {
-	return bcrypt.CompareHashAndPassword([]byte(a.password), append([]byte(password), options.GlobalSalt...))
+func (a Account) CheckPassword(password string, globalSalt []byte) error {
+	return bcrypt.CompareHashAndPassword([]byte(a.password), append([]byte(password), globalSalt...))
 }

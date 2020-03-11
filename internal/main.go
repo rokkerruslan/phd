@@ -9,7 +9,6 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"photo/internal/account"
-	"photo/internal/auth"
 	"photo/internal/event"
 	"photo/internal/offer"
 
@@ -42,20 +41,18 @@ func Run() {
 		apiV1.Route("/events", func(r chi.Router) {
 			event.Mount(r, pool)
 		})
-		apiV1.Route("/auth", func(r chi.Router) {
-			auth.Mount(r, pool, auth.Options{
-				GlobalSalt:       opts.globalSalt,
-				BcryptWorkFactor: opts.bcryptWorkFactor,
-			})
-		})
 		apiV1.Route("/offers", func(r chi.Router) {
 			offer.Mount(r, pool)
 		})
-		apiV1.Route("/accounts", func(r chi.Router) {
-			account.Mount(r, pool, account.Options{
-				GlobalSalt: opts.globalSalt,
-			})
-		})
+		apiV1.Mount("/accounts", account.NewApp(
+			account.Resources{
+				Db: pool,
+			},
+			account.Options{
+				GlobalSalt:       opts.globalSalt,
+				BcryptWorkFactor: opts.bcryptWorkFactor,
+			}),
+		)
 	})
 
 	log.Println(fmt.Sprintf("daemon bind socket on %s", opts.addr))

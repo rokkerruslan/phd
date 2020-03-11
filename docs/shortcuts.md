@@ -33,5 +33,5 @@ $ go tool cover -func=coverage.out
 
 SignUp
 ```shell script
-$ curl -X POST -d '{"Email":"em","Password":"1234567890"}' http://localhost:3000/api/v1/auth/sign-up
+$ curl -X POST -d '{"Email":"em","Password":"1234567890"}' http://localhost:3000/api/v1/accounts/sign-up
 ```

@@ -11,7 +11,6 @@ import (
 
 	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
-	"photo/internal/account"
 )
 
 const insertQuery = `
@@ -60,9 +59,9 @@ type Session struct {
 
 func GetFromRequest(r *http.Request) (Session, error) {
 	var s Session
-	token := r.Header.Get(account.AuthTokenName)
+	token := r.Header.Get("X-Auth-Token")
 	if token == "" {
-		return s, errors.New("Token is empty")
+		return s, errors.New("token is empty")
 	}
 	var err = errors.New("h")
 	return s, err
