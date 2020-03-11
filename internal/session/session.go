@@ -19,7 +19,7 @@ const insertQuery = `
 `
 
 func Create(ctx context.Context, db *pgxpool.Pool, accountID int) (session string, err error) {
-	baseErr := "session.Create fails: %v"
+	baseErr := "session.CreateEvent fails: %v"
 
 	buf := make([]byte, 32)
 	_, err = rand.Read(buf)
@@ -39,7 +39,7 @@ func Create(ctx context.Context, db *pgxpool.Pool, accountID int) (session strin
 var ErrDoesNotExist = errors.New("token doesn't exist")
 
 func Retrieve(ctx context.Context, db *pgxpool.Pool, session string) (id int, err error) {
-	baseErr := "session.Retrieve fails: %w"
+	baseErr := "session.retrieve fails: %w"
 
 	if err = db.QueryRow(ctx, "SELECT account_id FROM sessions WHERE session = $1", session).Scan(&id); err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {

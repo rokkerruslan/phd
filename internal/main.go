@@ -25,10 +25,6 @@ func Run() {
 		log.Fatal(err)
 	}
 
-	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("welcome"))
-	})
-
 	ctx := context.Background()
 	pool, err := pgxpool.Connect(ctx, opts.databaseURL)
 	if err != nil {
@@ -38,9 +34,12 @@ func Run() {
 	// We mount all our sub-applications for root
 	// router. Consistency isn't important.
 	r.Route("/api/v1", func(apiV1 chi.Router) {
-		apiV1.Route("/events", func(r chi.Router) {
-			event.Mount(r, pool)
-		})
+		apiV1.Mount("/events", event.NewApp(
+			event.Resources{
+				Db:pool,
+			},
+			event.Options{}),
+		)
 		apiV1.Route("/offers", func(r chi.Router) {
 			offer.Mount(r, pool)
 		})

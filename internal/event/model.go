@@ -10,8 +10,8 @@ const createQuery = `
 	INSERT INTO events (name, description owner_id, created, updated) VALUES($1, $2, $3, NOW(), NOW())
 `
 
-func (e *Event) Create(ctx context.Context) error {
-	if _, err := db.Exec(ctx, createQuery, e.Name, e.Description, e.OwnerID); err != nil {
+func (app *App) CreateEvent(ctx context.Context, e Event) error {
+	if _, err := app.resources.Db.Exec(ctx, createQuery, e.Name, e.Description, e.OwnerID); err != nil {
 		return err
 	}
 	return nil
@@ -21,9 +21,9 @@ const updateQuery = `
 	UPDATE events SET name = $1, updated = NOW() WHERE id = $2
 `
 
-func (e *Event) Update(ctx context.Context) error {
+func (app *App) updateEvent(ctx context.Context, e Event) error {
 	baseErr := "event.Update fails: %v"
-	_, err := db.Exec(ctx, updateQuery, e.Name, e.ID)
+	_, err := app.resources.Db.Exec(ctx, updateQuery, e.Name, e.ID)
 	if err != nil {
 		return fmt.Errorf(baseErr, err)
 	}
@@ -34,9 +34,9 @@ const retrieveQuery = `
 	SELECT id, name, owner_id, created, updated FROM events WHERE id = $1
 `
 
-func modelRetrieve(ctx context.Context, f filterRetrieve) (e Event, err error) {
+func (app *App) retrieveEvent(ctx context.Context, f filterRetrieve) (e Event, err error) {
 	defErr := "modelRetrieve fails: %v"
-	err = db.QueryRow(ctx, retrieveQuery, f.ID).Scan(e.ID, e.Name, e.OwnerID, e.Created, e.Updated)
+	err = app.resources.Db.QueryRow(ctx, retrieveQuery, f.ID).Scan(e.ID, e.Name, e.OwnerID, e.Created, e.Updated)
 	if err != nil {
 		return e, fmt.Errorf(defErr, err)
 	}
@@ -47,9 +47,9 @@ const deleteQuery = `
 	DELETE FROM events WHERE id == $1
 `
 
-func modelDelete(ctx context.Context, f filterRetrieve) error {
+func (app *App) deleteEvent(ctx context.Context, f filterRetrieve) error {
 	defErr := "modelDelete fails: %v"
-	_, err := db.Exec(ctx, deleteQuery, f.ID)
+	_, err := app.resources.Db.Exec(ctx, deleteQuery, f.ID)
 	if err != nil {
 		return fmt.Errorf(defErr, err)
 	}
@@ -64,9 +64,9 @@ const selectTimelinesQuery = `
 	SELECT id, start, "end", place, event_id FROM timelines WHERE event_id = ANY($1)
 `
 
-func ModelList(ctx context.Context, _ Filter) ([]Event, error) {
-	baseErr := "event.eventList fails: %v"
-	rows, err := db.Query(ctx, selectQuery)
+func (app *App) eventList(ctx context.Context, _ Filter) ([]Event, error) {
+	baseErr := "event.eventListHandler fails: %v"
+	rows, err := app.resources.Db.Query(ctx, selectQuery)
 	if err != nil {
 		return nil, fmt.Errorf(baseErr, err)
 	}
@@ -95,7 +95,7 @@ func ModelList(ctx context.Context, _ Filter) ([]Event, error) {
 		})
 	}
 
-	timelineRows, err := db.Query(ctx, selectTimelinesQuery, eventIDs)
+	timelineRows, err := app.resources.Db.Query(ctx, selectTimelinesQuery, eventIDs)
 	if err != nil {
 		return nil, fmt.Errorf(baseErr, err)
 	}

@@ -9,22 +9,8 @@ import (
 	"strconv"
 
 	"github.com/go-chi/chi"
-	"github.com/jackc/pgx/v4/pgxpool"
-
 	"photo/internal/api"
 )
-
-var db *pgxpool.Pool
-
-func Mount(r chi.Router, pool *pgxpool.Pool) {
-	r.Get("/", eventList)
-	r.Get("/{id}", Retrieve)
-	r.Post("/", Create)
-	r.Put("/{id}", Update)
-	r.Delete("/{id}", Delete)
-
-	db = pool
-}
 
 type Filter struct {
 }
@@ -33,10 +19,10 @@ func NewFilterFromQuery(_ url.Values) Filter {
 	return Filter{}
 }
 
-func eventList(w http.ResponseWriter, r *http.Request) {
+func (app *App) eventListHandler(w http.ResponseWriter, r *http.Request) {
 	filter := NewFilterFromQuery(r.URL.Query())
 
-	events, err := ModelList(r.Context(), filter)
+	events, err := app.eventList(r.Context(), filter)
 	if err != nil {
 		api.Error(w, err, http.StatusInternalServerError)
 		return
@@ -62,14 +48,14 @@ func newFilterRetrieve(r *http.Request) (f filterRetrieve, err error) {
 	return f, err
 }
 
-func Retrieve(w http.ResponseWriter, r *http.Request) {
+func (app *App) retrieve(w http.ResponseWriter, r *http.Request) {
 	filter, err := newFilterRetrieve(r)
 	if err != nil {
 		api.Error(w, err, http.StatusBadRequest)
 		return
 	}
 
-	event, err := modelRetrieve(r.Context(), filter)
+	event, err := app.retrieveEvent(r.Context(), filter)
 	if err != nil {
 		api.Error(w, err, http.StatusBadRequest)
 		return
@@ -78,7 +64,7 @@ func Retrieve(w http.ResponseWriter, r *http.Request) {
 	_ = json.NewEncoder(w).Encode(event)
 }
 
-func Create(w http.ResponseWriter, r *http.Request) {
+func (app *App) create(w http.ResponseWriter, r *http.Request) {
 	var event Event
 	if err := json.NewDecoder(r.Body).Decode(&event); err != nil {
 		log.Println(err)
@@ -90,13 +76,13 @@ func Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := event.Create(r.Context()); err != nil {
+	if err := app.CreateEvent(r.Context(), event); err != nil {
 		api.Error(w, err, http.StatusBadRequest)
 		return
 	}
 }
 
-func Update(w http.ResponseWriter, r *http.Request) {
+func (app *App) update(w http.ResponseWriter, r *http.Request) {
 	var event Event
 	if err := json.NewDecoder(r.Body).Decode(&event); err != nil {
 		log.Println(err)
@@ -108,7 +94,7 @@ func Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := event.Update(r.Context()); err != nil {
+	if err := app.updateEvent(r.Context(), event); err != nil {
 		api.Error(w, err, http.StatusBadRequest)
 		return
 	}
@@ -116,14 +102,14 @@ func Update(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
-func Delete(w http.ResponseWriter, r *http.Request) {
+func (app *App) delete(w http.ResponseWriter, r *http.Request) {
 	filter, err := newFilterRetrieve(r)
 	if err != nil {
 		api.Error(w, err, http.StatusBadRequest)
 		return
 	}
 
-	if err := modelDelete(r.Context(), filter); err != nil {
+	if err := app.deleteEvent(r.Context(), filter); err != nil {
 		api.Error(w, err, http.StatusBadRequest)
 		return
 	}

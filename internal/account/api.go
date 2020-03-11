@@ -6,44 +6,13 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/go-chi/chi"
-	"github.com/jackc/pgx/v4/pgxpool"
 	"golang.org/x/crypto/bcrypt"
 	"photo/internal/api"
 	"photo/internal/session"
 )
 
-type Resources struct {
-	Db *pgxpool.Pool
-}
-
-type Options struct {
-	GlobalSalt       []byte
-	BcryptWorkFactor int
-}
-
-type App struct {
-	resources Resources
-	options   Options
-}
-
-func NewApp(resources Resources, options Options) chi.Router {
-	app := App{
-		resources: resources,
-		options:   options,
-	}
-	r := chi.NewRouter()
-	r.Get("/{id}", app.Retrieve)
-	r.Delete("/{id}", app.Delete)
-
-	r.Post("/sign-in", app.SignIn)
-	r.Post("/sign-up", app.SignUp)
-	r.Delete("/sign-out", app.SignOut)
-	return r
-}
-
 func (app *App) Retrieve(w http.ResponseWriter, r *http.Request) {
-	baseErr := "account.Retrieve fails: %v"
+	baseErr := "account.retrieve fails: %v"
 
 	token := r.Header.Get(api.AuthTokenHeaderName)
 	if token == "" {
@@ -178,7 +147,7 @@ func (app *App) SignUp(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *App) SignOut(w http.ResponseWriter, r *http.Request) {
-	baseErr := "account.Retrieve fails: %v"
+	baseErr := "account.retrieve fails: %v"
 
 	token := r.Header.Get(api.AuthTokenHeaderName)
 	if token == "" {
