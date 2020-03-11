@@ -42,14 +42,13 @@ func NewApp(resources Resources, options Options) chi.Router {
 	return r
 }
 
-const AuthTokenName = "X-Auth-Token"
-
 func (app *App) Retrieve(w http.ResponseWriter, r *http.Request) {
 	baseErr := "account.Retrieve fails: %v"
 
-	token := r.Header.Get(AuthTokenName)
+	token := r.Header.Get(api.AuthTokenHeaderName)
 	if token == "" {
-		api.Error(w, fmt.Errorf(baseErr, fmt.Sprintf("`%s` isn't set", AuthTokenName)), http.StatusForbidden)
+		api.Error(w, fmt.Errorf(baseErr,
+			fmt.Sprintf("`%s` isn't set", api.AuthTokenHeaderName)), http.StatusForbidden)
 		return
 	}
 
@@ -155,14 +154,13 @@ func (app *App) SignUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	acc, err := New(r.Context(), signData.Email, string(hash))
-	if err != nil {
-		// TODO: dispatch by type (for example duplicate email it's BadRequest)
-		api.Error(w, fmt.Errorf(baseErr, err), http.StatusInternalServerError)
-		return
+	acc := Account{
+		Email:    signData.Email,
+		password: string(hash),
 	}
 
 	if acc.ID, err = app.createAccount(r.Context(), acc); err != nil {
+		// TODO: dispatch by type (for example duplicate email it's BadRequest)
 		api.Error(w, fmt.Errorf(baseErr, err), http.StatusInternalServerError)
 		return
 	}
@@ -182,12 +180,12 @@ func (app *App) SignUp(w http.ResponseWriter, r *http.Request) {
 func (app *App) SignOut(w http.ResponseWriter, r *http.Request) {
 	baseErr := "account.Retrieve fails: %v"
 
-	token := r.Header.Get(AuthTokenName)
+	token := r.Header.Get(api.AuthTokenHeaderName)
 	if token == "" {
-		api.Error(w, fmt.Errorf(baseErr, fmt.Sprintf("%s` isn't set", AuthTokenName)), http.StatusForbidden)
+		api.Error(w, fmt.Errorf(baseErr,
+			fmt.Sprintf("%s` isn't set", api.AuthTokenHeaderName)), http.StatusForbidden)
 		return
 	}
-	fmt.Println(token)
 	session.DropSession(r.Context(), app.resources.Db, token)
 
 	w.WriteHeader(http.StatusNoContent)
