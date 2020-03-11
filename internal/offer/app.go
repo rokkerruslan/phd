@@ -1,4 +1,4 @@
-package event
+package offer
 
 import (
 	"github.com/go-chi/chi"
@@ -23,10 +23,7 @@ func NewApp(resources Resources, options Options) chi.Router {
 	}
 
 	r := chi.NewRouter()
-	r.Get("/", app.eventListHandler)
-	r.Get("/{id}", app.retrieve)
+	r.Get("/", app.list)
 	r.Post("/", app.create)
-	r.Put("/{id}", app.update)
-	r.Delete("/{id}", app.delete)
 	return r
 }

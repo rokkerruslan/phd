@@ -8,17 +8,10 @@ import (
 	"net/url"
 	"strconv"
 
-	"github.com/go-chi/chi"
-	"github.com/jackc/pgx/v4/pgxpool"
 	"photo/internal/api"
 )
 
-func Mount(r chi.Router, pool *pgxpool.Pool) {
-	r.Get("/", List)
-	r.Post("/", Create)
-}
-
-func Create(w http.ResponseWriter, r *http.Request) {
+func (app *App) create(w http.ResponseWriter, r *http.Request) {
 	var offer Offer
 	if err := json.NewDecoder(r.Body).Decode(&offer); err != nil {
 		log.Println(err)
@@ -30,7 +23,7 @@ func Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := offer.Insert(r.Context()); err != nil {
+	if err := app.insert(r.Context(), offer); err != nil {
 		api.Error(w, err, http.StatusInternalServerError)
 		return
 	}
@@ -48,14 +41,14 @@ func NewFilterFromQuery(values url.Values) (f Filter, err error) {
 	return f, nil
 }
 
-func List(w http.ResponseWriter, r *http.Request) {
+func (app *App) list(w http.ResponseWriter, r *http.Request) {
 	filter, err := NewFilterFromQuery(r.URL.Query())
 	if err != nil {
 		api.Error(w, fmt.Errorf("account_id parsing fails: %v", err), http.StatusBadRequest)
 		return
 	}
 
-	offers, err := ModelList(r.Context(), filter)
+	offers, err := app.offerList(r.Context(), filter)
 	if err != nil {
 		api.Error(w, err, http.StatusInternalServerError)
 		return

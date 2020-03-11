@@ -8,11 +8,10 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
+	"github.com/jackc/pgx/v4/pgxpool"
 	"photo/internal/account"
 	"photo/internal/event"
 	"photo/internal/offer"
-
-	"github.com/jackc/pgx/v4/pgxpool"
 )
 
 // Run - entry point for internal package
@@ -36,13 +35,16 @@ func Run() {
 	r.Route("/api/v1", func(apiV1 chi.Router) {
 		apiV1.Mount("/events", event.NewApp(
 			event.Resources{
-				Db:pool,
+				Db: pool,
 			},
-			event.Options{}),
-		)
-		apiV1.Route("/offers", func(r chi.Router) {
-			offer.Mount(r, pool)
-		})
+			event.Options{},
+		))
+		apiV1.Mount("/offers", offer.NewApp(
+			offer.Resources{
+				Db: pool,
+			},
+			offer.Options{},
+		))
 		apiV1.Mount("/accounts", account.NewApp(
 			account.Resources{
 				Db: pool,
@@ -50,8 +52,8 @@ func Run() {
 			account.Options{
 				GlobalSalt:       opts.globalSalt,
 				BcryptWorkFactor: opts.bcryptWorkFactor,
-			}),
-		)
+			},
+		))
 	})
 
 	log.Println(fmt.Sprintf("daemon bind socket on %s", opts.addr))

@@ -3,22 +3,8 @@ package offer
 import (
 	"context"
 	"fmt"
-	"log"
 	"time"
-
-	"github.com/jackc/pgx/v4"
 )
-
-// todo: use pool
-var db *pgx.Conn
-
-func init() {
-	var err error
-	db, err = pgx.Connect(context.Background(), "postgres://postgres:postgres@localhost:10003/postgres?sslmode=disable")
-	if err != nil {
-		log.Fatal(err)
-	}
-}
 
 type Offer struct {
 	ID        int
@@ -32,18 +18,24 @@ func (o *Offer) Validate() error {
 	return nil
 }
 
-func (o *Offer) Insert(ctx context.Context) error {
-	_, err := db.Exec(ctx, "insert into offers (account_id, event_id, created, updated) values ($1, $2, now(), now())", o.AccountID, o.EventID)
+func (app *App) insert(ctx context.Context, o Offer) error {
+	_, err := app.resources.Db.Exec(
+		ctx,
+		"INSERT INTO offers (account_id, event_id, created, updated) VALUES ($1, $2, NOW(), NOW())",
+		o.AccountID,
+		o.EventID,
+	)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func ModelList(ctx context.Context, f Filter) ([]Offer, error) {
+func (app *App) offerList(ctx context.Context, f Filter) ([]Offer, error) {
 	defErr := "offer.List fails: %v"
 
-	rows, err := db.Query(ctx, "select id, account_id, event_id, created, updated from offers where account_id = $1", f.AccountID)
+	rows, err := app.resources.Db.Query(
+		ctx, "SELECT id, account_id, event_id, created, updated FROM offers WHERE account_id = $1", f.AccountID)
 	if err != nil {
 		return nil, fmt.Errorf(defErr, err)
 	}
