@@ -50,8 +50,9 @@ func Run() {
 				Db: pool,
 			},
 			accounts.Options{
-				GlobalSalt:       opts.globalSalt,
-				BcryptWorkFactor: opts.bcryptWorkFactor,
+				GlobalSalt:           opts.globalSalt,
+				BcryptWorkFactor:     opts.bcryptWorkFactor,
+				MinLenForNewPassword: opts.minLenForNewPassword,
 			},
 		))
 	})

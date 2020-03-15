@@ -10,8 +10,9 @@ type (
 		Db *pgxpool.Pool
 	}
 	Options struct {
-		GlobalSalt       []byte
-		BcryptWorkFactor int
+		GlobalSalt           []byte
+		BcryptWorkFactor     int
+		MinLenForNewPassword int
 	}
 )
 

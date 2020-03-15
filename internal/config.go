@@ -3,6 +3,7 @@ package internal
 import (
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
 )
 
@@ -13,8 +14,9 @@ type options struct {
 	addr        string
 	databaseURL string
 
-	globalSalt       []byte
-	bcryptWorkFactor int
+	globalSalt           []byte
+	bcryptWorkFactor     int
+	minLenForNewPassword int
 }
 
 func newOptions() (opts options, err error) {
@@ -37,6 +39,14 @@ func newOptions() (opts options, err error) {
 	}
 	opts.globalSalt = []byte(globalSalt)
 	opts.bcryptWorkFactor = 10
+	passwordLen, ok := os.LookupEnv("MIN_LEN_FOR_NEW_PASSWORD")
+	if !ok {
+		missed = append(missed, "MIN_LEN_FOR_NEW_PASSWORD")
+	}
+	opts.minLenForNewPassword, err = strconv.Atoi(passwordLen)
+	if err != nil {
+		return opts, fmt.Errorf(baseErr, fmt.Sprintf("minLenForNewPassword read fails: %v", err))
+	}
 
 	if len(missed) != 0 {
 		return opts, fmt.Errorf("newOptions fails, variables [%s] doesn't exists", strings.Join(missed, ", "))

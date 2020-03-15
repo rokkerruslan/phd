@@ -47,8 +47,6 @@ func (app *app) deleteHandler(_ http.ResponseWriter, _ *http.Request) {
 
 // Auth
 
-const minimalPasswordLength = 10
-
 type signInRequest struct {
 	Email    string
 	Password string
@@ -106,7 +104,7 @@ func (app *app) signUpHandler(w http.ResponseWriter, r *http.Request) {
 		api.Error(w, fmt.Errorf(baseErr, err), http.StatusBadRequest)
 		return
 	}
-	if len(signData.Password) < minimalPasswordLength {
+	if len(signData.Password) < app.options.MinLenForNewPassword {
 		api.Error(w, fmt.Errorf(baseErr, "`Password` length check fails"), http.StatusBadRequest)
 		return
 	}
