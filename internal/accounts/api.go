@@ -1,4 +1,4 @@
-package account
+package accounts
 
 import (
 	"encoding/json"
@@ -33,13 +33,13 @@ func (app *App) Retrieve(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	acc, err := app.RetrieveByID(r.Context(), id)
+	account, err := app.RetrieveByID(r.Context(), id)
 	if err != nil {
 		api.Error(w, fmt.Errorf(baseErr, err), http.StatusInternalServerError)
 		return
 	}
 
-	_ = json.NewEncoder(w).Encode(acc)
+	_ = json.NewEncoder(w).Encode(account)
 }
 
 func (app *App) Delete(_ http.ResponseWriter, _ *http.Request) {
@@ -66,7 +66,7 @@ func (app *App) SignIn(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// TODO: hash password anyway
-	acc, err := app.RetrieveAccountByEmail(r.Context(), signData.Email)
+	acc, err := app.RetrieveByEmail(r.Context(), signData.Email)
 	if err != nil {
 		api.Error(w, fmt.Errorf(baseErr, err), http.StatusBadRequest)
 		return

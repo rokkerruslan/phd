@@ -16,7 +16,7 @@ type App struct {
 	options   Options
 }
 
-func NewApp(resources Resources, options Options) chi.Router {
+func Setup(resources Resources, options Options) chi.Router {
 	app := App{
 		resources: resources,
 		options:   options,

@@ -9,7 +9,7 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/jackc/pgx/v4/pgxpool"
-	"photo/internal/account"
+	"photo/internal/accounts"
 	"photo/internal/event"
 	"photo/internal/offer"
 )
@@ -33,23 +33,23 @@ func Run() {
 	// We mount all our sub-applications for root
 	// router. Consistency isn't important.
 	r.Route("/api/v1", func(apiV1 chi.Router) {
-		apiV1.Mount("/events", event.NewApp(
+		apiV1.Mount("/events", event.Setup(
 			event.Resources{
 				Db: pool,
 			},
 			event.Options{},
 		))
-		apiV1.Mount("/offers", offer.NewApp(
+		apiV1.Mount("/offers", offer.Setup(
 			offer.Resources{
 				Db: pool,
 			},
 			offer.Options{},
 		))
-		apiV1.Mount("/accounts", account.NewApp(
-			account.Resources{
+		apiV1.Mount("/accounts", accounts.Setup(
+			accounts.Resources{
 				Db: pool,
 			},
-			account.Options{
+			accounts.Options{
 				GlobalSalt:       opts.globalSalt,
 				BcryptWorkFactor: opts.bcryptWorkFactor,
 			},
