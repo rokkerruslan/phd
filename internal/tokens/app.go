@@ -66,10 +66,10 @@ func FromRequest(r *http.Request) (string, error) {
 	return token, nil
 }
 
-func DropSession(ctx context.Context, db *pgxpool.Pool, session string) {
-	baseErr := "session.DropSession fails: %v"
+func DropToken(ctx context.Context, db *pgxpool.Pool, token string) {
+	baseErr := "token.DropToken fails: %v"
 
-	_, err := db.Exec(ctx, "DELETE FROM sessions WHERE session = $1", session)
+	_, err := db.Exec(ctx, "DELETE FROM tokens WHERE token = $1", token)
 	if err != nil {
 		log.Printf(baseErr, err)
 	}

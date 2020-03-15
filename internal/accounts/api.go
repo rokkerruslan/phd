@@ -12,7 +12,7 @@ import (
 )
 
 func (app *app) retrieveHandler(w http.ResponseWriter, r *http.Request) {
-	baseErr := "account.retrieveHandler fails: %v"
+	baseErr := "accounts.retrieveHandler fails: %v"
 
 	token, err := tokens.FromRequest(r)
 	if err != nil {
@@ -41,7 +41,7 @@ func (app *app) retrieveHandler(w http.ResponseWriter, r *http.Request) {
 	_ = json.NewEncoder(w).Encode(account)
 }
 
-func (app *app) Delete(_ http.ResponseWriter, _ *http.Request) {
+func (app *app) deleteHandler(_ http.ResponseWriter, _ *http.Request) {
 
 }
 
@@ -55,8 +55,8 @@ type signInRequest struct {
 }
 
 // TODO: can't sign if already have a token
-func (app *app) SignIn(w http.ResponseWriter, r *http.Request) {
-	baseErr := "auth.SignIn fails: %v"
+func (app *app) signInHandler(w http.ResponseWriter, r *http.Request) {
+	baseErr := "accounts.signInHandler fails: %v"
 
 	var signData signInRequest
 	if err := json.NewDecoder(r.Body).Decode(&signData); err != nil {
@@ -98,8 +98,8 @@ type signUpResponse struct {
 }
 
 // TODO: disable if already have a token.
-func (app *app) SignUp(w http.ResponseWriter, r *http.Request) {
-	baseErr := "auth.SignUp fails: %v"
+func (app *app) signUpHandler(w http.ResponseWriter, r *http.Request) {
+	baseErr := "accounts.signUpHandler fails: %v"
 
 	var signData signUpRequest
 	if err := json.NewDecoder(r.Body).Decode(&signData); err != nil {
@@ -145,8 +145,8 @@ func (app *app) SignUp(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func (app *app) SignOut(w http.ResponseWriter, r *http.Request) {
-	baseErr := "account.retrieve fails: %v"
+func (app *app) signOutHandler(w http.ResponseWriter, r *http.Request) {
+	baseErr := "accounts.signOutHandler fails: %v"
 
 	token := r.Header.Get(api.AuthTokenHeaderName)
 	if token == "" {
@@ -154,7 +154,7 @@ func (app *app) SignOut(w http.ResponseWriter, r *http.Request) {
 			fmt.Sprintf("%s` isn't set", api.AuthTokenHeaderName)), http.StatusForbidden)
 		return
 	}
-	tokens.DropSession(r.Context(), app.resources.Db, token)
+	tokens.DropToken(r.Context(), app.resources.Db, token)
 
 	w.WriteHeader(http.StatusNoContent)
 }

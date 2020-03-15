@@ -27,9 +27,9 @@ func Setup(resources Resources, options Options) chi.Router {
 	}
 	r := chi.NewRouter()
 	r.Get("/{id}", a.retrieveHandler)
-	r.Delete("/{id}", a.Delete)
-	r.Post("/sign-in", a.SignIn)
-	r.Post("/sign-up", a.SignUp)
-	r.Delete("/sign-out", a.SignOut)
+	r.Delete("/{id}", a.deleteHandler)
+	r.Post("/sign-in", a.signInHandler)
+	r.Post("/sign-up", a.signUpHandler)
+	r.Delete("/sign-out", a.signOutHandler)
 	return r
 }
