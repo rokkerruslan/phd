@@ -8,23 +8,22 @@ import (
 
 	"golang.org/x/crypto/bcrypt"
 	"photo/internal/api"
-	"photo/internal/session"
+	"photo/internal/tokens"
 )
 
 func (app *app) retrieveHandler(w http.ResponseWriter, r *http.Request) {
 	baseErr := "account.retrieveHandler fails: %v"
 
-	token := r.Header.Get(api.AuthTokenHeaderName)
-	if token == "" {
-		api.Error(w, fmt.Errorf(baseErr,
-			fmt.Sprintf("`%s` isn't set", api.AuthTokenHeaderName)), http.StatusForbidden)
+	token, err := tokens.FromRequest(r)
+	if err != nil {
+		api.Error(w, err, http.StatusForbidden)
 		return
 	}
 
-	id, err := session.Retrieve(r.Context(), app.resources.Db, token)
+	id, err := tokens.Retrieve(r.Context(), app.resources.Db, token)
 	if err != nil {
 		switch {
-		case errors.Is(err, session.ErrDoesNotExist):
+		case errors.Is(err, tokens.ErrDoesNotExist):
 			api.Error(w, fmt.Errorf(baseErr, err), http.StatusBadRequest)
 			return
 		default:
@@ -78,7 +77,7 @@ func (app *app) SignIn(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Authenticate user
-	token, err := session.Create(r.Context(), app.resources.Db, acc.ID)
+	token, err := tokens.Create(r.Context(), app.resources.Db, acc.ID)
 	if err != nil {
 		api.Error(w, fmt.Errorf(baseErr, err), http.StatusInternalServerError)
 		return
@@ -135,7 +134,7 @@ func (app *app) SignUp(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Authenticate
-	token, err := session.Create(r.Context(), app.resources.Db, acc.ID)
+	token, err := tokens.Create(r.Context(), app.resources.Db, acc.ID)
 	if err != nil {
 		api.Error(w, fmt.Errorf(baseErr, err), http.StatusInternalServerError)
 		return
@@ -155,7 +154,7 @@ func (app *app) SignOut(w http.ResponseWriter, r *http.Request) {
 			fmt.Sprintf("%s` isn't set", api.AuthTokenHeaderName)), http.StatusForbidden)
 		return
 	}
-	session.DropSession(r.Context(), app.resources.Db, token)
+	tokens.DropSession(r.Context(), app.resources.Db, token)
 
 	w.WriteHeader(http.StatusNoContent)
 }

@@ -6,13 +6,17 @@ import (
 )
 
 const createQuery = `
-	INSERT INTO accounts (email, password, created, updated) VALUES($1, $2, NOW(), NOW()) RETURNING id
+	INSERT INTO accounts (email, password, created, updated) 
+		VALUES($1, $2, NOW(), NOW())
+	RETURNING id
 `
 
 // TODO: all create model functions MUST return id or full object?
 func (app *app) createAccount(ctx context.Context, a Account) (int, error) {
 	var id int
-	err := app.resources.Db.QueryRow(ctx, createQuery, a.Email, a.password).Scan(&id)
+	err := app.resources.Db.
+		QueryRow(ctx, createQuery, a.Email, a.password).
+		Scan(&id)
 	if err != nil {
 		return 0, err
 	}
@@ -27,7 +31,9 @@ func (app *app) RetrieveByEmail(ctx context.Context, email string) (Account, err
 	baseErr := "accounts.RetrieveByEmail fails: %v"
 
 	var a Account
-	if err := app.resources.Db.QueryRow(ctx, selectQuery, email).Scan(&a.ID, &a.password); err != nil {
+	if err := app.resources.Db.
+		QueryRow(ctx, selectQuery, email).
+		Scan(&a.ID, &a.password); err != nil {
 		return a, fmt.Errorf(baseErr, err)
 	}
 	a.Email = email

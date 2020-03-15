@@ -1,4 +1,4 @@
-package session
+package tokens
 
 import (
 	"context"
@@ -38,10 +38,10 @@ func Create(ctx context.Context, db *pgxpool.Pool, accountID int) (session strin
 
 var ErrDoesNotExist = errors.New("token doesn't exist")
 
-func Retrieve(ctx context.Context, db *pgxpool.Pool, session string) (id int, err error) {
-	baseErr := "session.retrieve fails: %w"
+func Retrieve(ctx context.Context, db *pgxpool.Pool, token string) (id int, err error) {
+	baseErr := "token.retrieve fails: %w"
 
-	if err = db.QueryRow(ctx, "SELECT account_id FROM sessions WHERE session = $1", session).Scan(&id); err != nil {
+	if err = db.QueryRow(ctx, "SELECT account_id FROM tokens WHERE token = $1", token).Scan(&id); err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			err = fmt.Errorf(baseErr, ErrDoesNotExist)
 		} else {
@@ -58,14 +58,12 @@ type Session struct {
 	AccountID int
 }
 
-func GetFromRequest(r *http.Request) (Session, error) {
-	var s Session
+func FromRequest(r *http.Request) (string, error) {
 	token := r.Header.Get(api.AuthTokenHeaderName)
 	if token == "" {
-		return s, errors.New("token is empty")
+		return token, fmt.Errorf("`%s` isn't set", api.AuthTokenHeaderName)
 	}
-	var err = errors.New("h")
-	return s, err
+	return token, nil
 }
 
 func DropSession(ctx context.Context, db *pgxpool.Pool, session string) {

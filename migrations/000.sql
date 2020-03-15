@@ -62,3 +62,6 @@ CREATE TABLE offers (
 
     CONSTRAINT "only_one_offer_to_event_with_one_account" UNIQUE (event_id, account_id)
 );
+
+alter table sessions rename to tokens;
+alter table tokens rename column session to token;
