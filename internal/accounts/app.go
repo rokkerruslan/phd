@@ -5,31 +5,31 @@ import (
 	"github.com/jackc/pgx/v4/pgxpool"
 )
 
-type Resources struct {
-	Db *pgxpool.Pool
-}
+type (
+	Resources struct {
+		Db *pgxpool.Pool
+	}
+	Options struct {
+		GlobalSalt       []byte
+		BcryptWorkFactor int
+	}
+)
 
-type Options struct {
-	GlobalSalt       []byte
-	BcryptWorkFactor int
-}
-
-type App struct {
+type app struct {
 	resources Resources
 	options   Options
 }
 
 func Setup(resources Resources, options Options) chi.Router {
-	app := App{
+	a := app{
 		resources: resources,
 		options:   options,
 	}
 	r := chi.NewRouter()
-	r.Get("/{id}", app.Retrieve)
-	r.Delete("/{id}", app.Delete)
-
-	r.Post("/sign-in", app.SignIn)
-	r.Post("/sign-up", app.SignUp)
-	r.Delete("/sign-out", app.SignOut)
+	r.Get("/{id}", a.retrieveHandler)
+	r.Delete("/{id}", a.Delete)
+	r.Post("/sign-in", a.SignIn)
+	r.Post("/sign-up", a.SignUp)
+	r.Delete("/sign-out", a.SignOut)
 	return r
 }

@@ -10,7 +10,7 @@ const createQuery = `
 	INSERT INTO events (name, description owner_id, created, updated) VALUES($1, $2, $3, NOW(), NOW())
 `
 
-func (app *App) CreateEvent(ctx context.Context, e Event) error {
+func (app *app) CreateEvent(ctx context.Context, e Event) error {
 	if _, err := app.resources.Db.Exec(ctx, createQuery, e.Name, e.Description, e.OwnerID); err != nil {
 		return err
 	}
@@ -21,7 +21,7 @@ const updateQuery = `
 	UPDATE events SET name = $1, updated = NOW() WHERE id = $2
 `
 
-func (app *App) updateEvent(ctx context.Context, e Event) error {
+func (app *app) updateEvent(ctx context.Context, e Event) error {
 	baseErr := "event.Update fails: %v"
 	_, err := app.resources.Db.Exec(ctx, updateQuery, e.Name, e.ID)
 	if err != nil {
@@ -34,7 +34,7 @@ const retrieveQuery = `
 	SELECT id, name, owner_id, created, updated FROM events WHERE id = $1
 `
 
-func (app *App) retrieveEvent(ctx context.Context, f filterRetrieve) (e Event, err error) {
+func (app *app) retrieveEvent(ctx context.Context, f filterRetrieve) (e Event, err error) {
 	defErr := "modelRetrieve fails: %v"
 	err = app.resources.Db.QueryRow(ctx, retrieveQuery, f.ID).Scan(e.ID, e.Name, e.OwnerID, e.Created, e.Updated)
 	if err != nil {
@@ -47,7 +47,7 @@ const deleteQuery = `
 	DELETE FROM events WHERE id == $1
 `
 
-func (app *App) deleteEvent(ctx context.Context, f filterRetrieve) error {
+func (app *app) deleteEvent(ctx context.Context, f filterRetrieve) error {
 	defErr := "modelDelete fails: %v"
 	_, err := app.resources.Db.Exec(ctx, deleteQuery, f.ID)
 	if err != nil {
@@ -64,7 +64,7 @@ const selectTimelinesQuery = `
 	SELECT id, start, "end", place, event_id FROM timelines WHERE event_id = ANY($1)
 `
 
-func (app *App) eventList(ctx context.Context, _ Filter) ([]Event, error) {
+func (app *app) eventList(ctx context.Context, _ Filter) ([]Event, error) {
 	baseErr := "event.eventListHandler fails: %v"
 	rows, err := app.resources.Db.Query(ctx, selectQuery)
 	if err != nil {

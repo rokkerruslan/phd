@@ -11,7 +11,7 @@ import (
 	"photo/internal/api"
 )
 
-func (app *App) create(w http.ResponseWriter, r *http.Request) {
+func (app *app) create(w http.ResponseWriter, r *http.Request) {
 	var offer Offer
 	if err := json.NewDecoder(r.Body).Decode(&offer); err != nil {
 		log.Println(err)
@@ -41,7 +41,7 @@ func NewFilterFromQuery(values url.Values) (f Filter, err error) {
 	return f, nil
 }
 
-func (app *App) list(w http.ResponseWriter, r *http.Request) {
+func (app *app) list(w http.ResponseWriter, r *http.Request) {
 	filter, err := NewFilterFromQuery(r.URL.Query())
 	if err != nil {
 		api.Error(w, fmt.Errorf("account_id parsing fails: %v", err), http.StatusBadRequest)

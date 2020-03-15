@@ -19,7 +19,7 @@ func NewFilterFromQuery(_ url.Values) Filter {
 	return Filter{}
 }
 
-func (app *App) eventListHandler(w http.ResponseWriter, r *http.Request) {
+func (app *app) eventListHandler(w http.ResponseWriter, r *http.Request) {
 	filter := NewFilterFromQuery(r.URL.Query())
 
 	events, err := app.eventList(r.Context(), filter)
@@ -48,7 +48,7 @@ func newFilterRetrieve(r *http.Request) (f filterRetrieve, err error) {
 	return f, err
 }
 
-func (app *App) retrieve(w http.ResponseWriter, r *http.Request) {
+func (app *app) retrieve(w http.ResponseWriter, r *http.Request) {
 	filter, err := newFilterRetrieve(r)
 	if err != nil {
 		api.Error(w, err, http.StatusBadRequest)
@@ -64,7 +64,7 @@ func (app *App) retrieve(w http.ResponseWriter, r *http.Request) {
 	_ = json.NewEncoder(w).Encode(event)
 }
 
-func (app *App) create(w http.ResponseWriter, r *http.Request) {
+func (app *app) create(w http.ResponseWriter, r *http.Request) {
 	var event Event
 	if err := json.NewDecoder(r.Body).Decode(&event); err != nil {
 		log.Println(err)
@@ -82,7 +82,7 @@ func (app *App) create(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (app *App) update(w http.ResponseWriter, r *http.Request) {
+func (app *app) update(w http.ResponseWriter, r *http.Request) {
 	var event Event
 	if err := json.NewDecoder(r.Body).Decode(&event); err != nil {
 		log.Println(err)
@@ -102,7 +102,7 @@ func (app *App) update(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
-func (app *App) delete(w http.ResponseWriter, r *http.Request) {
+func (app *app) delete(w http.ResponseWriter, r *http.Request) {
 	filter, err := newFilterRetrieve(r)
 	if err != nil {
 		api.Error(w, err, http.StatusBadRequest)

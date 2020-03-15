@@ -18,7 +18,7 @@ func (o *Offer) Validate() error {
 	return nil
 }
 
-func (app *App) insert(ctx context.Context, o Offer) error {
+func (app *app) insert(ctx context.Context, o Offer) error {
 	_, err := app.resources.Db.Exec(
 		ctx,
 		"INSERT INTO offers (account_id, event_id, created, updated) VALUES ($1, $2, NOW(), NOW())",
@@ -31,7 +31,7 @@ func (app *App) insert(ctx context.Context, o Offer) error {
 	return nil
 }
 
-func (app *App) offerList(ctx context.Context, f Filter) ([]Offer, error) {
+func (app *app) offerList(ctx context.Context, f Filter) ([]Offer, error) {
 	defErr := "offer.List fails: %v"
 
 	rows, err := app.resources.Db.Query(

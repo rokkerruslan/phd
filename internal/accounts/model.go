@@ -10,7 +10,7 @@ const createQuery = `
 `
 
 // TODO: all create model functions MUST return id or full object?
-func (app *App) createAccount(ctx context.Context, a Account) (int, error) {
+func (app *app) createAccount(ctx context.Context, a Account) (int, error) {
 	var id int
 	err := app.resources.Db.QueryRow(ctx, createQuery, a.Email, a.password).Scan(&id)
 	if err != nil {
@@ -23,7 +23,7 @@ const selectQuery = `
 	SELECT id, password FROM accounts WHERE email = $1
 `
 
-func (app *App) RetrieveByEmail(ctx context.Context, email string) (Account, error) {
+func (app *app) RetrieveByEmail(ctx context.Context, email string) (Account, error) {
 	baseErr := "accounts.RetrieveByEmail fails: %v"
 
 	var a Account
@@ -35,7 +35,7 @@ func (app *App) RetrieveByEmail(ctx context.Context, email string) (Account, err
 }
 
 // TODO: do not use param like part of result object, always scan?
-func (app *App) RetrieveByID(ctx context.Context, id int) (Account, error) {
+func (app *app) RetrieveByID(ctx context.Context, id int) (Account, error) {
 	baseErr := "accounts.RetrieveByID fails: %v"
 
 	var a Account

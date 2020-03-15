@@ -11,8 +11,8 @@ import (
 	"photo/internal/session"
 )
 
-func (app *App) Retrieve(w http.ResponseWriter, r *http.Request) {
-	baseErr := "account.retrieve fails: %v"
+func (app *app) retrieveHandler(w http.ResponseWriter, r *http.Request) {
+	baseErr := "account.retrieveHandler fails: %v"
 
 	token := r.Header.Get(api.AuthTokenHeaderName)
 	if token == "" {
@@ -42,7 +42,7 @@ func (app *App) Retrieve(w http.ResponseWriter, r *http.Request) {
 	_ = json.NewEncoder(w).Encode(account)
 }
 
-func (app *App) Delete(_ http.ResponseWriter, _ *http.Request) {
+func (app *app) Delete(_ http.ResponseWriter, _ *http.Request) {
 
 }
 
@@ -56,7 +56,7 @@ type signInRequest struct {
 }
 
 // TODO: can't sign if already have a token
-func (app *App) SignIn(w http.ResponseWriter, r *http.Request) {
+func (app *app) SignIn(w http.ResponseWriter, r *http.Request) {
 	baseErr := "auth.SignIn fails: %v"
 
 	var signData signInRequest
@@ -99,7 +99,7 @@ type signUpResponse struct {
 }
 
 // TODO: disable if already have a token.
-func (app *App) SignUp(w http.ResponseWriter, r *http.Request) {
+func (app *app) SignUp(w http.ResponseWriter, r *http.Request) {
 	baseErr := "auth.SignUp fails: %v"
 
 	var signData signUpRequest
@@ -146,7 +146,7 @@ func (app *App) SignUp(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func (app *App) SignOut(w http.ResponseWriter, r *http.Request) {
+func (app *app) SignOut(w http.ResponseWriter, r *http.Request) {
 	baseErr := "account.retrieve fails: %v"
 
 	token := r.Header.Get(api.AuthTokenHeaderName)

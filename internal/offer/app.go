@@ -5,25 +5,25 @@ import (
 	"github.com/jackc/pgx/v4/pgxpool"
 )
 
-type Resources struct {
-	Db *pgxpool.Pool
-}
+type (
+	Resources struct {
+		Db *pgxpool.Pool
+	}
+	Options struct{}
+)
 
-type Options struct{}
-
-type App struct {
+type app struct {
 	resources Resources
 	options   Options
 }
 
 func Setup(resources Resources, options Options) chi.Router {
-	app := App{
+	a := app{
 		resources: resources,
 		options:   options,
 	}
-
 	r := chi.NewRouter()
-	r.Get("/", app.list)
-	r.Post("/", app.create)
+	r.Get("/", a.list)
+	r.Post("/", a.create)
 	return r
 }
