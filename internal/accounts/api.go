@@ -69,7 +69,7 @@ func (app *app) signInHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := acc.CheckPassword(signData.Password, app.options.GlobalSalt); err != nil {
+	if err := acc.CheckPassword(signData.Password, app.opts.GlobalSalt); err != nil {
 		api.Error(w, fmt.Errorf(baseErr, err), http.StatusBadRequest)
 		return
 	}
@@ -104,7 +104,7 @@ func (app *app) signUpHandler(w http.ResponseWriter, r *http.Request) {
 		api.Error(w, fmt.Errorf(baseErr, err), http.StatusBadRequest)
 		return
 	}
-	if len(signData.Password) < app.options.MinLenForNewPassword {
+	if len(signData.Password) < app.opts.MinLenForNewPassword {
 		api.Error(w, fmt.Errorf(baseErr, "`Password` length check fails"), http.StatusBadRequest)
 		return
 	}
@@ -114,7 +114,7 @@ func (app *app) signUpHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	hash, err := bcrypt.GenerateFromPassword(
-		append([]byte(signData.Password), app.options.GlobalSalt...), app.options.BcryptWorkFactor)
+		append([]byte(signData.Password), app.opts.GlobalSalt...), app.opts.BcryptWorkFactor)
 	if err != nil {
 		api.Error(w, fmt.Errorf(baseErr, err), http.StatusInternalServerError)
 		return

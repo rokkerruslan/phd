@@ -37,19 +37,19 @@ func Run() {
 			event.Resources{
 				Db: pool,
 			},
-			event.Options{},
+			event.Opts{},
 		))
 		apiV1.Mount("/offers", offer.Setup(
 			offer.Resources{
 				Db: pool,
 			},
-			offer.Options{},
+			offer.Opts{},
 		))
 		apiV1.Mount("/accounts", accounts.Setup(
 			accounts.Resources{
 				Db: pool,
 			},
-			accounts.Options{
+			accounts.Opts{
 				GlobalSalt:           opts.globalSalt,
 				BcryptWorkFactor:     opts.bcryptWorkFactor,
 				MinLenForNewPassword: opts.minLenForNewPassword,

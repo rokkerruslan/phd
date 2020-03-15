@@ -9,18 +9,18 @@ type (
 	Resources struct {
 		Db *pgxpool.Pool
 	}
-	Options struct{}
+	Opts struct{}
 )
 
 type app struct {
 	resources Resources
-	options   Options
+	opts      Opts
 }
 
-func Setup(resources Resources, options Options) chi.Router {
+func Setup(resources Resources, opts Opts) chi.Router {
 	a := app{
 		resources: resources,
-		options:   options,
+		opts:      opts,
 	}
 	r := chi.NewRouter()
 	r.Get("/", a.list)
