@@ -21,6 +21,7 @@ type app struct {
 	opts      Opts
 }
 
+// Setup - initialize accounts app.
 func Setup(resources Resources, opts Opts) chi.Router {
 	a := app{
 		resources: resources,

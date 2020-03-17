@@ -19,7 +19,7 @@ loc() {
         exit 1
     fi
 
-    ENV_LOCAL=$(cat $ENV_FILE_LOCAL | grep '^[a-zA-z]' | xargs)
+    ENV_LOCAL=$(cat $ENV_FILE_LOCAL | grep '^[a-zA-Z]' | xargs)
 
     case $1 in
     t | test)
@@ -38,7 +38,7 @@ loc() {
         update
         ;;
     *)
-        echo command $1 does not exist, check help
+        echo command "$1" does not exist, check help
         ;;
     esac
 }
@@ -58,6 +58,7 @@ fmt() {
 start() {
     go build -o ./dist/$DAEMON_NAME ./cmd/$DAEMON_NAME
 
+    # shellcheck disable=SC2086
     env $ENV_LOCAL ./dist/$DAEMON_NAME
 }
 
@@ -67,22 +68,17 @@ update() {
 }
 
 showEnv() {
-    while IFS=' ' read -ra ARRAY; do
-        echo "\nENVIRONMENT VARIABLES:\n"
-        for i in "${ARRAY[@]}"; do
-            echo "    $i\n"
-        done
-    done <<< "$ENV_LOCAL"
+    echo "$ENV_LOCAL"
 }
 
-# ==== Entrypoint =========================================== #
+# ==== Entry point ========================================== #
 
 USAGE=$(
     cat <<-END
-app - entrypoint for control
+app - entry point for control
 
 USAGE
-    ./app command subcommand
+    ./app command sub-command
 
 COMMANDS
 
