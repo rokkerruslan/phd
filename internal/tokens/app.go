@@ -15,7 +15,7 @@ import (
 )
 
 const insertQuery = `
-	INSERT INTO sessions (session, account_id, created) VALUES ($1, $2, NOW())
+	INSERT INTO tokens (token, account_id, created) VALUES ($1, $2, NOW())
 `
 
 func Create(ctx context.Context, db *pgxpool.Pool, accountID int) (session string, err error) {
