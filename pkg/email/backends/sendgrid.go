@@ -11,13 +11,14 @@ import (
 )
 
 type SendGrid struct {
-	url string
+	apiKey string
+	url    string
 }
 
 // NewSendGrid instantiate new Sender with SendGrid backend
 //
 // Example:
-// sender := backends.NewSendGrid()
+// sender := backends.NewSendGrid("YOUR_API_KEY")
 // mail := email.Mail{
 //   To:      "rokkerruslan@protonmail.com",
 //   From:    "noreply@photogram.live",
@@ -26,9 +27,10 @@ type SendGrid struct {
 // }
 // sender.Send(mail)
 //
-func NewSendGrid() *SendGrid {
+func NewSendGrid(apiKey string) *SendGrid {
 	return &SendGrid{
-		url: "https://api.sendgrid.com/v3/mail/send",
+		apiKey: apiKey,
+		url:    "https://api.sendgrid.com/v3/mail/send",
 	}
 }
 
@@ -38,11 +40,13 @@ func (s *SendGrid) Send(mail email.Mail) error {
 	data := request{
 		Personalizations: []per{{
 			Subject: mail.Subject,
-			To:      []to{{
+			To: []to{{
 				Email: mail.To,
 			}},
 		}},
-		From:    from{Email: mail.From},
+		From: from{
+			Email: mail.From,
+		},
 		Content: []content{{
 			Type:  "text/plain",
 			Value: mail.Body,
@@ -59,7 +63,7 @@ func (s *SendGrid) Send(mail email.Mail) error {
 		return fmt.Errorf(baseErr, err)
 	}
 
-	req.Header.Add("authorization", "Bearer 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")
+	req.Header.Add("authorization", fmt.Sprintf("Bearer %s", s.apiKey))
 	req.Header.Add("content-type", "application/json")
 
 	res, err := http.DefaultClient.Do(req)
