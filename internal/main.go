@@ -11,6 +11,7 @@ import (
 	"github.com/jackc/pgx/v4/pgxpool"
 	"photo/internal/accounts"
 	"photo/internal/event"
+	"photo/internal/files"
 	"photo/internal/offer"
 )
 
@@ -64,6 +65,12 @@ func Run() {
 			BcryptWorkFactor:     opts.bcryptWorkFactor,
 			MinLenForNewPassword: opts.minLenForNewPassword,
 		},
+	))
+	r.Mount("/files", files.Setup(
+		files.Resources{
+			Db: pool,
+		},
+		files.Opts{},
 	))
 
 	log.Println(fmt.Sprintf("daemon bind socket on %s", opts.addr))
