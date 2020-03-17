@@ -1,5 +1,10 @@
 # Shortcuts
 
+Database setup:
+```shell script
+$ docker run --name ph -p 5432:5432 -v ph:/var/lib/postgresql/data -d postgres:12 -c log_statement=all
+```
+
 Event list:
 ```shell script
 $ curl -s localhost:3000/api/v1/events/ | jq

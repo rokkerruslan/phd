@@ -25,6 +25,9 @@ loc() {
     t | test)
         tests
         ;;
+    b | build)
+        build
+        ;;
     f | fmt)
         fmt
         ;;
@@ -33,6 +36,9 @@ loc() {
         ;;
     s | start | "")
         start
+        ;;
+    m | mi | migrate)
+        migrate
         ;;
     u | update)
         update
@@ -45,6 +51,12 @@ loc() {
 
 tests() {
     go test ./internal/...
+}
+
+build() {
+    go build -o ./dist/$DAEMON_NAME ./cmd/$DAEMON_NAME
+    go build -o ./dist/mi ./cmd/mi
+    chmod +x ./dist/mi
 }
 
 cover() {
@@ -60,6 +72,11 @@ start() {
 
     # shellcheck disable=SC2086
     env $ENV_LOCAL ./dist/$DAEMON_NAME
+}
+
+migrate() {
+    # shellcheck disable=SC2086
+    env $ENV_LOCAL ./dist/mi
 }
 
 update() {

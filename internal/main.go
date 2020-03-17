@@ -14,6 +14,17 @@ import (
 	"photo/internal/offer"
 )
 
+type App interface {
+	Router() chi.Router
+}
+
+// Apps - central app registry
+type Apps struct {
+	Account App
+	Auth    App
+	Event   App
+}
+
 // Run - entry point for internal package
 func Run() {
 	r := chi.NewRouter()
@@ -32,7 +43,7 @@ func Run() {
 
 	// We mount all our sub-applications for root
 	// router. Consistency isn't important.
-	r.Route("/api/v1", func(apiV1 chi.Router) {
+	r.Route("/", func(apiV1 chi.Router) {
 		apiV1.Mount("/events", event.Setup(
 			event.Resources{
 				Db: pool,
