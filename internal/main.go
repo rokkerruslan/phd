@@ -43,30 +43,28 @@ func Run() {
 
 	// We mount all our sub-applications for root
 	// router. Consistency isn't important.
-	r.Route("/", func(apiV1 chi.Router) {
-		apiV1.Mount("/events", event.Setup(
-			event.Resources{
-				Db: pool,
-			},
-			event.Opts{},
-		))
-		apiV1.Mount("/offers", offer.Setup(
-			offer.Resources{
-				Db: pool,
-			},
-			offer.Opts{},
-		))
-		apiV1.Mount("/accounts", accounts.Setup(
-			accounts.Resources{
-				Db: pool,
-			},
-			accounts.Opts{
-				GlobalSalt:           opts.globalSalt,
-				BcryptWorkFactor:     opts.bcryptWorkFactor,
-				MinLenForNewPassword: opts.minLenForNewPassword,
-			},
-		))
-	})
+	r.Mount("/events", event.Setup(
+		event.Resources{
+			Db: pool,
+		},
+		event.Opts{},
+	))
+	r.Mount("/offers", offer.Setup(
+		offer.Resources{
+			Db: pool,
+		},
+		offer.Opts{},
+	))
+	r.Mount("/accounts", accounts.Setup(
+		accounts.Resources{
+			Db: pool,
+		},
+		accounts.Opts{
+			GlobalSalt:           opts.globalSalt,
+			BcryptWorkFactor:     opts.bcryptWorkFactor,
+			MinLenForNewPassword: opts.minLenForNewPassword,
+		},
+	))
 
 	log.Println(fmt.Sprintf("daemon bind socket on %s", opts.addr))
 	if err := http.ListenAndServe(opts.addr, r); err != nil {

@@ -3,7 +3,7 @@ info:
   title: Photographer
   version: 0.0.1
 paths:
-  /api/v1/events:
+  /events:
     get:
       description: Show all available Events
       responses:
@@ -33,7 +33,7 @@ paths:
                 properties:
                   id:
                     type: number
-  /api/v1/events/{id}:
+  /events/{id}:
     get:
       description: Retrieve information about Event
       parameters:
@@ -52,7 +52,7 @@ paths:
       responses:
         204:
           description: Success deleting
-  /api/v1/accounts/{id}:
+  /accounts/{id}:
     get:
       description: Retrieve info about yourself
       parameters:
