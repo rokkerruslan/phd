@@ -56,7 +56,6 @@ func NewRegistry() *Registry {
 	return &r
 }
 
-
 type Migration struct {
 	Name    string
 	Line    line

@@ -16,11 +16,14 @@ const migrationTemplate = `-- mi: %d
 func New(name string) {
 	r := NewRegistry()
 
-	m := r.Migrations[len(r.Migrations) - 1]
+	m := r.Migrations[len(r.Migrations)-1]
 
 	nextMigrationNumber := m.Line.Number + 1
 
-	fileName := fmt.Sprintf("%d.sql", nextMigrationNumber)
+	fileName, err := formatMigrationFileName(nextMigrationNumber, name)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	f, err := os.Create(filepath.Join(migrationsDir, fileName))
 	if err != nil {

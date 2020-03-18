@@ -38,3 +38,16 @@ func TestFormatMigrationFileName_BigNumber(t *testing.T) {
 		t.Errorf("expected error with number, got %v", err)
 	}
 }
+
+func TestParseMigrationFileName_Positive(t *testing.T) {
+	number, name, err := parseMigrationFileName("001.Positive.sql")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if diff := cmp.Diff(1, number); diff != "" {
+		t.Error(diff)
+	}
+	if diff := cmp.Diff("Positive", name); diff != "" {
+		t.Error(diff)
+	}
+}
