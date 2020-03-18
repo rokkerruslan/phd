@@ -28,7 +28,7 @@ func (a *app) upload(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// TODO: use different service for image storing
-	f, err := os.OpenFile(filepath.Join("./images", header.Filename), os.O_CREATE | os.O_RDWR, 0777)
+	f, err := os.OpenFile(filepath.Join("./images", header.Filename), os.O_CREATE|os.O_RDWR, 0777)
 	if err != nil {
 		log.Println(err)
 		return

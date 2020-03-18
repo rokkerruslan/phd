@@ -1,7 +1,6 @@
 package backends
 
 type ConsoleSender struct {
-
 }
 
 func NewConsoleSender() *ConsoleSender {

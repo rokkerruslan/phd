@@ -6,3 +6,6 @@
 - Image uploading and linking with Event
 - Downloading images
 - Mi impl into another repository
+- Improve mi impl
+- Make event private
+- Add money flows
