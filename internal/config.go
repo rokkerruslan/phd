@@ -1,3 +1,4 @@
+// TODO: we need library for config loading
 package internal
 
 import (
