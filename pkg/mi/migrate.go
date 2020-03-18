@@ -1,57 +1,30 @@
-// TODO: initialize with migrations table
-// TODO: console ui
 package mi
 
 import (
-	"bufio"
 	"context"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
-	"path/filepath"
 	"sort"
-	"strconv"
-	"strings"
 	"time"
 
 	"github.com/jackc/pgx/v4"
 )
 
-const prefix = "-- mi:"
-
-type Migration struct {
-	Name    string
-	Line    line
-	Content string
+func Migrate() {
+	r := NewRegistry()
+	r.InitConnection()
+	r.Sort()
+	r.Apply()
+	r.Commit()
 }
 
-type line struct {
-	Number int
-}
-
-func parseLine(src string) line {
-	if !strings.HasPrefix(src, prefix) {
-		log.Fatal("line must starts with prefix")
-	}
-
-	src = strings.TrimPrefix(src, prefix)
-	src = strings.TrimSpace(src)
-
-	number, err := strconv.Atoi(src)
+func (r *Registry) InitConnection() {
+	conn, err := pgx.Connect(context.Background(), os.Getenv("DATABASE_URL"))
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	return line{
-		Number: number,
-	}
-}
-
-type Registry struct {
-	Migrations []Migration
-
-	conn *pgx.Conn
+	r.conn = conn
 }
 
 func (r *Registry) Sort() {
@@ -118,51 +91,6 @@ func (r *Registry) Filter() {
 	}
 
 	r.Migrations = nonApplied
-}
-
-func Migrate() {
-	matches, err := filepath.Glob("./migrations/*.sql")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	fmt.Println("Unsorted Migrations:", matches)
-
-	registry := Registry{}
-
-	for _, match := range matches {
-		f, err := os.Open(match)
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		reader := bufio.NewReader(f)
-		line, _, err := reader.ReadLine()
-		if err != nil {
-			log.Fatal(err)
-		}
-		data, err := ioutil.ReadAll(reader)
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		registry.Migrations = append(registry.Migrations, Migration{
-			Name:    match,
-			Line:    parseLine(string(line)),
-			Content: string(data),
-		})
-	}
-
-	conn, err := pgx.Connect(context.Background(), os.Getenv("DATABASE_URL"))
-	if err != nil {
-		log.Fatal(err)
-	}
-	registry.conn = conn
-	defer conn.Close(context.Background())
-
-	registry.Sort()
-	registry.Apply()
-	registry.Commit()
 }
 
 func (r *Registry) Commit() {

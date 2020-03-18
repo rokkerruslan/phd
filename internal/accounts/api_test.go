@@ -11,7 +11,8 @@ func TestSignUpInvalidInput(t *testing.T) {
 	rec := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodPost, "/", strings.NewReader(`{invalid}`))
 
-	SignUp(rec, req)
+	a := app{}
+	a.signUpHandler(rec, req)
 
 	if rec.Code != http.StatusBadRequest {
 		t.Errorf("expected: %v, got: %v", http.StatusBadRequest, rec.Code)
@@ -27,7 +28,10 @@ func TestSignUpPasswordTooShort(t *testing.T) {
 	rec := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodPost, "/", strings.NewReader(`{"Password":"TooShort!","Email":"e"}`))
 
-	SignUp(rec, req)
+	a := app{opts: Opts{
+		MinLenForNewPassword: 10,
+	}}
+	a.signUpHandler(rec, req)
 
 	if rec.Code != http.StatusBadRequest {
 		t.Errorf("expected: %v, got: %v", http.StatusBadRequest, rec.Code)
@@ -43,7 +47,8 @@ func TestSignUpEmailIsEmpty(t *testing.T) {
 	rec := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodPost, "/", strings.NewReader(`{"Password":"VeryVeryVeryLong","Email":""}`))
 
-	SignUp(rec, req)
+	a := app{}
+	a.signUpHandler(rec, req)
 
 	if rec.Code != http.StatusBadRequest {
 		t.Errorf("expected: %v, got: %v", http.StatusBadRequest, rec.Code)

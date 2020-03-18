@@ -1,9 +1,9 @@
 #!/usr/bin/env sh
 
 # TODO: add goda tool
-# goda graph -cluster  ./cmd/ph | dot -Tsvg -o ./dist/graph.svg && open ./dist/graph.svg
+# goda graph -cluster  ./cmd/phd | dot -Tsvg -o ./dist/graph.svg && open ./dist/graph.svg
 
-APP_NAME=photogram
+APP_NAME=ph
 
 # ==== app.sh =============================================== #
 

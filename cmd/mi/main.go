@@ -5,5 +5,5 @@ import (
 )
 
 func main() {
-	mi.Migrate()
+	mi.App()
 }
