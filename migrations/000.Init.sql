@@ -1,4 +1,4 @@
--- mi: 000
+-- mi: 000.Init.sql
 
 CREATE TABLE accounts (
     id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,

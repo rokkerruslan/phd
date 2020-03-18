@@ -7,7 +7,6 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"strconv"
 	"strings"
 
 	"github.com/jackc/pgx/v4"
@@ -36,6 +35,11 @@ func NewRegistry() *Registry {
 			log.Fatal(err)
 		}
 
+		number, name, err := parseMigrationFileName(filepath.Base(match))
+		if err != nil {
+			log.Fatal(err)
+		}
+
 		reader := bufio.NewReader(f)
 		line, _, err := reader.ReadLine()
 		if err != nil {
@@ -47,7 +51,8 @@ func NewRegistry() *Registry {
 		}
 
 		r.Migrations = append(r.Migrations, Migration{
-			Name:    match,
+			Name:    name,
+			Number:  number,
 			Line:    parseLine(string(line)),
 			Content: string(data),
 		})
@@ -58,6 +63,7 @@ func NewRegistry() *Registry {
 
 type Migration struct {
 	Name    string
+	Number  int
 	Line    line
 	Content string
 }
@@ -76,7 +82,7 @@ func parseLine(src string) line {
 	src = strings.TrimPrefix(src, prefix)
 	src = strings.TrimSpace(src)
 
-	number, err := strconv.Atoi(src)
+	number, _, err := parseMigrationFileName(src)
 	if err != nil {
 		log.Fatal(err)
 	}

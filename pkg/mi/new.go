@@ -7,10 +7,9 @@ import (
 	"path/filepath"
 )
 
-const migrationTemplate = `-- mi: %d
+const migrationTemplate = `-- mi: %s
 
 -- WRITE YOUR MIGRATION HERE
-
 `
 
 func New(name string) {
@@ -30,11 +29,9 @@ func New(name string) {
 		log.Fatal(err)
 	}
 
-	if _, err := f.WriteString(fmt.Sprintf(migrationTemplate, nextMigrationNumber)); err != nil {
+	if _, err := f.WriteString(fmt.Sprintf(migrationTemplate, fileName)); err != nil {
 		log.Fatal(err)
 	}
-
-	fmt.Printf("|%-6s|%-6s|\n", "foo", "b")
 
 	fmt.Println("Success, your migration:", fileName)
 }

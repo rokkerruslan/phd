@@ -13,8 +13,6 @@ $ mi -h
 func App() {
 	args := os.Args[1:]
 
-	fmt.Println("ARGS:", args)
-
 	if len(args) == 0 {
 		Status()
 		return
