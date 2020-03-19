@@ -3,6 +3,7 @@ package offer
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 )
 
@@ -14,11 +15,25 @@ type Offer struct {
 	Updated   time.Time
 }
 
-func (o *Offer) Validate() error {
+func (o *Offer) ValidateForCreate() error {
+	baseErr := "offer.ValidateForCreate fails: %v"
+
+	var errors []string
+	if o.AccountID == 0 {
+		errors = append(errors, "offer.AccountID is zero")
+	}
+	if o.EventID == 0 {
+		errors = append(errors, "offer.EventID is zero")
+	}
+
+	if len(errors) != 0 {
+		return fmt.Errorf(baseErr, strings.Join(errors, ", "))
+	}
+
 	return nil
 }
 
-func (app *app) insert(ctx context.Context, o Offer) error {
+func (app *app) createOffer(ctx context.Context, o Offer) error {
 	_, err := app.resources.Db.Exec(
 		ctx,
 		"INSERT INTO offers (account_id, event_id, created, updated) VALUES ($1, $2, NOW(), NOW())",

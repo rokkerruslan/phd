@@ -11,19 +11,19 @@ import (
 	"ph/internal/api"
 )
 
-func (app *app) create(w http.ResponseWriter, r *http.Request) {
+func (app *app) createOfferHandler(w http.ResponseWriter, r *http.Request) {
 	var offer Offer
 	if err := json.NewDecoder(r.Body).Decode(&offer); err != nil {
 		log.Println(err)
 		return
 	}
 
-	if err := offer.Validate(); err != nil {
+	if err := offer.ValidateForCreate(); err != nil {
 		api.Error(w, err, http.StatusBadRequest)
 		return
 	}
 
-	if err := app.insert(r.Context(), offer); err != nil {
+	if err := app.createOffer(r.Context(), offer); err != nil {
 		api.Error(w, err, http.StatusInternalServerError)
 		return
 	}

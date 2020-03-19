@@ -22,12 +22,12 @@ $ curl -X PUT -d '{"ID":8,"Name":"Event X8","Timelines":[{"Start":"2006-01-02T15
 
 Offer list:
 ```shell script
-$ curl -s localhost:3000/api/v1/offers/ | jq
+$ curl -s localhost:3000/offers/?account_id=5 | jq
 ```
 
 Create offer
 ```shell script
-$ curl -X POST -d '{"AccountID":1,"EventID":1}' -s localhost:3000/api/v1/offers/ | jq
+$ curl -X POST -d @.i/offerCreate.json -s localhost:3000/offers/
 ```
 
 Code coverage:

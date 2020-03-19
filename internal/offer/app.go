@@ -24,6 +24,6 @@ func Setup(resources Resources, opts Opts) chi.Router {
 	}
 	r := chi.NewRouter()
 	r.Get("/", a.list)
-	r.Post("/", a.create)
+	r.Post("/", a.createOfferHandler)
 	return r
 }
