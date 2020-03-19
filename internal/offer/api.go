@@ -8,7 +8,7 @@ import (
 	"net/url"
 	"strconv"
 
-	"photo/internal/api"
+	"ph/internal/api"
 )
 
 func (app *app) create(w http.ResponseWriter, r *http.Request) {

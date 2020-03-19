@@ -9,7 +9,7 @@ import (
 	"strconv"
 
 	"github.com/go-chi/chi"
-	"photo/internal/api"
+	"ph/internal/api"
 )
 
 type Filter struct {

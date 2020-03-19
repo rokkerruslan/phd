@@ -1,7 +1,7 @@
 package main
 
 import (
-	"photo/pkg/mi"
+	"ph/pkg/mi"
 )
 
 func main() {

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"photo/internal"
+	"ph/internal"
 )
 
 func main() {

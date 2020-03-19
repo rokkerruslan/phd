@@ -11,7 +11,7 @@ import (
 
 	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
-	"photo/internal/api"
+	"ph/internal/api"
 )
 
 const insertQuery = `

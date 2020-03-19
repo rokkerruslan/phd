@@ -7,7 +7,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"photo/pkg/email"
+	"ph/pkg/email"
 )
 
 type SendGrid struct {

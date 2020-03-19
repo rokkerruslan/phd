@@ -7,8 +7,8 @@ import (
 	"net/http"
 
 	"golang.org/x/crypto/bcrypt"
-	"photo/internal/api"
-	"photo/internal/tokens"
+	"ph/internal/api"
+	"ph/internal/tokens"
 )
 
 func (app *app) retrieveHandler(w http.ResponseWriter, r *http.Request) {

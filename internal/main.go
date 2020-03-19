@@ -9,10 +9,10 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/jackc/pgx/v4/pgxpool"
-	"photo/internal/accounts"
-	"photo/internal/event"
-	"photo/internal/files"
-	"photo/internal/offer"
+	"ph/internal/accounts"
+	"ph/internal/event"
+	"ph/internal/files"
+	"ph/internal/offer"
 )
 
 type App interface {

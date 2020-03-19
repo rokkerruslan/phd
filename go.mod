@@ -1,4 +1,4 @@
-module photo
+module ph
 
 go 1.14
 
