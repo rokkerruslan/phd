@@ -23,7 +23,7 @@ const updateQuery = `
 
 func (app *app) updateEvent(ctx context.Context, e Event) error {
 	baseErr := "event.Update fails: %v"
-	fmt.Printf("%+v", e)
+
 	_, err := app.resources.Db.Exec(ctx, updateQuery, e.Name, e.ID, e.IsHidden)
 	if err != nil {
 		return fmt.Errorf(baseErr, err)
@@ -58,7 +58,7 @@ func (app *app) deleteEvent(ctx context.Context, f filterRetrieve) error {
 }
 
 const selectQuery = `
-	SELECT id, name, description, owner_id, created, updated FROM events LIMIT 10
+	SELECT id, name, description, owner_id, created, updated, is_public, is_hidden FROM events LIMIT 10
 `
 
 const selectTimelinesQuery = `
@@ -82,7 +82,9 @@ func (app *app) eventList(ctx context.Context, _ Filter) ([]Event, error) {
 		var ownerID int
 		var created time.Time
 		var updated time.Time
-		if err := rows.Scan(&id, &name, &description, &ownerID, &created, &updated); err != nil {
+		var isPublic bool
+		var isHidden bool
+		if err := rows.Scan(&id, &name, &description, &ownerID, &created, &updated, &isPublic, &isHidden); err != nil {
 			return nil, fmt.Errorf(baseErr, err)
 		}
 		eventIDs = append(eventIDs, id)
@@ -93,6 +95,8 @@ func (app *app) eventList(ctx context.Context, _ Filter) ([]Event, error) {
 			OwnerID:     ownerID,
 			Created:     created,
 			Updated:     updated,
+			IsPublic:    isPublic,
+			IsHidden:    isHidden,
 		})
 	}
 
