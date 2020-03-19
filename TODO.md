@@ -1,11 +1,17 @@
 # TODO
 
+## Infra
+- Mi impl into another repository
+
+## Docs
+- Improve API spec
+- Write README
+
+## Coding
+- Add ability to hide/show events.
 - Offer page
 - Portfolio Page
 - Auth with email
-- Image uploading and linking with Event
 - Downloading images
-- Mi impl into another repository
-- Improve API spec
-- Improve flows description
-- Write README
+- Image uploading and linking with Event
+- Add the `Collection` entity.
