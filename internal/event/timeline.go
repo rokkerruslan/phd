@@ -14,7 +14,7 @@ type Timeline struct {
 	ID    int
 	Start time.Time
 	End   time.Time
-	Place string
+	Place string // Oblast'/Kray
 }
 
 func (t *Timeline) Validate() error {
