@@ -11,5 +11,6 @@ type Event struct {
 	OwnerID     int
 	Created     time.Time
 	Updated     time.Time
+	IsPublic    bool
 	Timelines   []Timeline
 }

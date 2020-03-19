@@ -7,11 +7,11 @@ import (
 )
 
 const createQuery = `
-	INSERT INTO events (name, description owner_id, created, updated) VALUES($1, $2, $3, NOW(), NOW())
+	INSERT INTO events (name, description, owner_id, created, updated, is_public) VALUES($1, $2, $3, NOW(), NOW(), $4)
 `
 
 func (app *app) CreateEvent(ctx context.Context, e Event) error {
-	if _, err := app.resources.Db.Exec(ctx, createQuery, e.Name, e.Description, e.OwnerID); err != nil {
+	if _, err := app.resources.Db.Exec(ctx, createQuery, e.Name, e.Description, e.OwnerID, e.IsPublic); err != nil {
 		return err
 	}
 	return nil
