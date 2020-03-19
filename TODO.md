@@ -9,3 +9,4 @@
 - Make event private
 - Improve API spec
 - Improve flows description
+- Write README
