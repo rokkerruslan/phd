@@ -89,6 +89,13 @@ func (app *app) update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	var err error
+	event.ID, err = strconv.Atoi(chi.URLParam(r, "id"))
+	if err != nil {
+		api.Error(w, err, http.StatusBadRequest)
+		return
+	}
+
 	if err := event.ValidateForUpdate(); err != nil {
 		api.Error(w, err, http.StatusBadRequest)
 		return

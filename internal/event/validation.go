@@ -22,10 +22,6 @@ func validateForCreate(e Event) error {
 func (e *Event) ValidateForUpdate() error {
 	errors := e.baseValidation()
 
-	if e.ID == 0 {
-		errors = append(errors, "`ID` can't be empty")
-	}
-
 	if len(errors) == 0 {
 		return nil
 	}

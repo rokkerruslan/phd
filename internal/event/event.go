@@ -12,5 +12,6 @@ type Event struct {
 	Created     time.Time
 	Updated     time.Time
 	IsPublic    bool
+	IsHidden    bool
 	Timelines   []Timeline
 }
