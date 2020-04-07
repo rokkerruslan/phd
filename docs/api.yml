@@ -7,7 +7,7 @@ info:
 paths:
   '/accounts/sign-up':
     post:
-      description: Registration
+      description: registration
       requestBody:
         description: Initial registration data
         required: true
@@ -24,7 +24,7 @@ paths:
                 Password:
                   type: string
       responses:
-        '200':
+        200:
           description: Sucsessful registration
           content:
             application/json:
@@ -34,4 +34,94 @@ paths:
                   - Token
                 properties:
                   Token:
+                    type: string
+        400:
+          description: Error. `Email or password` is empty
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - Email or password is empty
+                properties:
+                  Email or password is empty:
+                    type: string
+  '/accounts/sign-in':
+    post:
+      description: Enter
+      requestBody:
+        description: Input data entry
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - Email
+                - Password
+              properties:
+                Email:
+                  type: string
+                Password:
+                  type: string
+      responses:
+        200:
+          description: successful login
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - Token
+                properties:
+                  Token:
+                    type: string
+        400:
+          description: Error. Account does not exist
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - Account does not exist
+                properties:
+                  Account does not exist:
+                    type: string
+  '/accounts/sign-out':
+    delete:
+      description: exit
+      parameters:
+        - in: header
+          name: X-Auth-Token
+          schema:
+            type: string
+          required: true
+      responses:
+        204:
+          description: exit
+  '/accounts/{id}':
+    get:
+      description: getting user information
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+        - in: header
+          name: X-Auth-Token
+          schema:
+            type: integer
+          required: true
+      responses:
+        200:
+          description: providing user information
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ID:
+                    type: integer
+                  Email:
                     type: string
