@@ -1,0 +1,17 @@
+{
+  "Name": "Event X",
+  "OwnerID": 5,
+  "IsPublic": true,
+  "Timelines": [
+    {
+      "Start": "2006-01-02T15:05:05Z",
+      "End": "2006-01-02T16:06:05Z",
+      "Place": "Saint Petersburg"
+    },
+    {
+      "Start": "2006-01-02T17:05:05Z",
+      "End": "2006-01-02T18:06:05Z",
+      "Place": "Saint Petersburg"
+    }
+  ]
+}
