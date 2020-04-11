@@ -1,3 +1,13 @@
+# 1.5.0 (March 30, 2020)
+
+* Update golang.org/x/crypto for security fix
+* Implement "verify-ca" SSL mode (Greg Curtis)
+
+# 1.4.0 (March 7, 2020)
+
+* Fix ExecParams and ExecPrepared handling of empty query.
+* Support reading config from PostgreSQL service files.
+
 # 1.3.2 (February 14, 2020)
 
 * Update chunkreader to v2.0.1 for optimized default buffer size.

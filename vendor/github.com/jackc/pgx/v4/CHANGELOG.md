@@ -1,3 +1,20 @@
+# 4.6.0 (March 30, 2020)
+
+* stdlib: Bail early if preloading rows.Next() results in rows.Err() (Bas van Beek)
+* Sanitize time to microsecond accuracy (Andrew Nicoll)
+* Update pgtype to v1.3.0
+* Update pgconn to v1.5.0
+    * Update golang.org/x/crypto for security fix
+    * Implement "verify-ca" SSL mode
+
+# 4.5.0 (March 7, 2020)
+
+* Update to pgconn v1.4.0
+    * Fixes QueryRow with empty SQL
+    * Adds PostgreSQL service file support
+* Add Len() to *pgx.Batch (WGH)
+* Better logging for individual batch items (Ben Bader)
+
 # 4.4.1 (February 14, 2020)
 
 * Update pgconn to v1.3.2 - better default read buffer size
