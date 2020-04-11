@@ -6,21 +6,21 @@ import (
 )
 
 type (
-	Resources struct {
+	Assets struct {
 		Db *pgxpool.Pool
 	}
 	Opts struct{}
 )
 
-type app struct {
-	resources Resources
-	opts      Opts
+type App struct {
+	assets Assets
+	opts   Opts
 }
 
-func Setup(resources Resources, opts Opts) chi.Router {
-	a := app{
-		resources: resources,
-		opts:      opts,
+func Setup(assets Assets, opts Opts) chi.Router {
+	a := App{
+		assets: assets,
+		opts:   opts,
 	}
 	r := chi.NewRouter()
 	r.Get("/", a.list)

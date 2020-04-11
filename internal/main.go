@@ -51,7 +51,7 @@ func Run() {
 		event.Opts{},
 	))
 	r.Mount("/offers", offer.Setup(
-		offer.Resources{
+		offer.Assets{
 			Db: pool,
 		},
 		offer.Opts{},

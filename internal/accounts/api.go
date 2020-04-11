@@ -20,7 +20,7 @@ func (app *app) retrieveHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id, err := tokens.Retrieve(r.Context(), app.resources.Db, token)
+	id, err := tokens.RetrieveAccountID(r.Context(), app.resources.Db, token)
 	if err != nil {
 		switch {
 		case errors.Is(err, tokens.ErrDoesNotExist):
@@ -96,6 +96,7 @@ type signUpResponse struct {
 }
 
 // TODO: disable if already have a token.
+// TODO: signUpHandler MUST return account id
 func (app *app) signUpHandler(w http.ResponseWriter, r *http.Request) {
 	baseErr := "accounts.signUpHandler fails: %v"
 

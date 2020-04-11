@@ -14,6 +14,23 @@ import (
 	"ph/internal/api"
 )
 
+// RetrieveAccountIDByToken fetch auth token from request headers and try
+// fetch account id from tokens storage.
+func RetrieveAccountIDByToken(ctx context.Context, db *pgxpool.Pool, r *http.Request) (accountID int, err error) {
+	baseErr := "RetrieveAccountIDByToken fails: %v"
+
+	token, err := FromRequest(r)
+	if err != nil {
+		return 0, fmt.Errorf(baseErr, err)
+	}
+	accountID, err = RetrieveAccountID(ctx, db, token)
+	if err != nil {
+		return 0, fmt.Errorf(baseErr, err)
+	}
+
+	return accountID, nil
+}
+
 const insertQuery = `
 	INSERT INTO tokens (token, account_id, created) VALUES ($1, $2, NOW())
 `
@@ -38,7 +55,7 @@ func Create(ctx context.Context, db *pgxpool.Pool, accountID int) (session strin
 
 var ErrDoesNotExist = errors.New("token doesn't exist")
 
-func Retrieve(ctx context.Context, db *pgxpool.Pool, token string) (id int, err error) {
+func RetrieveAccountID(ctx context.Context, db *pgxpool.Pool, token string) (id int, err error) {
 	baseErr := "token.retrieve fails: %w"
 
 	if err = db.QueryRow(ctx, "SELECT account_id FROM tokens WHERE token = $1", token).Scan(&id); err != nil {

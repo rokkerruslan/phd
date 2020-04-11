@@ -3,28 +3,46 @@ package offer
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"net/url"
 	"strconv"
 
 	"ph/internal/api"
+	"ph/internal/tokens"
 )
 
-func (app *app) createOfferHandler(w http.ResponseWriter, r *http.Request) {
+func (app *App) createOfferHandler(w http.ResponseWriter, r *http.Request) {
+	baseErr := "App.createOfferHandler fails: %s"
+
 	var offer Offer
 	if err := json.NewDecoder(r.Body).Decode(&offer); err != nil {
-		log.Println(err)
+		api.Error(w, fmt.Errorf(baseErr, err), http.StatusBadRequest)
 		return
 	}
 
 	if err := offer.ValidateForCreate(); err != nil {
-		api.Error(w, err, http.StatusBadRequest)
+		api.Error(w, fmt.Errorf(baseErr, err), http.StatusBadRequest)
 		return
 	}
 
-	if err := app.createOffer(r.Context(), offer); err != nil {
-		api.Error(w, err, http.StatusInternalServerError)
+	accountID, err := tokens.RetrieveAccountIDByToken(r.Context(), app.assets.Db, r)
+	if err != nil {
+		api.Error(w, fmt.Errorf(baseErr, err), http.StatusBadRequest)
+		return
+	}
+
+	if !offer.CanBeCreated(accountID) {
+		api.Error(w, fmt.Errorf(baseErr, "you can't create offer for this account"), http.StatusBadRequest)
+		return
+	}
+
+	if offer, err = app.createOffer(r.Context(), offer); err != nil {
+		api.Error(w, fmt.Errorf(baseErr, err), http.StatusInternalServerError)
+		return
+	}
+
+	if err := json.NewEncoder(w).Encode(offer); err != nil {
+		api.Error(w, fmt.Errorf(baseErr, err), http.StatusInternalServerError)
 		return
 	}
 }
@@ -41,7 +59,7 @@ func NewFilterFromQuery(values url.Values) (f Filter, err error) {
 	return f, nil
 }
 
-func (app *app) list(w http.ResponseWriter, r *http.Request) {
+func (app *App) list(w http.ResponseWriter, r *http.Request) {
 	filter, err := NewFilterFromQuery(r.URL.Query())
 	if err != nil {
 		api.Error(w, fmt.Errorf("account_id parsing fails: %v", err), http.StatusBadRequest)
