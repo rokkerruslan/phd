@@ -67,7 +67,7 @@ func (app *app) retrieve(w http.ResponseWriter, r *http.Request) {
 func (app *app) create(w http.ResponseWriter, r *http.Request) {
 	var event Event
 	if err := json.NewDecoder(r.Body).Decode(&event); err != nil {
-		api.Error(w, err, http.StatusInternalServerError)
+		api.Error(w, err, http.StatusBadRequest)
 		return
 	}
 
