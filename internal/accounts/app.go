@@ -3,6 +3,7 @@ package accounts
 import (
 	"github.com/go-chi/chi"
 	"github.com/jackc/pgx/v4/pgxpool"
+	"ph/internal/tokens"
 )
 
 type (
@@ -19,6 +20,8 @@ type (
 type app struct {
 	resources Resources
 	opts      Opts
+
+	tokens *tokens.App
 }
 
 // Setup - initialize accounts app.
@@ -26,6 +29,9 @@ func Setup(resources Resources, opts Opts) chi.Router {
 	a := app{
 		resources: resources,
 		opts:      opts,
+		tokens: tokens.NewApp(tokens.Assets{
+			Db: resources.Db,
+		}),
 	}
 	r := chi.NewRouter()
 	r.Get("/{id}", a.retrieveHandler)

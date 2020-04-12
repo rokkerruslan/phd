@@ -8,7 +8,6 @@ import (
 	"strconv"
 
 	"ph/internal/api"
-	"ph/internal/tokens"
 )
 
 func (app *App) createOfferHandler(w http.ResponseWriter, r *http.Request) {
@@ -25,7 +24,7 @@ func (app *App) createOfferHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	accountID, err := tokens.RetrieveAccountIDByToken(r.Context(), app.assets.Db, r)
+	accountID, err := app.tokens.RetrieveAccountIDFromRequest(r.Context(), r)
 	if err != nil {
 		api.Error(w, fmt.Errorf(baseErr, err), http.StatusBadRequest)
 		return

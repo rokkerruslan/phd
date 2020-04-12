@@ -54,12 +54,12 @@ func (app *App) createOffer(ctx context.Context, o Offer) (Offer, error) {
 }
 
 func (app *App) offerList(ctx context.Context, f Filter) ([]Offer, error) {
-	defErr := "offer.List fails: %v"
+	baseErr := "offer.List fails: %v"
 
 	rows, err := app.assets.Db.Query(
 		ctx, "SELECT id, account_id, event_id, created, updated FROM offers WHERE account_id = $1", f.AccountID)
 	if err != nil {
-		return nil, fmt.Errorf(defErr, err)
+		return nil, fmt.Errorf(baseErr, err)
 	}
 	defer rows.Close()
 
@@ -71,7 +71,7 @@ func (app *App) offerList(ctx context.Context, f Filter) ([]Offer, error) {
 		var created time.Time
 		var updated time.Time
 		if err := rows.Scan(&id, &accountID, &eventID, &created, &updated); err != nil {
-			return nil, fmt.Errorf(defErr, err)
+			return nil, fmt.Errorf(baseErr, err)
 		}
 		offers = append(offers, Offer{
 			ID:        id,
@@ -92,7 +92,7 @@ func (app *App) offerFetchOne(ctx context.Context, offerID int) (Offer, error) {
 		ctx,
 		"SELECT id, account_id, event_id, created, updated FROM offers WHERE id = $1",
 		offerID,
-		)
+	)
 
 	var o Offer
 	if err := row.Scan(o.ID, o.AccountID, o.EventID, o.Created, o.Updated); err != nil {

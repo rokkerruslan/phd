@@ -11,19 +11,36 @@ import (
 
 	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
+
 	"ph/internal/api"
 )
 
-// RetrieveAccountIDByToken fetch auth token from request headers and try
-// fetch account id from tokens storage.
-func RetrieveAccountIDByToken(ctx context.Context, db *pgxpool.Pool, r *http.Request) (accountID int, err error) {
-	baseErr := "RetrieveAccountIDByToken fails: %v"
+type (
+	Assets struct {
+		Db *pgxpool.Pool
+	}
+)
 
-	token, err := FromRequest(r)
+type App struct {
+	Assets
+}
+
+func NewApp(assets Assets) *App {
+	return &App{
+		Assets: assets,
+	}
+}
+
+// RetrieveAccountIDFromRequest fetch auth token from request headers and try
+// fetch account id from tokens storage.
+func (app *App) RetrieveAccountIDFromRequest(ctx context.Context, r *http.Request) (accountID int, err error) {
+	baseErr := "RetrieveAccountIDFromRequest fails: %w"
+
+	token, err := fromRequest(r)
 	if err != nil {
 		return 0, fmt.Errorf(baseErr, err)
 	}
-	accountID, err = RetrieveAccountID(ctx, db, token)
+	accountID, err = app.retrieveAccountID(ctx, token)
 	if err != nil {
 		return 0, fmt.Errorf(baseErr, err)
 	}
@@ -35,8 +52,8 @@ const insertQuery = `
 	INSERT INTO tokens (token, account_id, created) VALUES ($1, $2, NOW())
 `
 
-func Create(ctx context.Context, db *pgxpool.Pool, accountID int) (session string, err error) {
-	baseErr := "session.CreateEvent fails: %v"
+func (app *App) Create(ctx context.Context, accountID int) (session string, err error) {
+	baseErr := "tokens.Create fails: %v"
 
 	buf := make([]byte, 32)
 	_, err = rand.Read(buf)
@@ -46,7 +63,7 @@ func Create(ctx context.Context, db *pgxpool.Pool, accountID int) (session strin
 
 	session = base64.StdEncoding.EncodeToString(buf)
 
-	if _, err = db.Exec(ctx, insertQuery, session, accountID); err != nil {
+	if _, err = app.Assets.Db.Exec(ctx, insertQuery, session, accountID); err != nil {
 		return "", fmt.Errorf(baseErr, err)
 	}
 
@@ -55,10 +72,10 @@ func Create(ctx context.Context, db *pgxpool.Pool, accountID int) (session strin
 
 var ErrDoesNotExist = errors.New("token doesn't exist")
 
-func RetrieveAccountID(ctx context.Context, db *pgxpool.Pool, token string) (id int, err error) {
-	baseErr := "token.retrieve fails: %w"
+func (app *App) retrieveAccountID(ctx context.Context, token string) (id int, err error) {
+	baseErr := "retrieveAccountID fails: %w"
 
-	if err = db.QueryRow(ctx, "SELECT account_id FROM tokens WHERE token = $1", token).Scan(&id); err != nil {
+	if err = app.Db.QueryRow(ctx, "SELECT account_id FROM tokens WHERE token = $1", token).Scan(&id); err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			err = fmt.Errorf(baseErr, ErrDoesNotExist)
 		} else {
@@ -75,7 +92,7 @@ type Session struct {
 	AccountID int
 }
 
-func FromRequest(r *http.Request) (string, error) {
+func fromRequest(r *http.Request) (string, error) {
 	token := r.Header.Get(api.AuthTokenHeaderName)
 	if token == "" {
 		return token, fmt.Errorf("`%s` isn't set", api.AuthTokenHeaderName)

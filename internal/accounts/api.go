@@ -14,13 +14,7 @@ import (
 func (app *app) retrieveHandler(w http.ResponseWriter, r *http.Request) {
 	baseErr := "accounts.retrieveHandler fails: %v"
 
-	token, err := tokens.FromRequest(r)
-	if err != nil {
-		api.Error(w, err, http.StatusForbidden)
-		return
-	}
-
-	id, err := tokens.RetrieveAccountID(r.Context(), app.resources.Db, token)
+	id, err := app.tokens.RetrieveAccountIDFromRequest(r.Context(), r)
 	if err != nil {
 		switch {
 		case errors.Is(err, tokens.ErrDoesNotExist):
@@ -75,7 +69,7 @@ func (app *app) signInHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Authenticate user
-	token, err := tokens.Create(r.Context(), app.resources.Db, acc.ID)
+	token, err := app.tokens.Create(r.Context(), acc.ID)
 	if err != nil {
 		api.Error(w, fmt.Errorf(baseErr, err), http.StatusInternalServerError)
 		return
@@ -133,7 +127,7 @@ func (app *app) signUpHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Authenticate
-	token, err := tokens.Create(r.Context(), app.resources.Db, acc.ID)
+	token, err := app.tokens.Create(r.Context(), acc.ID)
 	if err != nil {
 		api.Error(w, fmt.Errorf(baseErr, err), http.StatusInternalServerError)
 		return

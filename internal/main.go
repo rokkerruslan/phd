@@ -15,17 +15,6 @@ import (
 	"ph/internal/offer"
 )
 
-type App interface {
-	Router() chi.Router
-}
-
-// Apps - central app registry
-type Apps struct {
-	Account App
-	Auth    App
-	Event   App
-}
-
 // Run - entry point for internal package
 func Run() {
 	r := chi.NewRouter()
