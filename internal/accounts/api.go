@@ -147,7 +147,7 @@ func (app *app) signOutHandler(w http.ResponseWriter, r *http.Request) {
 			fmt.Sprintf("%s` isn't set", api.AuthTokenHeaderName)), http.StatusForbidden)
 		return
 	}
-	tokens.DropToken(r.Context(), app.resources.Db, token)
+	app.tokens.DropToken(r.Context(), token)
 
 	w.WriteHeader(http.StatusNoContent)
 }
