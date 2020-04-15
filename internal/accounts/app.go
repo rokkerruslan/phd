@@ -3,6 +3,7 @@ package accounts
 import (
 	"github.com/go-chi/chi"
 	"github.com/jackc/pgx/v4/pgxpool"
+	"ph/internal/api"
 	"ph/internal/tokens"
 )
 
@@ -34,6 +35,7 @@ func Setup(resources Resources, opts Opts) chi.Router {
 		}),
 	}
 	r := chi.NewRouter()
+	r.Use(api.ApplicationJSON)
 	r.Get("/{id}", a.retrieveHandler)
 	r.Delete("/{id}", a.deleteHandler)
 	r.Post("/sign-in", a.signInHandler)

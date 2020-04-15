@@ -12,6 +12,6 @@ type Image struct {
 	AuthorID int
 }
 
-func (a *app) createImage(ctx context.Context, ) {
+func (a *app) createImage(ctx context.Context) {
 
 }

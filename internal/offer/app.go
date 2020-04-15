@@ -3,6 +3,7 @@ package offer
 import (
 	"github.com/go-chi/chi"
 	"github.com/jackc/pgx/v4/pgxpool"
+	"ph/internal/api"
 	"ph/internal/tokens"
 )
 
@@ -29,6 +30,7 @@ func Setup(assets Assets, opts Opts) chi.Router {
 		}),
 	}
 	r := chi.NewRouter()
+	r.Use(api.ApplicationJSON)
 	r.Get("/", a.list)
 	r.Post("/", a.createOfferHandler)
 	return r

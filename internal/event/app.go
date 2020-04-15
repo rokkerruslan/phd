@@ -3,6 +3,7 @@ package event
 import (
 	"github.com/go-chi/chi"
 	"github.com/jackc/pgx/v4/pgxpool"
+	"ph/internal/api"
 )
 
 type (
@@ -23,6 +24,7 @@ func Setup(resources Resources, opts Opts) chi.Router {
 		opts:      opts,
 	}
 	r := chi.NewRouter()
+	r.Use(api.ApplicationJSON)
 	r.Get("/", a.eventListHandler)
 	r.Get("/{id}", a.retrieve)
 	r.Post("/", a.create)
