@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
+	"strings"
 
 	"ph/internal/api"
 )
@@ -48,20 +49,41 @@ func (app *App) createOfferHandler(w http.ResponseWriter, r *http.Request) {
 
 type Filter struct {
 	AccountID int
+	EventID   int
 }
 
-func NewFilterFromQuery(values url.Values) (f Filter, err error) {
-	defErr := "filter creating fails: %v"
-	if f.AccountID, err = strconv.Atoi(values.Get("account_id")); err != nil {
-		return f, fmt.Errorf(defErr, fmt.Errorf("account_id parsing fails: %v", err))
+func NewFilterFromQuery(values url.Values) (Filter, error) {
+	baseErr := "NewFilterFromQuery fails: %v"
+
+	var f Filter
+	var err error
+	var errors []string
+
+	accountIDRaw := values.Get("account_id")
+	if accountIDRaw != "" {
+		if f.AccountID, err = strconv.Atoi(accountIDRaw); err != nil {
+			errors = append(errors, fmt.Sprintf("account_id parsing fails: %v", err))
+		}
 	}
+
+	eventIDRaw := values.Get("event_id")
+	if eventIDRaw != "" {
+		if f.EventID, err = strconv.Atoi(eventIDRaw); err != nil {
+			errors = append(errors, fmt.Sprintf("event_id parsing fails: %v", err))
+		}
+	}
+
+	if len(errors) != 0 {
+		return f, fmt.Errorf(baseErr, strings.Join(errors, ", "))
+	}
+
 	return f, nil
 }
 
 func (app *App) list(w http.ResponseWriter, r *http.Request) {
 	filter, err := NewFilterFromQuery(r.URL.Query())
 	if err != nil {
-		api.Error(w, fmt.Errorf("account_id parsing fails: %v", err), http.StatusBadRequest)
+		api.Error(w, err, http.StatusBadRequest)
 		return
 	}
 

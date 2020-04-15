@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"strings"
 	"time"
+
+	"github.com/jackc/pgx/v4"
 )
 
 type Offer struct {
@@ -54,14 +56,47 @@ func (app *App) createOffer(ctx context.Context, o Offer) (Offer, error) {
 }
 
 func (app *App) offerList(ctx context.Context, f Filter) ([]Offer, error) {
-	baseErr := "offer.List fails: %v"
+	baseErr := "accounts.offerList fails: %v"
 
-	rows, err := app.assets.Db.Query(
-		ctx, "SELECT id, account_id, event_id, created, updated FROM offers WHERE account_id = $1", f.AccountID)
+	var err error
+	var rows pgx.Rows
+	if f.AccountID != 0 {
+		rows, err = app.assets.Db.Query(
+			ctx, "SELECT id, account_id, event_id, created, updated FROM offers WHERE account_id = $1", f.AccountID)
+	} else if f.EventID != 0 {
+		rows, err = app.assets.Db.Query(
+			ctx, "SELECT id, account_ID, event_id, created, updated FROM offers WHERE event_id = $1", f.EventID)
+	} else {
+		return nil, fmt.Errorf(baseErr, "filter is empty")
+	}
+
 	if err != nil {
 		return nil, fmt.Errorf(baseErr, err)
 	}
 	defer rows.Close()
+
+	return constructOffersFromRows(rows)
+}
+
+func (app *App) offerFetchOne(ctx context.Context, offerID int) (Offer, error) {
+	baseErr := "app.offerGetOne fails: %v"
+
+	row := app.assets.Db.QueryRow(
+		ctx,
+		"SELECT id, account_id, event_id, created, updated FROM offers WHERE id = $1",
+		offerID,
+	)
+
+	var o Offer
+	if err := row.Scan(o.ID, o.AccountID, o.EventID, o.Created, o.Updated); err != nil {
+		return o, fmt.Errorf(baseErr, err)
+	}
+
+	return o, nil
+}
+
+func constructOffersFromRows(rows pgx.Rows) ([]Offer, error) {
+	baseErr := "constructOffersFromRows fails: %w"
 
 	offers := []Offer{}
 	for rows.Next() {
@@ -83,21 +118,4 @@ func (app *App) offerList(ctx context.Context, f Filter) ([]Offer, error) {
 	}
 
 	return offers, nil
-}
-
-func (app *App) offerFetchOne(ctx context.Context, offerID int) (Offer, error) {
-	baseErr := "app.offerGetOne fails: %v"
-
-	row := app.assets.Db.QueryRow(
-		ctx,
-		"SELECT id, account_id, event_id, created, updated FROM offers WHERE id = $1",
-		offerID,
-	)
-
-	var o Offer
-	if err := row.Scan(o.ID, o.AccountID, o.EventID, o.Created, o.Updated); err != nil {
-		return o, fmt.Errorf(baseErr, err)
-	}
-
-	return o, nil
 }
