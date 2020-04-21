@@ -108,11 +108,7 @@ paths:
           required: true
           schema:
             type: integer
-        - in: header
-          name: X-Auth-Token
-          schema:
-            type: integer
-          required: true
+        - $ref: '#/components/parameters/X-Auth-Token'
       responses:
         200:
           description: providing user information
@@ -180,3 +176,59 @@ paths:
       responses:
         204:
           description: event update completion
+  '/offers':
+    post:
+      description: create offer
+      parameters:
+        - $ref: '#/components/parameters/X-Auth-Token'
+      requestBody:
+        description: account id and event id
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - AccountID
+                - EventID
+              properties:
+                AccountID:
+                  type: integer
+                EventID:
+                  type: integer
+      responses:
+        200:
+          description: offer data
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - ID
+                  - AccountID
+                  - EventID
+                  - Created
+                  - Updated
+                properties:
+                  ID:
+                    type: integer
+                  AccountID:
+                    type: integer
+                  EventID:
+                    type: integer
+                  Created:
+                    type: string
+                    format: date-time
+                  Update:
+                    type: string
+                    format: date-time
+components:
+  parameters:
+    X-Auth-Token:
+      in: header
+      name: X-Auth-Token
+      description: Authentication Token
+      schema:
+        type: string
+      required: true
+      example: "njxa7uLl3AYSkseDY61KlYJ+FJ0TrRqhVJOhaj4BYHQ="
