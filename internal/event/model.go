@@ -45,7 +45,7 @@ func (app *app) retrieveEvent(ctx context.Context, f filterRetrieve) (e Event, e
 }
 
 const deleteQuery = `
-	DELETE FROM events WHERE id == $1
+	DELETE FROM events WHERE id = $1
 `
 
 func (app *app) deleteEvent(ctx context.Context, f filterRetrieve) error {
