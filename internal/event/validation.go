@@ -35,6 +35,9 @@ func (e *Event) baseValidation() []string {
 	if e.Name == "" {
 		errors = append(errors, "`Name` can't be empty")
 	}
+	if e.Description == "" {
+		errors = append(errors, "`Description` can't be empty")
+	}
 	if e.Timelines == nil || len(e.Timelines) == 0 {
 		errors = append(errors, "`Timelines` can't be empty")
 	}

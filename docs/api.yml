@@ -154,26 +154,29 @@ paths:
       responses:
         200:
           description: completion of the event
-    '/update':
-      put:
-        description: update information for ivents
-        requestBody:
-          description: event structure update
-          required: true
-          content:
-            application/json:
-              schema:
-                type: object
-                required:
-                  - Name
-                  - Timelines
-                properties:
-                  Name:
-                    type: string
-                  Timelines:
-                    type: array
-                    items:
-                      type: object
+  '/update':
+    put:
+      description: update information for ivents
+      requestBody:
+        description: event structure update
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - Name
+                - Timelines
+                - Description
+              properties:
+                Name:
+                  type: string
+                Description:
+                  type: string
+                Timelines:
+                  type: array
+                  items:
+                    type: object
       responses:
         204:
-          descption: event update completion
+          description: event update completion

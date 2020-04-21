@@ -18,13 +18,13 @@ func (app *app) CreateEvent(ctx context.Context, e Event) error {
 }
 
 const updateQuery = `
-	UPDATE events SET name = $1, updated = NOW(), is_hidden = $3 WHERE id = $2
+	UPDATE events SET name = $1, updated = NOW(), is_hidden = $3, description = $4 WHERE id = $2
 `
 
 func (app *app) updateEvent(ctx context.Context, e Event) error {
 	baseErr := "event.Update fails: %v"
 
-	_, err := app.resources.Db.Exec(ctx, updateQuery, e.Name, e.ID, e.IsHidden)
+	_, err := app.resources.Db.Exec(ctx, updateQuery, e.Name, e.ID, e.IsHidden, e.Description)
 	if err != nil {
 		return fmt.Errorf(baseErr, err)
 	}
