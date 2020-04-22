@@ -25,10 +25,10 @@ func Setup(resources Resources, opts Opts) chi.Router {
 	}
 	r := chi.NewRouter()
 	r.Use(api.ApplicationJSON)
-	r.Get("/", a.eventListHandler)
-	r.Get("/{id}", a.retrieve)
-	r.Post("/", a.create)
-	r.Put("/{id}", a.update)
-	r.Delete("/{id}", a.delete)
+	r.Get("/", a.listHandler)
+	r.Get("/{id}", a.retrieveHandler)
+	r.Post("/", a.createHandler)
+	r.Put("/{id}", a.updateHandler)
+	r.Delete("/{id}", a.deleteHandler)
 	return r
 }

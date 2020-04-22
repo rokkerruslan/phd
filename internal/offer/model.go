@@ -38,7 +38,7 @@ func (o *Offer) ValidateForCreate() error {
 }
 
 // Users can't create offers not from yourself.
-func (o *Offer) CanBeCreated(accountID int) bool {
+func (o *Offer) canBeCreated(accountID int) bool {
 	return o.AccountID == accountID
 }
 
@@ -68,7 +68,7 @@ func (app *App) createOffer(ctx context.Context, o Offer) (Offer, error) {
 	return o, nil
 }
 
-func (app *App) offerList(ctx context.Context, f Filter) ([]Offer, error) {
+func (app *App) offerList(ctx context.Context, f ListFilter) ([]Offer, error) {
 	baseErr := "accounts.offerList fails: %v"
 
 	var err error

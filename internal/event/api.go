@@ -2,12 +2,12 @@ package event
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"net/url"
 	"strconv"
 
 	"github.com/go-chi/chi"
+
 	"ph/internal/api"
 )
 
@@ -18,7 +18,7 @@ func NewFilterFromQuery(_ url.Values) Filter {
 	return Filter{}
 }
 
-func (app *app) eventListHandler(w http.ResponseWriter, r *http.Request) {
+func (app *app) listHandler(w http.ResponseWriter, r *http.Request) {
 	filter := NewFilterFromQuery(r.URL.Query())
 
 	events, err := app.eventList(r.Context(), filter)
@@ -30,25 +30,8 @@ func (app *app) eventListHandler(w http.ResponseWriter, r *http.Request) {
 	_ = json.NewEncoder(w).Encode(events)
 }
 
-type filterRetrieve struct {
-	ID int
-}
-
-func newFilterRetrieve(r *http.Request) (f filterRetrieve, err error) {
-	baseErr := "newFilterRetrieve fails: %v"
-	raw := chi.URLParam(r, "id")
-	if raw == "" {
-		return f, fmt.Errorf(baseErr, "`id` param doesn't present")
-	}
-	f.ID, err = strconv.Atoi(raw)
-	if err != nil {
-		return f, fmt.Errorf(baseErr, err)
-	}
-	return f, err
-}
-
-func (app *app) retrieve(w http.ResponseWriter, r *http.Request) {
-	filter, err := newFilterRetrieve(r)
+func (app *app) retrieveHandler(w http.ResponseWriter, r *http.Request) {
+	filter, err := api.NewRetrieveFilter(r)
 	if err != nil {
 		api.Error(w, err, http.StatusBadRequest)
 		return
@@ -63,7 +46,7 @@ func (app *app) retrieve(w http.ResponseWriter, r *http.Request) {
 	_ = json.NewEncoder(w).Encode(event)
 }
 
-func (app *app) create(w http.ResponseWriter, r *http.Request) {
+func (app *app) createHandler(w http.ResponseWriter, r *http.Request) {
 	var event Event
 	if err := json.NewDecoder(r.Body).Decode(&event); err != nil {
 		api.Error(w, err, http.StatusBadRequest)
@@ -81,7 +64,7 @@ func (app *app) create(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (app *app) update(w http.ResponseWriter, r *http.Request) {
+func (app *app) updateHandler(w http.ResponseWriter, r *http.Request) {
 	var event Event
 	if err := json.NewDecoder(r.Body).Decode(&event); err != nil {
 		api.Error(w, err, http.StatusBadRequest)
@@ -108,8 +91,8 @@ func (app *app) update(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
-func (app *app) delete(w http.ResponseWriter, r *http.Request) {
-	filter, err := newFilterRetrieve(r)
+func (app *app) deleteHandler(w http.ResponseWriter, r *http.Request) {
+	filter, err := api.NewRetrieveFilter(r)
 	if err != nil {
 		api.Error(w, err, http.StatusBadRequest)
 		return

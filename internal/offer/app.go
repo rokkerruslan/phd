@@ -32,6 +32,7 @@ func Setup(assets Assets, opts Opts) chi.Router {
 	r := chi.NewRouter()
 	r.Use(api.ApplicationJSON)
 	r.Get("/", a.list)
-	r.Post("/", a.createOfferHandler)
+	r.Post("/", a.createHandler)
+	r.Put("/{id}", a.updateHandler)
 	return r
 }
