@@ -2,6 +2,7 @@ package offer
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 
@@ -38,10 +39,7 @@ func (app *App) createHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := json.NewEncoder(w).Encode(offer); err != nil {
-		api.Error(w, fmt.Errorf(baseErr, err), http.StatusInternalServerError)
-		return
-	}
+	api.Response(w, offer)
 }
 
 func (app *App) updateHandler(w http.ResponseWriter, r *http.Request) {
@@ -53,7 +51,41 @@ func (app *App) updateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Println("UPDATE OFFER ID:", f.ID)
+	var eventOwnerID int
+	if err := app.assets.Db.QueryRow(
+		r.Context(),
+		"SELECT owner_id FROM events JOIN offers ON events.id = offers.event_id WHERE offers.id = $1",
+		f.ID,
+	).Scan(&eventOwnerID); err != nil {
+		api.Error(w, fmt.Errorf(baseErr, err), http.StatusBadRequest)
+		return
+	}
+
+	accountID, err := app.tokens.RetrieveAccountIDFromRequest(r.Context(), r)
+	if err != nil {
+		api.Error(w, fmt.Errorf(baseErr, err), http.StatusBadRequest)
+		return
+	}
+
+	if accountID != eventOwnerID {
+		api.Error(w, fmt.Errorf(baseErr, errors.New("only Event Owner can update order")), http.StatusBadRequest)
+		return
+	}
+
+	var offer Offer
+	if err := json.NewDecoder(r.Body).Decode(&offer); err != nil {
+		api.Error(w, fmt.Errorf(baseErr, err), http.StatusBadRequest)
+		return
+	}
+
+	offer.ID = f.ID
+	offer, err = app.updateOffer(r.Context(), offer)
+	if err != nil {
+		api.Error(w, fmt.Errorf(baseErr, err), http.StatusBadRequest)
+		return
+	}
+
+	api.Response(w, offer)
 }
 
 func (app *App) list(w http.ResponseWriter, r *http.Request) {
@@ -69,5 +101,5 @@ func (app *App) list(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_ = json.NewEncoder(w).Encode(offers)
+	api.Response(w, offers)
 }

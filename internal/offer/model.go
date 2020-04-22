@@ -68,6 +68,16 @@ func (app *App) createOffer(ctx context.Context, o Offer) (Offer, error) {
 	return o, nil
 }
 
+func (app *App) updateOffer(ctx context.Context, o Offer) (Offer, error) {
+	baseErr := "updateOffer fails: %v"
+
+	if _, err := app.assets.Db.Exec(ctx, "UPDATE offers SET is_approved = $1 WHERE id = $2", o.IsApproved, o.ID); err != nil {
+		return o, fmt.Errorf(baseErr, err)
+	}
+
+	return o, nil
+}
+
 func (app *App) offerList(ctx context.Context, f ListFilter) ([]Offer, error) {
 	baseErr := "accounts.offerList fails: %v"
 
