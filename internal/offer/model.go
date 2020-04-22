@@ -10,11 +10,12 @@ import (
 )
 
 type Offer struct {
-	ID        int
-	AccountID int
-	EventID   int
-	Created   time.Time
-	Updated   time.Time
+	ID         int
+	AccountID  int
+	EventID    int
+	IsApproved bool
+	Created    time.Time
+	Updated    time.Time
 }
 
 func (o *Offer) ValidateForCreate() error {
@@ -27,6 +28,7 @@ func (o *Offer) ValidateForCreate() error {
 	if o.EventID == 0 {
 		errors = append(errors, "offer.EventID is zero")
 	}
+	// TODO: check event for is_hidden, we can't create offer for hidden events.
 
 	if len(errors) != 0 {
 		return fmt.Errorf(baseErr, strings.Join(errors, ", "))
@@ -41,15 +43,26 @@ func (o *Offer) CanBeCreated(accountID int) bool {
 }
 
 func (app *App) createOffer(ctx context.Context, o Offer) (Offer, error) {
+	baseErr := "createOffer fails: %v"
+
+	var isPublic bool
+	if err := app.assets.Db.QueryRow(ctx, "SELECT is_public FROM events WHERE id = $1", o.EventID).
+		Scan(&isPublic); err != nil {
+		return o, fmt.Errorf(baseErr, err)
+	}
+
+	o.IsApproved = isPublic
+
 	row := app.assets.Db.QueryRow(
 		ctx,
-		"INSERT INTO offers (account_id, event_id, created, updated) VALUES ($1, $2, NOW(), NOW()) RETURNING id, created, updated",
+		"INSERT INTO offers (account_id, event_id, created, updated, is_approved) VALUES ($1, $2, NOW(), NOW(), $3) RETURNING id, created, updated",
 		o.AccountID,
 		o.EventID,
+		o.IsApproved,
 	)
 
 	if err := row.Scan(&o.ID, &o.Created, &o.Updated); err != nil {
-		return o, err
+		return o, fmt.Errorf(baseErr, err)
 	}
 
 	return o, nil
