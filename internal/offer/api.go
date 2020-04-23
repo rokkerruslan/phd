@@ -88,6 +88,39 @@ func (app *App) updateHandler(w http.ResponseWriter, r *http.Request) {
 	api.Response(w, offer)
 }
 
+func (app *App) deleteHandler(w http.ResponseWriter, r *http.Request) {
+	baseErr := "updateHandler fails: %v"
+
+	f, err := api.NewRetrieveFilter(r)
+	if err != nil {
+		api.Error(w, fmt.Errorf(baseErr, err), http.StatusBadRequest)
+		return
+	}
+
+	accountID, err := app.tokens.RetrieveAccountIDFromRequest(r.Context(), r)
+	if err != nil {
+		api.Error(w, fmt.Errorf(baseErr, err), http.StatusBadRequest)
+		return
+	}
+
+	var offerOwnerID int
+	if err := app.assets.Db.QueryRow(
+		r.Context(),
+		"SELECT account_id FROM offers WHERE id = $1",
+		f.ID,
+	).Scan(&offerOwnerID); err != nil {
+		api.Error(w, fmt.Errorf(baseErr, err), http.StatusBadRequest)
+		return
+	}
+
+	if accountID != offerOwnerID {
+		api.Error(w, fmt.Errorf(baseErr, "only owner can delete offer"), http.StatusBadRequest)
+		return
+	}
+
+	app.deleteOffer(r.Context(), f)
+}
+
 func (app *App) list(w http.ResponseWriter, r *http.Request) {
 	filter, err := NewListFilterFromQuery(r.URL.Query())
 	if err != nil {

@@ -34,5 +34,6 @@ func Setup(assets Assets, opts Opts) chi.Router {
 	r.Get("/", a.list)
 	r.Post("/", a.createHandler)
 	r.Put("/{id}", a.updateHandler)
+	r.Delete("/{id}", a.deleteHandler)
 	return r
 }

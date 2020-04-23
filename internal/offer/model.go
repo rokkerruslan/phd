@@ -7,6 +7,8 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v4"
+
+	"ph/internal/api"
 )
 
 type Offer struct {
@@ -76,6 +78,12 @@ func (app *App) updateOffer(ctx context.Context, o Offer) (Offer, error) {
 	}
 
 	return o, nil
+}
+
+func (app *App) deleteOffer(ctx context.Context, f api.RetrieveFilter){
+	//baseErr := "deleteOffer fails: %v"
+
+	app.assets.Db.Exec(ctx, "DELETE FROM offers WHERE id = $1", f.ID)
 }
 
 func (app *App) offerList(ctx context.Context, f ListFilter) ([]Offer, error) {

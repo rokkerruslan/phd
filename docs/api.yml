@@ -99,7 +99,7 @@ paths:
       responses:
         204:
           description: exit
-  '/accounts/{id}':
+  '/accounts/id':
     get:
       description: getting user information
       parameters:
@@ -150,7 +150,7 @@ paths:
       responses:
         200:
           description: completion of the event
-  '/update':
+  '/events/id':
     put:
       description: update information for ivents
       requestBody:
@@ -207,7 +207,6 @@ paths:
                   - ID
                   - AccountID
                   - EventID
-                  - IsApproved
                   - Created
                   - Updated
                 properties:
@@ -217,14 +216,67 @@ paths:
                     type: integer
                   EventID:
                     type: integer
-                  IsApproved:
-                    type: bool
                   Created:
                     type: string
                     format: date-time
                   Update:
                     type: string
                     format: date-time
+  '/offers/id':
+    put:
+      description: offer data update
+      parameters:
+        - $ref: '#/components/parameters/X-Auth-Token'
+      requestBody:
+        description: event approval
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - IsApproved
+              properties:
+                IsApproved:
+                  type: integer
+                  nullable: true
+      responses:
+        200:
+          description: updated offer data
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - ID
+                  - AccountID
+                  - EventID
+                  - IsApproved
+                  - Created
+                  - Update
+                properties:
+                  ID:
+                    type: integer
+                  AccountID:
+                    type: integer
+                  EventID:
+                    type: integer
+                  IsApproved:
+                    type: integer
+                    nullable: true
+                  Created:
+                    type: string
+                    format: date-time
+                  Update:
+                    type: string
+                    format: date-time
+    delete:
+      description: delete offer
+      parameters:
+        - $ref: '#/components/parameters/X-Auth-Token'
+      responses:
+        200:
+          description: delete offer
 components:
   parameters:
     X-Auth-Token:
@@ -235,3 +287,4 @@ components:
         type: string
       required: true
       example: "njxa7uLl3AYSkseDY61KlYJ+FJ0TrRqhVJOhaj4BYHQ="
+        
