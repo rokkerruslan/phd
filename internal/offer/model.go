@@ -80,10 +80,14 @@ func (app *App) updateOffer(ctx context.Context, o Offer) (Offer, error) {
 	return o, nil
 }
 
-func (app *App) deleteOffer(ctx context.Context, f api.RetrieveFilter){
-	//baseErr := "deleteOffer fails: %v"
+func (app *App) deleteOffer(ctx context.Context, f api.RetrieveFilter) error {
+	baseErr := "deleteOffer fails: %v"
 
-	app.assets.Db.Exec(ctx, "DELETE FROM offers WHERE id = $1", f.ID)
+	if _, err := app.assets.Db.Exec(ctx, "DELETE FROM offers WHERE id = $1", f.ID); err != nil {
+		return fmt.Errorf(baseErr, err)
+	}
+
+	return nil
 }
 
 func (app *App) offerList(ctx context.Context, f ListFilter) ([]Offer, error) {

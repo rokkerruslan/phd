@@ -118,7 +118,12 @@ func (app *App) deleteHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	app.deleteOffer(r.Context(), f)
+	if err := app.deleteOffer(r.Context(), f); err != nil {
+		api.Error(w, fmt.Errorf(baseErr, err), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
 }
 
 func (app *App) list(w http.ResponseWriter, r *http.Request) {

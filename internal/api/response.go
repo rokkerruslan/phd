@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-
 )
 
 func Response(w http.ResponseWriter, obj interface{}) {

@@ -5,7 +5,7 @@ info:
   contact:
     email: 'Denis.Rokker@gmail.com'
 paths:
-  '/accounts/sign-up':
+  /accounts/sign-up:
     post:
       description: registration
       requestBody:
@@ -46,7 +46,7 @@ paths:
                 properties:
                   Email or password is empty:
                     type: string
-  '/accounts/sign-in':
+  /accounts/sign-in:
     post:
       description: Enter
       requestBody:
@@ -87,7 +87,7 @@ paths:
                 properties:
                   Account does not exist:
                     type: string
-  '/accounts/sign-out':
+  /accounts/sign-out:
     delete:
       description: exit
       parameters:
@@ -98,8 +98,9 @@ paths:
           required: true
       responses:
         204:
-          description: exit
-  '/accounts/id':
+          description: |
+            Complete logout
+  /accounts/id:
     get:
       description: getting user information
       parameters:
@@ -121,7 +122,7 @@ paths:
                     type: integer
                   Email:
                     type: string
-  '/events/':
+  /events:
     post:
       description: create new events
       requestBody:
@@ -150,7 +151,7 @@ paths:
       responses:
         200:
           description: completion of the event
-  '/events/id':
+  /events/id:
     put:
       description: update information for ivents
       requestBody:
@@ -176,7 +177,7 @@ paths:
       responses:
         204:
           description: event update completion
-  '/offers':
+  /offers:
     post:
       description: create offer
       parameters:
@@ -222,11 +223,12 @@ paths:
                   Update:
                     type: string
                     format: date-time
-  '/offers/id':
+  /offers/{id}:
     put:
       description: offer data update
       parameters:
         - $ref: '#/components/parameters/X-Auth-Token'
+        - $ref: '#/components/parameters/OfferID'
       requestBody:
         description: event approval
         required: true
@@ -274,11 +276,19 @@ paths:
       description: delete offer
       parameters:
         - $ref: '#/components/parameters/X-Auth-Token'
+        - $ref: '#/components/parameters/OfferID'
       responses:
         200:
           description: delete offer
 components:
   parameters:
+    OfferID:
+      in: path
+      name: id
+      description: Offer unique key
+      required: true
+      schema:
+        type: number
     X-Auth-Token:
       in: header
       name: X-Auth-Token
@@ -287,4 +297,3 @@ components:
         type: string
       required: true
       example: "njxa7uLl3AYSkseDY61KlYJ+FJ0TrRqhVJOhaj4BYHQ="
-        
