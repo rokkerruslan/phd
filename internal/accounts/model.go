@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/jackc/pgconn"
 	"github.com/jackc/pgx/v4"
 )
 
@@ -14,14 +15,26 @@ const createQuery = `
 	RETURNING id
 `
 
+var ErrAlreadyExists = errors.New("account already exists")
+
 // TODO: all create model functions MUST return id or full object?
 func (app *app) createAccount(ctx context.Context, a Account) (int, error) {
+	baseErr := "createAccount fails: %w"
+
 	var id int
 	err := app.resources.Db.
 		QueryRow(ctx, createQuery, a.Email, a.password).
 		Scan(&id)
+
+	// TODO: write helpers?
 	if err != nil {
-		return 0, err
+		if pgerr, ok := err.(*pgconn.PgError); ok {
+			if pgerr.ConstraintName == "accounts_email_key" {
+				return 0, fmt.Errorf(baseErr, ErrAlreadyExists)
+			}
+		}
+
+		return 0, fmt.Errorf(baseErr, err)
 	}
 	return id, nil
 }

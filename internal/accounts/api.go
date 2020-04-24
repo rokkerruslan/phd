@@ -121,8 +121,11 @@ func (app *app) signUpHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if acc.ID, err = app.createAccount(r.Context(), acc); err != nil {
-		// TODO: dispatch by type (for example duplicate email it's BadRequest)
-		api.Error(w, fmt.Errorf(baseErr, err), http.StatusInternalServerError)
+		status := http.StatusInternalServerError
+		if errors.Is(err, ErrAlreadyExists) {
+			status = http.StatusBadRequest
+		}
+		api.Error(w, fmt.Errorf(baseErr, err), status)
 		return
 	}
 
