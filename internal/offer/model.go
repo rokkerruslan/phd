@@ -73,7 +73,9 @@ func (app *App) createOffer(ctx context.Context, o Offer) (Offer, error) {
 func (app *App) updateOffer(ctx context.Context, o Offer) (Offer, error) {
 	baseErr := "updateOffer fails: %v"
 
-	if _, err := app.assets.Db.Exec(ctx, "UPDATE offers SET is_approved = $1 WHERE id = $2", o.IsApproved, o.ID); err != nil {
+	row := app.assets.Db.QueryRow(ctx, "UPDATE offers SET is_approved = $1 WHERE id = $2 RETURNING account_id, event_id, created, updated", o.IsApproved, o.ID)
+
+	if err := row.Scan(&o.AccountID, &o.EventID, &o.Created, &o.Updated); err != nil {
 		return o, fmt.Errorf(baseErr, err)
 	}
 
