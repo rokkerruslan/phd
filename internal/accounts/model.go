@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/jackc/pgconn"
 	"github.com/jackc/pgx/v4"
@@ -45,7 +46,7 @@ func (app *app) RetrieveByEmail(ctx context.Context, email string) (a Account, e
 	baseErr := "accounts.RetrieveByEmail fails: %v"
 
 	err = app.resources.Db.
-		QueryRow(ctx, "SELECT id, email, password FROM accounts WHERE email = $1", email).
+		QueryRow(ctx, "SELECT id, email, password FROM accounts WHERE email = $1", strings.ToLower(email)).
 		Scan(&a.ID, &a.Email, &a.password)
 	if err != nil {
 		switch {

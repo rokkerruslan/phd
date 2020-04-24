@@ -115,12 +115,9 @@ func (app *app) signUpHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	acc := Account{
-		Email:    signData.Email,
-		password: string(hash),
-	}
+	a := NewAccount(signData.Email, string(hash))
 
-	if acc.ID, err = app.createAccount(r.Context(), acc); err != nil {
+	if a.ID, err = app.createAccount(r.Context(), a); err != nil {
 		status := http.StatusInternalServerError
 		if errors.Is(err, ErrAlreadyExists) {
 			status = http.StatusBadRequest
@@ -130,7 +127,7 @@ func (app *app) signUpHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Authenticate
-	token, err := app.tokens.Create(r.Context(), acc.ID)
+	token, err := app.tokens.Create(r.Context(), a.ID)
 	if err != nil {
 		api.Error(w, fmt.Errorf(baseErr, err), http.StatusInternalServerError)
 		return
