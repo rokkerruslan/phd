@@ -34,6 +34,19 @@ func (app *App) createHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	var eventOwnerID int
+	if err := app.assets.Db.
+		QueryRow(r.Context(), "SELECT owner_id FROM events WHERE id = $1", offer.EventID).
+		Scan(&eventOwnerID); err != nil {
+			api.Error(w, fmt.Errorf(baseErr, err), http.StatusInternalServerError)
+			return
+	}
+
+	if eventOwnerID == accountID {
+		api.Error(w, fmt.Errorf(baseErr, "you can't create offer for you event"), http.StatusBadRequest)
+		return
+	}
+
 	if offer, err = app.createOffer(r.Context(), offer); err != nil {
 		api.Error(w, fmt.Errorf(baseErr, err), http.StatusInternalServerError)
 		return
