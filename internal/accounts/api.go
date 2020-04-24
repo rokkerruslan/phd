@@ -57,26 +57,27 @@ func (app *app) signInHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// TODO: hash password anyway
-	acc, err := app.RetrieveByEmail(r.Context(), signData.Email)
+	a, err := app.RetrieveByEmail(r.Context(), signData.Email)
 	if err != nil {
 		api.Error(w, fmt.Errorf(baseErr, err), http.StatusBadRequest)
 		return
 	}
 
-	if err := acc.CheckPassword(signData.Password, app.opts.GlobalSalt); err != nil {
+	if err := a.CheckPassword(signData.Password, app.opts.GlobalSalt); err != nil {
 		api.Error(w, fmt.Errorf(baseErr, err), http.StatusBadRequest)
 		return
 	}
 
 	// Authenticate user
-	token, err := app.tokens.Create(r.Context(), acc.ID)
+	token, err := app.tokens.Create(r.Context(), a.ID)
 	if err != nil {
 		api.Error(w, fmt.Errorf(baseErr, err), http.StatusInternalServerError)
 		return
 	}
 
 	_ = json.NewEncoder(w).Encode(signUpResponse{
-		Token: token,
+		Token:     token,
+		AccountID: a.ID,
 	})
 }
 
