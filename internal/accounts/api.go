@@ -86,7 +86,8 @@ type signUpRequest struct {
 }
 
 type signUpResponse struct {
-	Token string
+	AccountID int
+	Token     string
 }
 
 // TODO: disable if already have a token.
@@ -134,7 +135,8 @@ func (app *app) signUpHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	_ = json.NewEncoder(w).Encode(signUpResponse{
-		Token: token,
+		Token:     token,
+		AccountID: a.ID,
 	})
 }
 
