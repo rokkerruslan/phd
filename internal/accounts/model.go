@@ -20,7 +20,7 @@ func (app *app) createAccount(ctx context.Context, a Account) (int, error) {
 	err := app.resources.Db.
 		QueryRow(
 			ctx,
-			"INSERT INTO accounts (name, email, password, created, updated) VALUES ($1, $2, $3, NOW(), NOW()) RETURNING id",
+			"INSERT INTO accounts (name, email, password, is_deleted, created, updated) VALUES ($1, $2, $3, FALSE, NOW(), NOW()) RETURNING id",
 			a.Name,
 			a.Email,
 			a.password,
@@ -39,6 +39,22 @@ func (app *app) createAccount(ctx context.Context, a Account) (int, error) {
 	return id, nil
 }
 
+func (app *app) deleteAccount(ctx context.Context, id int) error {
+	baseErr := "deleteAccount fails: %v"
+
+	if _, err := app.resources.Db.
+		Exec(ctx, "UPDATE accounts SET is_deleted = TRUE WHERE id = $1", id); err != nil {
+			return fmt.Errorf(baseErr, err)
+	}
+
+	if _, err := app.resources.Db.
+		Exec(ctx, "DELETE FROM tokens WHERE account_id = $1", id); err != nil {
+			return fmt.Errorf(baseErr, err)
+	}
+
+	return nil
+}
+
 var ErrAccountDoesNotExist = errors.New("account does not exist")
 
 func (app *app) RetrieveByEmail(ctx context.Context, email string) (a Account, err error) {
@@ -47,7 +63,7 @@ func (app *app) RetrieveByEmail(ctx context.Context, email string) (a Account, e
 	err = app.resources.Db.
 		QueryRow(
 			ctx,
-			"SELECT id, name, email, password FROM accounts WHERE email = $1",
+			"SELECT id, name, email, password FROM accounts WHERE email = $1 AND is_deleted = FALSE",
 			strings.ToLower(email),
 		).Scan(&a.ID, &a.Name, &a.Email, &a.password)
 	if err != nil {
@@ -68,7 +84,7 @@ func (app *app) RetrieveByID(ctx context.Context, id int) (Account, error) {
 	if err := app.resources.Db.
 		QueryRow(
 			ctx,
-			"SELECT id, name, email FROM accounts WHERE id = $1",
+			"SELECT id, name, email FROM accounts WHERE id = $1 AND is_deleted = FALSE",
 			id,
 		).Scan(&a.ID, &a.Name, &a.Email); err != nil {
 			return a, fmt.Errorf(baseErr, err)

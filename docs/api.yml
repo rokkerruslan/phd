@@ -122,6 +122,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Account'
+    delete:
+      description: |
+        Delete account and remove all available tokens
+      parameters:
+        - $ref: '#/components/parameters/ID'
+        - $ref: '#/components/parameters/X-Auth-Token'
+      responses:
+        204:
+          description: Success deleting
   /events:
     post:
       description: create new events

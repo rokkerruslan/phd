@@ -12,6 +12,7 @@ import (
 	"ph/internal/tokens"
 )
 
+// TODO: check id from path
 func (app *app) retrieveHandler(w http.ResponseWriter, r *http.Request) {
 	baseErr := "accounts.retrieveHandler fails: %v"
 
@@ -36,8 +37,28 @@ func (app *app) retrieveHandler(w http.ResponseWriter, r *http.Request) {
 	_ = json.NewEncoder(w).Encode(account)
 }
 
-func (app *app) deleteHandler(_ http.ResponseWriter, _ *http.Request) {
+// TODO: check account id from path
+func (app *app) deleteHandler(w http.ResponseWriter, r *http.Request) {
+	baseErr := "deleteHandler fails: %v"
 
+	id, err := app.tokens.RetrieveAccountIDFromRequest(r.Context(), r)
+	if err != nil {
+		switch {
+		case errors.Is(err, tokens.ErrDoesNotExist):
+			api.Error(w, fmt.Errorf(baseErr, err), http.StatusBadRequest)
+			return
+		default:
+			api.Error(w, fmt.Errorf(baseErr, err), http.StatusInternalServerError)
+			return
+		}
+	}
+
+	if err := app.deleteAccount(r.Context(), id); err != nil {
+		api.Error(w, fmt.Errorf(baseErr, err), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
 }
 
 // Auth
