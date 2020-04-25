@@ -112,16 +112,11 @@ paths:
         - $ref: '#/components/parameters/X-Auth-Token'
       responses:
         200:
-          description: providing user information
+          description: Providing user information
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  ID:
-                    type: integer
-                  Email:
-                    type: string
+                $ref: '#/components/schemas/Account'
   /events:
     post:
       description: create new events
@@ -297,3 +292,21 @@ components:
         type: string
       required: true
       example: "njxa7uLl3AYSkseDY61KlYJ+FJ0TrRqhVJOhaj4BYHQ="
+  schemas:
+    Account:
+      type: object
+      required:
+        - ID
+        - Name
+        - Email
+      properties:
+        ID:
+          type: integer
+        Name:
+          type: string
+        Email:
+          type: string
+      example:
+        ID: 1
+        Name: "Rokker Ruslan"
+        Email: "rokkerruslan@protonmail.com"
