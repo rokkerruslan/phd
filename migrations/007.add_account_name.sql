@@ -2,3 +2,4 @@
 
 -- TODO: Add NOT NULL
 ALTER TABLE accounts ADD COLUMN name TEXT;
+
