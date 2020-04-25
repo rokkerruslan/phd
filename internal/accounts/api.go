@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"golang.org/x/crypto/bcrypt"
 	"ph/internal/api"
@@ -82,8 +83,29 @@ func (app *app) signInHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 type signUpRequest struct {
+	Name     string
 	Email    string
 	Password string
+}
+
+func (r *signUpRequest) Validate(passwordMinLen int) error {
+	var e []string
+
+	if r.Name == "" {
+		e = append(e, "`Name` is empty")
+	}
+	if r.Email == "" {
+		e = append(e, "`Email` is empty")
+	}
+	if len(r.Password) < passwordMinLen {
+		e = append(e, "`Password` length check fails")
+	}
+
+	if len(e) != 0 {
+		return fmt.Errorf("signUpRequest.Validate fails: %v", strings.Join(e, ", "))
+	}
+
+	return nil
 }
 
 type signUpResponse struct {
@@ -101,12 +123,9 @@ func (app *app) signUpHandler(w http.ResponseWriter, r *http.Request) {
 		api.Error(w, fmt.Errorf(baseErr, err), http.StatusBadRequest)
 		return
 	}
-	if len(signData.Password) < app.opts.MinLenForNewPassword {
-		api.Error(w, fmt.Errorf(baseErr, "`Password` length check fails"), http.StatusBadRequest)
-		return
-	}
-	if signData.Email == "" {
-		api.Error(w, fmt.Errorf(baseErr, "`Email` is empty"), http.StatusBadRequest)
+
+	if err := signData.Validate(app.opts.MinLenForNewPassword); err != nil {
+		api.Error(w, fmt.Errorf(baseErr, err), http.StatusBadRequest)
 		return
 	}
 
@@ -117,7 +136,7 @@ func (app *app) signUpHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	a := NewAccount(signData.Email, string(hash))
+	a := NewAccount(signData.Name, signData.Email, string(hash))
 
 	if a.ID, err = app.createAccount(r.Context(), a); err != nil {
 		status := http.StatusInternalServerError

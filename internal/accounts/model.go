@@ -10,12 +10,6 @@ import (
 	"github.com/jackc/pgx/v4"
 )
 
-const createQuery = `
-	INSERT INTO accounts (email, password, created, updated) 
-		VALUES($1, $2, NOW(), NOW())
-	RETURNING id
-`
-
 var ErrAlreadyExists = errors.New("account already exists")
 
 // TODO: all create model functions MUST return id or full object?
@@ -24,8 +18,13 @@ func (app *app) createAccount(ctx context.Context, a Account) (int, error) {
 
 	var id int
 	err := app.resources.Db.
-		QueryRow(ctx, createQuery, a.Email, a.password).
-		Scan(&id)
+		QueryRow(
+			ctx,
+			"INSERT INTO accounts (name, email, password, created, updated) VALUES ($1, $2, $3, NOW(), NOW()) RETURNING id",
+			a.Name,
+			a.Email,
+			a.password,
+		).Scan(&id)
 
 	// TODO: write helpers?
 	if err != nil {
@@ -46,8 +45,11 @@ func (app *app) RetrieveByEmail(ctx context.Context, email string) (a Account, e
 	baseErr := "accounts.RetrieveByEmail fails: %v"
 
 	err = app.resources.Db.
-		QueryRow(ctx, "SELECT id, email, password FROM accounts WHERE email = $1", strings.ToLower(email)).
-		Scan(&a.ID, &a.Email, &a.password)
+		QueryRow(
+			ctx,
+			"SELECT id, name, email, password FROM accounts WHERE email = $1",
+			strings.ToLower(email),
+		).Scan(&a.ID, &a.Name, &a.Email, &a.password)
 	if err != nil {
 		switch {
 		case errors.Is(err, pgx.ErrNoRows):
@@ -64,9 +66,12 @@ func (app *app) RetrieveByID(ctx context.Context, id int) (Account, error) {
 
 	var a Account
 	if err := app.resources.Db.
-		QueryRow(ctx, "SELECT id, email FROM accounts WHERE id = $1", id).
-		Scan(&a.ID, &a.Email); err != nil {
-		return a, fmt.Errorf(baseErr, err)
+		QueryRow(
+			ctx,
+			"SELECT id, name, email FROM accounts WHERE id = $1",
+			id,
+		).Scan(&a.ID, &a.Name, &a.Email); err != nil {
+			return a, fmt.Errorf(baseErr, err)
 	}
 	return a, nil
 }

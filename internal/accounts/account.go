@@ -6,8 +6,9 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func NewAccount(email string, passwordHash string) Account {
+func NewAccount(name, email string, passwordHash string) Account {
 	return Account{
+		Name:     name,
 		Email:    strings.ToLower(email),
 		password: passwordHash,
 	}
@@ -15,6 +16,7 @@ func NewAccount(email string, passwordHash string) Account {
 
 type Account struct {
 	ID    int
+	Name  string
 	Email string
 
 	password string
