@@ -18,10 +18,13 @@ paths:
               required:
                 - Email
                 - Password
+                - Name
               properties:
                 Email:
                   type: string
                 Password:
+                  type: string
+                Name:
                   type: string
       responses:
         200:
@@ -32,9 +35,12 @@ paths:
                 type: object
                 required:
                   - Token
+                  - AccountID
                 properties:
                   Token:
                     type: string
+                  AccountID:
+                    type: integer
         400:
           description: Error. `Email or password` is empty
           content:
@@ -42,9 +48,9 @@ paths:
               schema:
                 type: object
                 required:
-                  - Email or password is empty
+                  - Error
                 properties:
-                  Email or password is empty:
+                  Error:
                     type: string
   /accounts/sign-in:
     post:
@@ -73,9 +79,12 @@ paths:
                 type: object
                 required:
                   - Token
+                  - AccountID
                 properties:
                   Token:
                     type: string
+                  AccountID:
+                    type: integer
         400:
           description: Error. Account does not exist
           content:
@@ -83,9 +92,9 @@ paths:
               schema:
                 type: object
                 required:
-                  - Account does not exist
+                  - Error
                 properties:
-                  Account does not exist:
+                  Error:
                     type: string
   /accounts/sign-out:
     delete:
@@ -100,23 +109,26 @@ paths:
         204:
           description: |
             Complete logout
-  /accounts/id:
+  /accounts/{id}:
     get:
       description: getting user information
       parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/OfferID'
         - $ref: '#/components/parameters/X-Auth-Token'
       responses:
         200:
-          description: Providing user information
+          description: providing user information
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Account'
+                type: object
+                properties:
+                  ID:
+                    type: integer
+                  Email:
+                    type: string
+                  Name:
+                    type: string
   /events:
     post:
       description: create new events
@@ -146,9 +158,11 @@ paths:
       responses:
         200:
           description: completion of the event
-  /events/id:
+  /events/{id}:
     put:
       description: update information for ivents
+      parameters:
+        - $ref: '#/components/parameters/OfferID'
       requestBody:
         description: event structure update
         required: true
@@ -283,7 +297,7 @@ components:
       description: Offer unique key
       required: true
       schema:
-        type: number
+        type: integer
     X-Auth-Token:
       in: header
       name: X-Auth-Token
@@ -292,21 +306,3 @@ components:
         type: string
       required: true
       example: "njxa7uLl3AYSkseDY61KlYJ+FJ0TrRqhVJOhaj4BYHQ="
-  schemas:
-    Account:
-      type: object
-      required:
-        - ID
-        - Name
-        - Email
-      properties:
-        ID:
-          type: integer
-        Name:
-          type: string
-        Email:
-          type: string
-      example:
-        ID: 1
-        Name: "Rokker Ruslan"
-        Email: "rokkerruslan@protonmail.com"
