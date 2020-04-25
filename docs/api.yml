@@ -113,7 +113,7 @@ paths:
     get:
       description: getting user information
       parameters:
-        - $ref: '#/components/parameters/OfferID'
+        - $ref: '#/components/parameters/ID'
         - $ref: '#/components/parameters/X-Auth-Token'
       responses:
         200:
@@ -121,14 +121,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  ID:
-                    type: integer
-                  Email:
-                    type: string
-                  Name:
-                    type: string
+                $ref: '#/components/schemas/Account'
   /events:
     post:
       description: create new events
@@ -162,7 +155,7 @@ paths:
     put:
       description: update information for ivents
       parameters:
-        - $ref: '#/components/parameters/OfferID'
+        - $ref: '#/components/parameters/ID'
       requestBody:
         description: event structure update
         required: true
@@ -237,7 +230,7 @@ paths:
       description: offer data update
       parameters:
         - $ref: '#/components/parameters/X-Auth-Token'
-        - $ref: '#/components/parameters/OfferID'
+        - $ref: '#/components/parameters/ID'
       requestBody:
         description: event approval
         required: true
@@ -285,16 +278,16 @@ paths:
       description: delete offer
       parameters:
         - $ref: '#/components/parameters/X-Auth-Token'
-        - $ref: '#/components/parameters/OfferID'
+        - $ref: '#/components/parameters/ID'
       responses:
         200:
           description: delete offer
 components:
   parameters:
-    OfferID:
+    ID:
       in: path
       name: id
-      description: Offer unique key
+      description: Object unique key
       required: true
       schema:
         type: integer
@@ -323,4 +316,4 @@ components:
       example:
         ID: 1
         Name: "Rokker Ruslan"
-        Email: "rokkerruslan@protonmail.com"m"
+        Email: "rokkerruslan@protonmail.com"
