@@ -306,3 +306,21 @@ components:
         type: string
       required: true
       example: "njxa7uLl3AYSkseDY61KlYJ+FJ0TrRqhVJOhaj4BYHQ="
+  schemas:
+    Account:
+      type: object
+      required:
+        - ID
+        - Name
+        - Email
+      properties:
+        ID:
+          type: integer
+        Name:
+          type: string
+        Email:
+          type: string
+      example:
+        ID: 1
+        Name: "Rokker Ruslan"
+        Email: "rokkerruslan@protonmail.com"m"
