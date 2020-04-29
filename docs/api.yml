@@ -4,9 +4,18 @@ info:
   title: 'Photographer'
   contact:
     email: 'Denis.Rokker@gmail.com'
+tags:
+  - name: "Accounts"
+    description: all about accounts
+  - name: "Events"
+    description: all about events
+  - name: "Offers"
+    description: all about offers
 paths:
   /accounts/sign-up:
     post:
+      tags:
+        - "Accounts"
       description: registration
       requestBody:
         description: Initial registration data
@@ -54,6 +63,8 @@ paths:
                     type: string
   /accounts/sign-in:
     post:
+      tags:
+        - "Accounts"
       description: Enter
       requestBody:
         description: Input data entry
@@ -98,6 +109,8 @@ paths:
                     type: string
   /accounts/sign-out:
     delete:
+      tags:
+        - "Accounts"
       description: exit
       parameters:
         - in: header
@@ -111,6 +124,8 @@ paths:
             Complete logout
   /accounts/{id}:
     get:
+      tags:
+        - "Accounts"
       description: getting user information
       parameters:
         - $ref: '#/components/parameters/ID'
@@ -123,16 +138,19 @@ paths:
               schema:
                 $ref: '#/components/schemas/Account'
     delete:
-      description: |
-        Delete account and remove all available tokens
+      tags:
+        - "Accounts"
+      description: delete account
       parameters:
         - $ref: '#/components/parameters/ID'
         - $ref: '#/components/parameters/X-Auth-Token'
       responses:
         204:
-          description: Success deleting
+          description: deleting an account and all information about it
   /events:
     post:
+      tags:
+        - "Events"
       description: create new events
       requestBody:
         description: event structure filling
@@ -162,6 +180,8 @@ paths:
           description: completion of the event
   /events/{id}:
     put:
+      tags:
+        - "Events"
       description: update information for ivents
       parameters:
         - $ref: '#/components/parameters/ID'
@@ -190,6 +210,8 @@ paths:
           description: event update completion
   /offers:
     post:
+      tags:
+        - "Offers"
       description: create offer
       parameters:
         - $ref: '#/components/parameters/X-Auth-Token'
@@ -236,6 +258,8 @@ paths:
                     format: date-time
   /offers/{id}:
     put:
+      tags:
+        - "Offers"
       description: offer data update
       parameters:
         - $ref: '#/components/parameters/X-Auth-Token'
@@ -284,6 +308,8 @@ paths:
                     type: string
                     format: date-time
     delete:
+      tags:
+        - "Offers"
       description: delete offer
       parameters:
         - $ref: '#/components/parameters/X-Auth-Token'
