@@ -146,7 +146,7 @@ paths:
         - $ref: '#/components/parameters/X-Auth-Token'
       responses:
         204:
-          description: deleting an account and all information about it
+          description: deleting an account and all its tokens
   /events:
     post:
       tags:
