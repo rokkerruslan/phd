@@ -5,20 +5,20 @@ info:
   contact:
     email: 'Denis.Rokker@gmail.com'
 tags:
-  - name: "Accounts"
-    description: all about accounts
-  - name: "Events"
-    description: all about events
-  - name: "Offers"
-    description: all about offers
+  - name: Accounts
+    description: "All about accounts"
+  - name: Events
+    description: "All about events"
+  - name: Offers
+    description: "All about offers"
 paths:
   /accounts/sign-up:
     post:
       tags:
-        - "Accounts"
-      description: registration
+        - Accounts
+      description: "Registration"
       requestBody:
-        description: Initial registration data
+        description: "Initial registration data"
         required: true
         content:
           application/json:
@@ -37,7 +37,7 @@ paths:
                   type: string
       responses:
         200:
-          description: Sucsessful registration
+          description: "Sucsessful registration"
           content:
             application/json:
               schema:
@@ -51,7 +51,7 @@ paths:
                   AccountID:
                     type: integer
         400:
-          description: Error. `Email or password` is empty
+          description: "Error. `Email or password` is empty"
           content:
             application/json:
               schema:
@@ -64,10 +64,10 @@ paths:
   /accounts/sign-in:
     post:
       tags:
-        - "Accounts"
-      description: Enter
+        - Accounts
+      description: "Enter"
       requestBody:
-        description: Input data entry
+        description: "Input data entry"
         required: true
         content:
           application/json:
@@ -83,7 +83,7 @@ paths:
                   type: string
       responses:
         200:
-          description: successful login
+          description: "Successful login"
           content:
             application/json:
               schema:
@@ -97,7 +97,7 @@ paths:
                   AccountID:
                     type: integer
         400:
-          description: Error. Account does not exist
+          description: "Error. Account does not exist"
           content:
             application/json:
               schema:
@@ -110,8 +110,8 @@ paths:
   /accounts/sign-out:
     delete:
       tags:
-        - "Accounts"
-      description: exit
+        - Accounts
+      description: "Exit"
       parameters:
         - in: header
           name: X-Auth-Token
@@ -120,40 +120,39 @@ paths:
           required: true
       responses:
         204:
-          description: |
-            Complete logout
+          description: "Complete logout"
   /accounts/{id}:
     get:
       tags:
-        - "Accounts"
-      description: getting user information
+        - Accounts
+      description: "Etting user information"
       parameters:
         - $ref: '#/components/parameters/ID'
         - $ref: '#/components/parameters/X-Auth-Token'
       responses:
         200:
-          description: providing user information
+          description: "Providing user information"
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Account'
     delete:
       tags:
-        - "Accounts"
-      description: delete account
+        - Accounts
+      description: "Delete account"
       parameters:
         - $ref: '#/components/parameters/ID'
         - $ref: '#/components/parameters/X-Auth-Token'
       responses:
         204:
-          description: deleting an account and all its tokens
+          description: "Deleting an account and all its tokens"
   /events:
     post:
       tags:
-        - "Events"
-      description: create new events
+        - Events
+      description: "Create new events"
       requestBody:
-        description: event structure filling
+        description: "Event structure filling"
         required: true
         content:
           aplication/json:
@@ -177,16 +176,16 @@ paths:
                     type: object
       responses:
         200:
-          description: completion of the event
+          description: "Completion of the event"
   /events/{id}:
     put:
       tags:
-        - "Events"
-      description: update information for ivents
+        - Events
+      description: "Update information for ivents"
       parameters:
         - $ref: '#/components/parameters/ID'
       requestBody:
-        description: event structure update
+        description: "Event structure update"
         required: true
         content:
           application/json:
@@ -207,16 +206,16 @@ paths:
                     type: object
       responses:
         204:
-          description: event update completion
+          description: "Event update completion"
   /offers:
     post:
       tags:
-        - "Offers"
-      description: create offer
+        - Offers
+      description: "Create offer"
       parameters:
         - $ref: '#/components/parameters/X-Auth-Token'
       requestBody:
-        description: account id and event id
+        description: "Account id and event id"
         required: true
         content:
           application/json:
@@ -259,13 +258,13 @@ paths:
   /offers/{id}:
     put:
       tags:
-        - "Offers"
-      description: offer data update
+        - Offers
+      description: "Offer data update"
       parameters:
         - $ref: '#/components/parameters/X-Auth-Token'
         - $ref: '#/components/parameters/ID'
       requestBody:
-        description: event approval
+        description: "Event approval"
         required: true
         content:
           application/json:
@@ -279,7 +278,7 @@ paths:
                   nullable: true
       responses:
         200:
-          description: updated offer data
+          description: "Updated offer data"
           content:
             application/json:
               schema:
@@ -309,27 +308,27 @@ paths:
                     format: date-time
     delete:
       tags:
-        - "Offers"
-      description: delete offer
+        - Offers
+      description: "Delete offer"
       parameters:
         - $ref: '#/components/parameters/X-Auth-Token'
         - $ref: '#/components/parameters/ID'
       responses:
         200:
-          description: delete offer
+          description: "Delete offer"
 components:
   parameters:
     ID:
       in: path
       name: id
-      description: Object unique key
+      description: "Object unique key"
       required: true
       schema:
         type: integer
     X-Auth-Token:
       in: header
       name: X-Auth-Token
-      description: Authentication Token
+      description: "Authentication Token"
       schema:
         type: string
       required: true
