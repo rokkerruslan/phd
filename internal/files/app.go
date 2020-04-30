@@ -3,26 +3,31 @@ package files
 import (
 	"github.com/go-chi/chi"
 	"github.com/jackc/pgx/v4/pgxpool"
+	"ph/internal/tokens"
 )
 
 type (
-	Resources struct {
+	Assets struct {
 		Db *pgxpool.Pool
 	}
 	Opts struct{}
 )
 
-type app struct {
-	resources Resources
-	opts      Opts
+type App struct {
+	assets Assets
+	opts   Opts
+	tokens *tokens.App
 }
 
-func Setup(resources Resources, opts Opts) chi.Router {
-	a := app{
-		resources: resources,
-		opts:      opts,
+func Setup(assets Assets, opts Opts) chi.Router {
+	a := App{
+		assets: assets,
+		opts:   opts,
+		tokens: tokens.NewApp(tokens.Assets{
+			assets.Db,
+		}),
 	}
 	r := chi.NewRouter()
-	r.Post("/", a.upload)
+	r.Post("/", a.uploadHandler)
 	return r
 }

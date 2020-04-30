@@ -1,43 +1,57 @@
 package files
 
 import (
-	"io/ioutil"
-	"log"
+	"encoding/json"
+	"fmt"
 	"net/http"
-	"os"
-	"path/filepath"
+
+	"ph/internal/api"
 )
 
-// TODO: only images
-func (a *app) upload(w http.ResponseWriter, r *http.Request) {
-	if err := r.ParseMultipartForm(32 << 20); err != nil {
-		log.Println(err)
+func (app *App) uploadHandler(w http.ResponseWriter, r *http.Request) {
+	baseErr := "uploadHandler fails: %v"
+
+	var data ImageUploadRequest
+	if err := json.NewDecoder(r.Body).Decode(&data); err != nil {
+		api.Error(w, fmt.Errorf(baseErr, err), http.StatusBadRequest)
 		return
 	}
 
-	file, header, err := r.FormFile("f")
+	if err := data.Validate(); err != nil {
+		api.Error(w, fmt.Errorf(baseErr, err), http.StatusBadRequest)
+		return
+	}
+
+	accountID, err := app.tokens.RetrieveAccountIDFromRequest(r.Context(), r)
 	if err != nil {
-		log.Println(err)
+		api.Error(w, fmt.Errorf(baseErr, err), http.StatusBadRequest)
 		return
 	}
 
-	data, err := ioutil.ReadAll(file)
-	if err != nil {
-		log.Println(err)
+	if data.AuthorID != accountID {
+		api.Error(w, fmt.Errorf(baseErr, "you can't create image from this account"), http.StatusBadRequest)
 		return
 	}
 
-	// TODO: use different service for image storing
-	f, err := os.OpenFile(filepath.Join("./images", header.Filename), os.O_CREATE|os.O_RDWR, 0777)
-	if err != nil {
-		log.Println(err)
+	// TODO: check hidden/deleted status
+	var isEventPublic bool
+	row := app.assets.Db.QueryRow(r.Context(), "SELECT is_public FROM events WHERE id = $1", data.EventID)
+	if err := row.Scan(&isEventPublic); err != nil {
+		api.Error(w, fmt.Errorf(baseErr, err), http.StatusInternalServerError)
 		return
 	}
-	defer f.Close()
 
-	// TODO: fill rewrite file
-	if _, err := f.Write(data); err != nil {
-		log.Println(err)
+	if !isEventPublic {
+		// TODO: Check creating availability
+	}
+
+	if err := data.Store(); err != nil {
+		api.Error(w, fmt.Errorf(baseErr, err), http.StatusInternalServerError)
+		return
+	}
+
+	if err := app.createImage(r.Context(), data); err != nil {
+		api.Error(w, fmt.Errorf(baseErr, err), http.StatusInternalServerError)
 		return
 	}
 

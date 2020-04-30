@@ -56,7 +56,7 @@ func Run() {
 		},
 	))
 	r.Mount("/files", files.Setup(
-		files.Resources{
+		files.Assets{
 			Db: pool,
 		},
 		files.Opts{},
