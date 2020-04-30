@@ -2,6 +2,7 @@ package accounts
 
 import (
 	"strings"
+	"time"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -18,6 +19,9 @@ type Account struct {
 	ID    int
 	Name  string
 	Email string
+
+	Created time.Time
+	Updated time.Time
 
 	password string
 }

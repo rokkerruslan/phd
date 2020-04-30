@@ -12,31 +12,29 @@ import (
 
 var ErrAlreadyExists = errors.New("account already exists")
 
-// TODO: all create model functions MUST return id or full object?
-func (app *app) createAccount(ctx context.Context, a Account) (int, error) {
+func (app *app) createAccount(ctx context.Context, a Account) (Account, error) {
 	baseErr := "createAccount fails: %w"
 
-	var id int
 	err := app.resources.Db.
 		QueryRow(
 			ctx,
-			"INSERT INTO accounts (name, email, password, is_deleted, created, updated) VALUES ($1, $2, $3, FALSE, NOW(), NOW()) RETURNING id",
+			"INSERT INTO accounts (name, email, password, is_deleted, created, updated) VALUES ($1, $2, $3, FALSE, NOW(), NOW()) RETURNING id, created, updated",
 			a.Name,
 			a.Email,
 			a.password,
-		).Scan(&id)
+		).Scan(&a.ID, &a.Created, &a.Updated)
 
 	// TODO: write helpers?
 	if err != nil {
 		if pgerr, ok := err.(*pgconn.PgError); ok {
 			if pgerr.ConstraintName == "accounts_email_key" {
-				return 0, fmt.Errorf(baseErr, ErrAlreadyExists)
+				return a, fmt.Errorf(baseErr, ErrAlreadyExists)
 			}
 		}
-
-		return 0, fmt.Errorf(baseErr, err)
+		return a, fmt.Errorf(baseErr, err)
 	}
-	return id, nil
+
+	return a, nil
 }
 
 func (app *app) deleteAccount(ctx context.Context, id int) error {

@@ -14,7 +14,7 @@ import (
 
 // TODO: check id from path
 func (app *app) retrieveHandler(w http.ResponseWriter, r *http.Request) {
-	baseErr := "accounts.retrieveHandler fails: %v"
+	baseErr := "retrieveHandler fails: %v"
 
 	id, err := app.tokens.RetrieveAccountIDFromRequest(r.Context(), r)
 	if err != nil {
@@ -34,7 +34,7 @@ func (app *app) retrieveHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_ = json.NewEncoder(w).Encode(account)
+	api.Response(w, account)
 }
 
 // TODO: check account id from path
@@ -68,6 +68,11 @@ type signInRequest struct {
 	Password string
 }
 
+type signInResponse struct {
+	AccountID int
+	Token     string
+}
+
 // TODO: can't sign if already have a token
 func (app *app) signInHandler(w http.ResponseWriter, r *http.Request) {
 	baseErr := "accounts.signInHandler fails: %v"
@@ -97,7 +102,7 @@ func (app *app) signInHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_ = json.NewEncoder(w).Encode(signUpResponse{
+	api.Response(w, signInResponse{
 		Token:     token,
 		AccountID: a.ID,
 	})
@@ -130,8 +135,8 @@ func (r *signUpRequest) Validate(passwordMinLen int) error {
 }
 
 type signUpResponse struct {
-	AccountID int
-	Token     string
+	Token   string
+	Account Account
 }
 
 // TODO: disable if already have a token.
@@ -159,7 +164,7 @@ func (app *app) signUpHandler(w http.ResponseWriter, r *http.Request) {
 
 	a := NewAccount(signData.Name, signData.Email, string(hash))
 
-	if a.ID, err = app.createAccount(r.Context(), a); err != nil {
+	if a, err = app.createAccount(r.Context(), a); err != nil {
 		status := http.StatusInternalServerError
 		if errors.Is(err, ErrAlreadyExists) {
 			status = http.StatusBadRequest
@@ -175,9 +180,9 @@ func (app *app) signUpHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_ = json.NewEncoder(w).Encode(signUpResponse{
-		Token:     token,
-		AccountID: a.ID,
+	api.Response(w, signUpResponse{
+		Token:   token,
+		Account: a,
 	})
 }
 
