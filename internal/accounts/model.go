@@ -24,10 +24,10 @@ func (app *App) createAccount(ctx context.Context, a Account) (Account, error) {
 			a.password,
 		).Scan(&a.ID, &a.Created, &a.Updated)
 
-	// TODO: write helpers?
+	// TODO: write helpers? 23505 - UNIQUE
 	if err != nil {
 		if pgerr, ok := err.(*pgconn.PgError); ok {
-			if pgerr.ConstraintName == "accounts_email_key" {
+			if pgerr.Code == "23505" {
 				return a, fmt.Errorf(baseErr, ErrAlreadyExists)
 			}
 		}

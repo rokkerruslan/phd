@@ -118,7 +118,7 @@ func (r *signUpRequest) Validate(passwordMinLen int) error {
 	var e []string
 
 	if r.Name == "" {
-		e = append(e, "`Title` is empty")
+		e = append(e, "`Name` is empty")
 	}
 	if r.Email == "" {
 		e = append(e, "`Email` is empty")

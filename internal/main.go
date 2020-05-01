@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi"
+	"github.com/go-chi/cors"
 	"github.com/go-chi/chi/middleware"
 	"github.com/jackc/pgx/v4/pgxpool"
 	"ph/internal/accounts"
@@ -19,6 +20,10 @@ import (
 func Run() {
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
+
+	r.Use(cors.Handler(cors.Options{
+		AllowedOrigins:   []string{"*"},
+	}))
 
 	opts, err := newOptions()
 	if err != nil {
