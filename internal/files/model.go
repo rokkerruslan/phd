@@ -6,6 +6,8 @@ import (
 	"net/url"
 	"strconv"
 	"strings"
+
+	"github.com/jackc/pgx/v4"
 )
 
 func (app *App) createImage(ctx context.Context, r ImageUploadRequest) error {
@@ -67,16 +69,25 @@ func newListFilter(values url.Values) (listFilter, error) {
 	return f, nil
 }
 
-func (app *App) listImage(ctx context.Context, _ listFilter) ([]ImageListResponse, error) {
+func (app *App) listImage(ctx context.Context, f listFilter) ([]ImageListResponse, error) {
 	baseErr := "listImage fails: %v"
 
-	rows, err := app.assets.Db.Query(
-		ctx,
-		"SELECT title, author_id, event_id, hash, created FROM images",
-	)
+	var err error
+	var rows pgx.Rows
+	if f.authorID != 0 {
+		rows, err = app.assets.Db.Query(
+			ctx, "SELECT title, author_id, event_id, hash, created FROM images WHERE author_id = $1", f.authorID)
+	} else if f.eventID != 0 {
+		rows, err = app.assets.Db.Query(
+			ctx, "SELECT title, author_id, event_id, hash, created FROM images WHERE event_id = $1", f.eventID)
+	} else {
+		return nil, fmt.Errorf(baseErr, "filter is empty")
+	}
+
 	if err != nil {
 		return nil, fmt.Errorf(baseErr, err)
 	}
+	defer rows.Close()
 
 	list := make([]ImageListResponse, 0)
 	for rows.Next() {
