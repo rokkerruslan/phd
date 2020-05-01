@@ -137,21 +137,11 @@ func constructOffersFromRows(rows pgx.Rows) ([]Offer, error) {
 
 	offers := []Offer{}
 	for rows.Next() {
-		var id int
-		var accountID int
-		var eventID int
-		var created time.Time
-		var updated time.Time
-		if err := rows.Scan(&id, &accountID, &eventID, &created, &updated); err != nil {
+		var o Offer
+		if err := rows.Scan(&o.ID, &o.AccountID, &o.EventID, &o.Created, &o.Updated); err != nil {
 			return nil, fmt.Errorf(baseErr, err)
 		}
-		offers = append(offers, Offer{
-			ID:        id,
-			AccountID: accountID,
-			EventID:   eventID,
-			Created:   created,
-			Updated:   updated,
-		})
+		offers = append(offers, o)
 	}
 
 	return offers, nil
