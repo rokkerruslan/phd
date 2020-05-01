@@ -46,12 +46,25 @@ paths:
                 type: object
                 required:
                   - Token
-                  - AccountID
+                  - Account
                 properties:
                   Token:
                     type: string
                   AccountID:
-                    type: integer
+                    type: object
+                    properties:
+                      ID:
+                        type: integer
+                      Name:
+                        type: string
+                      Email:
+                        type: string
+                      Created:
+                        type: string
+                        format: date-time
+                      Updeated:
+                        type: string
+                        format: date-time
         400:
           description: "Error. `Email or password` is empty"
           content:
@@ -148,6 +161,17 @@ paths:
       responses:
         204:
           description: "Deleting an account and all its tokens"
+        400:
+          description: "Error. Account does not exist"
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - Error
+                properties:
+                  Error:
+                    type: string
   /events:
     post:
       tags:
@@ -417,6 +441,8 @@ components:
         - ID
         - Name
         - Email
+        - Created
+        - Updated
       properties:
         ID:
           type: integer
@@ -424,6 +450,12 @@ components:
           type: string
         Email:
           type: string
+        Created:
+          type: string
+          format: date-time
+        Updated:
+          type: string
+          format: date-time
       example:
         ID: 1
         Name: "Rokker Ruslan"
