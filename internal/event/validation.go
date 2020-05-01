@@ -33,7 +33,7 @@ func (e *Event) baseValidation() []string {
 	var errors []string
 
 	if e.Name == "" {
-		errors = append(errors, "`Name` can't be empty")
+		errors = append(errors, "`Title` can't be empty")
 	}
 	if e.Description == "" {
 		errors = append(errors, "`Description` can't be empty")

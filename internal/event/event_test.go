@@ -29,7 +29,7 @@ func TestEvent_Validate_Negative_EmptyName(t *testing.T) {
 	if got == nil {
 		t.Fatalf("expected error, got nil")
 	}
-	if !strings.Contains(got.Error(), "`Name`") {
+	if !strings.Contains(got.Error(), "`Title`") {
 		t.Errorf("error must contains reason, got: %v", got)
 	}
 }

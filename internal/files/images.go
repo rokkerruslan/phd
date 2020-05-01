@@ -1,7 +1,6 @@
 package files
 
 import (
-	"context"
 	"crypto/sha256"
 	"encoding/base64"
 	"fmt"
@@ -11,10 +10,18 @@ import (
 	"time"
 )
 
+type ImageListResponse struct {
+	EventID  int
+	AuthorID int
+	Title    string
+	Hash     string
+	Created  time.Time
+}
+
 type ImageUploadRequest struct {
 	EventID  int
 	AuthorID int
-	Name     string
+	Title    string
 	Data     string
 
 	hash string
@@ -29,8 +36,8 @@ func (r *ImageUploadRequest) Validate() error {
 	if r.AuthorID == 0 {
 		e = append(e, "`AuthorID` is missing")
 	}
-	if r.Name == "" {
-		e = append(e, "`Name` is missing")
+	if r.Title == "" {
+		e = append(e, "`Title` is missing")
 	}
 	if r.Data == "" {
 		e = append(e, "`Data` is missing")
@@ -52,7 +59,7 @@ func (r *ImageUploadRequest) Store() error {
 	}
 
 	hash := sha256.New()
-	hash.Write([]byte(r.Name))
+	hash.Write([]byte(r.Title))
 
 	// TODO: more clever solution (use GLOBAL_SALT)
 	timeHash, err := time.Now().MarshalBinary()
@@ -74,32 +81,4 @@ func (r *ImageUploadRequest) Store() error {
 	}
 
 	return nil
-}
-
-func (app *App) createImage(ctx context.Context, r ImageUploadRequest) error {
-	baseErr := "createImage fails: %v"
-
-	var id int
-	row := app.assets.Db.QueryRow(
-		ctx,
-		"INSERT INTO images (title, author_id, event_id, hash, created, updated) VALUES ($1, $2, $3, $4, NOW(), NOW()) RETURNING id",
-		r.Name,
-		r.AuthorID,
-		r.EventID,
-		r.hash,
-	)
-	if err := row.Scan(&id); err != nil {
-		return fmt.Errorf(baseErr, err)
-	}
-
-	return nil
-}
-
-type Image struct {
-	ID       int
-	Path     string
-	Name     string
-	EventID  int
-	AuthorID int
-	Hash     string
 }

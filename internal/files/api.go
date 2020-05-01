@@ -8,6 +8,24 @@ import (
 	"ph/internal/api"
 )
 
+func (app *App) listHandler(w http.ResponseWriter, r *http.Request) {
+	baseErr := "files.listHandler fails: %v"
+
+	f, err := newListFilter(r.URL.Query())
+	if err != nil {
+		api.Error(w, fmt.Errorf(baseErr, err), http.StatusBadRequest)
+		return
+	}
+
+	list, err := app.listImage(r.Context(), f)
+	if err != nil {
+		api.Error(w, fmt.Errorf(baseErr, err), http.StatusBadRequest)
+		return
+	}
+
+	api.Response(w, list)
+}
+
 func (app *App) uploadHandler(w http.ResponseWriter, r *http.Request) {
 	baseErr := "uploadHandler fails: %v"
 

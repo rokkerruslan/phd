@@ -28,6 +28,7 @@ func Setup(assets Assets, opts Opts) chi.Router {
 		}),
 	}
 	r := chi.NewRouter()
+	r.Get("/", a.listHandler)
 	r.Post("/", a.uploadHandler)
 	return r
 }
