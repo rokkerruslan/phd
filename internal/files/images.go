@@ -70,7 +70,7 @@ func (r *ImageUploadRequest) Store() error {
 	r.hash = fmt.Sprintf("%x", hash.Sum(nil))
 
 	// TODO: use hash sum for name
-	f, err := os.OpenFile(filepath.Join("./images", r.hash), os.O_CREATE|os.O_RDWR, 0777)
+	f, err := os.OpenFile(filepath.Join(FilesDirName, r.hash), os.O_CREATE|os.O_RDWR, 0777)
 	if err != nil {
 		return fmt.Errorf(baseErr, err)
 	}
