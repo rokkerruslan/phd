@@ -11,6 +11,8 @@ tags:
     description: "All about events"
   - name: Offers
     description: "All about offers"
+  - name: Images
+    description: "All about images"
 paths:
   /accounts/sign-up:
     post:
@@ -316,12 +318,87 @@ paths:
       responses:
         200:
           description: "Delete offer"
+  /files:
+    post:
+      tags:
+        - Images
+      description: "Upload images"
+      requestBody:
+        description: "Image information"
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - EventID
+                - AuthorID
+                - Title
+                - Data
+              properties:
+                EventID:
+                  type: integer
+                AuthorID:
+                  type: integer
+                Title:
+                  type: string
+                Data:
+                  type: string
+      responses:
+        202:
+          description: image upload completion
+    get:
+      tags:
+        - Images
+      description: "Obtaining image metadata"
+      parameters:
+        - $ref: '#/components/parameters/AuthorID'
+        - $ref: '#/components/parameters/EventID'
+      responses:
+        200:
+          description: "Image metadata"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  required:
+                    - EventID
+                    - AuthorID
+                    - Title
+                    - Hash
+                    - Created
+                  properties:
+                    EventID:
+                      type: integer
+                    AuthorID:
+                      type: integer
+                    Title:
+                      type: string
+                    Hash:
+                      type: string
+                    Created:
+                      type: string
+                      format: date-time
 components:
   parameters:
     ID:
       in: path
       name: id
       description: "Object unique key"
+      required: true
+      schema:
+        type: integer
+    AuthorID:
+      in: query
+      name: author_id
+      required: true
+      schema:
+        type: integer
+    EventID:
+      in: query
+      name: event_id
       required: true
       schema:
         type: integer
@@ -351,4 +428,3 @@ components:
         ID: 1
         Name: "Rokker Ruslan"
         Email: "rokkerruslan@protonmail.com"
-        
