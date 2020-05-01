@@ -18,16 +18,16 @@ type (
 	}
 )
 
-type app struct {
+type App struct {
 	resources Resources
 	opts      Opts
 
 	tokens *tokens.App
 }
 
-// Setup - initialize accounts app.
+// Setup - initialize accounts App.
 func Setup(resources Resources, opts Opts) chi.Router {
-	a := app{
+	app := App{
 		resources: resources,
 		opts:      opts,
 		tokens: tokens.NewApp(tokens.Assets{
@@ -36,10 +36,10 @@ func Setup(resources Resources, opts Opts) chi.Router {
 	}
 	r := chi.NewRouter()
 	r.Use(api.ApplicationJSON)
-	r.Get("/{id}", a.retrieveHandler)
-	r.Delete("/{id}", a.deleteHandler)
-	r.Post("/sign-in", a.signInHandler)
-	r.Post("/sign-up", a.signUpHandler)
-	r.Delete("/sign-out", a.signOutHandler)
+	r.Get("/{id}", app.retrieveHandler)
+	r.Delete("/{id}", app.deleteHandler)
+	r.Post("/sign-in", app.signInHandler)
+	r.Post("/sign-up", app.signUpHandler)
+	r.Delete("/sign-out", app.signOutHandler)
 	return r
 }

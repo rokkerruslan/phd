@@ -12,7 +12,7 @@ import (
 
 var ErrAlreadyExists = errors.New("account already exists")
 
-func (app *app) createAccount(ctx context.Context, a Account) (Account, error) {
+func (app *App) createAccount(ctx context.Context, a Account) (Account, error) {
 	baseErr := "createAccount fails: %w"
 
 	err := app.resources.Db.
@@ -37,7 +37,7 @@ func (app *app) createAccount(ctx context.Context, a Account) (Account, error) {
 	return a, nil
 }
 
-func (app *app) deleteAccount(ctx context.Context, id int) error {
+func (app *App) deleteAccount(ctx context.Context, id int) error {
 	baseErr := "deleteAccount fails: %v"
 
 	if _, err := app.resources.Db.
@@ -55,7 +55,7 @@ func (app *app) deleteAccount(ctx context.Context, id int) error {
 
 var ErrAccountDoesNotExist = errors.New("account does not exist")
 
-func (app *app) RetrieveByEmail(ctx context.Context, email string) (a Account, err error) {
+func (app *App) RetrieveByEmail(ctx context.Context, email string) (a Account, err error) {
 	baseErr := "accounts.RetrieveByEmail fails: %v"
 
 	err = app.resources.Db.
@@ -75,7 +75,7 @@ func (app *app) RetrieveByEmail(ctx context.Context, email string) (a Account, e
 }
 
 // TODO: do not use param like part of result object, always scan?
-func (app *app) RetrieveByID(ctx context.Context, id int) (Account, error) {
+func (app *App) RetrieveByID(ctx context.Context, id int) (Account, error) {
 	baseErr := "accounts.RetrieveByID fails: %v"
 
 	var a Account

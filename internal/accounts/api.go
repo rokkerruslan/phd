@@ -13,7 +13,7 @@ import (
 )
 
 // TODO: check id from path
-func (app *app) retrieveHandler(w http.ResponseWriter, r *http.Request) {
+func (app *App) retrieveHandler(w http.ResponseWriter, r *http.Request) {
 	baseErr := "retrieveHandler fails: %v"
 
 	id, err := app.tokens.RetrieveAccountIDFromRequest(r.Context(), r)
@@ -38,7 +38,7 @@ func (app *app) retrieveHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // TODO: check account id from path
-func (app *app) deleteHandler(w http.ResponseWriter, r *http.Request) {
+func (app *App) deleteHandler(w http.ResponseWriter, r *http.Request) {
 	baseErr := "deleteHandler fails: %v"
 
 	id, err := app.tokens.RetrieveAccountIDFromRequest(r.Context(), r)
@@ -74,7 +74,7 @@ type signInResponse struct {
 }
 
 // TODO: can't sign if already have a token
-func (app *app) signInHandler(w http.ResponseWriter, r *http.Request) {
+func (app *App) signInHandler(w http.ResponseWriter, r *http.Request) {
 	baseErr := "accounts.signInHandler fails: %v"
 
 	var signData signInRequest
@@ -118,7 +118,7 @@ func (r *signUpRequest) Validate(passwordMinLen int) error {
 	var e []string
 
 	if r.Name == "" {
-		e = append(e, "`Name` is empty")
+		e = append(e, "`Title` is empty")
 	}
 	if r.Email == "" {
 		e = append(e, "`Email` is empty")
@@ -141,7 +141,7 @@ type signUpResponse struct {
 
 // TODO: disable if already have a token.
 // TODO: signUpHandler MUST return account id
-func (app *app) signUpHandler(w http.ResponseWriter, r *http.Request) {
+func (app *App) signUpHandler(w http.ResponseWriter, r *http.Request) {
 	baseErr := "accounts.signUpHandler fails: %v"
 
 	var signData signUpRequest
@@ -186,7 +186,7 @@ func (app *app) signUpHandler(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func (app *app) signOutHandler(w http.ResponseWriter, r *http.Request) {
+func (app *App) signOutHandler(w http.ResponseWriter, r *http.Request) {
 	baseErr := "accounts.signOutHandler fails: %v"
 
 	token := r.Header.Get(api.AuthTokenHeaderName)
