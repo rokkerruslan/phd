@@ -68,11 +68,6 @@ type signInRequest struct {
 	Password string
 }
 
-type signInResponse struct {
-	AccountID int
-	Token     string
-}
-
 // TODO: can't sign if already have a token
 func (app *App) signInHandler(w http.ResponseWriter, r *http.Request) {
 	baseErr := "accounts.signInHandler fails: %v"
@@ -102,9 +97,9 @@ func (app *App) signInHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	api.Response(w, signInResponse{
-		Token:     token,
-		AccountID: a.ID,
+	api.Response(w, signUpResponse{
+		Token:   token,
+		Account: a,
 	})
 }
 
