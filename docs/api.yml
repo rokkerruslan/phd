@@ -313,8 +313,7 @@ paths:
                 - IsApproved
               properties:
                 IsApproved:
-                  type: integer
-                  nullable: true
+                  type: boolean
       responses:
         200:
           description: "Updated offer data"
@@ -337,8 +336,7 @@ paths:
                   EventID:
                     type: integer
                   IsApproved:
-                    type: integer
-                    nullable: true
+                    type: boolean
                   Created:
                     type: string
                     format: date-time
