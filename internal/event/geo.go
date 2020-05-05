@@ -1,4 +1,4 @@
-// TODO: to another application (geo app)?
+// TODO: to another application (geo App)?
 package event
 
 type Point struct {

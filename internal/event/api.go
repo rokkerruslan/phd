@@ -2,6 +2,7 @@ package event
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -18,7 +19,7 @@ func NewFilterFromQuery(_ url.Values) Filter {
 	return Filter{}
 }
 
-func (app *app) listHandler(w http.ResponseWriter, r *http.Request) {
+func (app *App) listHandler(w http.ResponseWriter, r *http.Request) {
 	filter := NewFilterFromQuery(r.URL.Query())
 
 	events, err := app.eventList(r.Context(), filter)
@@ -30,7 +31,7 @@ func (app *app) listHandler(w http.ResponseWriter, r *http.Request) {
 	api.Response(w, events)
 }
 
-func (app *app) retrieveHandler(w http.ResponseWriter, r *http.Request) {
+func (app *App) retrieveHandler(w http.ResponseWriter, r *http.Request) {
 	filter, err := api.NewRetrieveFilter(r)
 	if err != nil {
 		api.Error(w, err, http.StatusBadRequest)
@@ -46,7 +47,9 @@ func (app *app) retrieveHandler(w http.ResponseWriter, r *http.Request) {
 	_ = json.NewEncoder(w).Encode(event)
 }
 
-func (app *app) createHandler(w http.ResponseWriter, r *http.Request) {
+func (app *App) createHandler(w http.ResponseWriter, r *http.Request) {
+	baseErr := "events.createHandler fails: %v"
+
 	var event Event
 	if err := json.NewDecoder(r.Body).Decode(&event); err != nil {
 		api.Error(w, err, http.StatusBadRequest)
@@ -58,7 +61,18 @@ func (app *app) createHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	event, err := app.createEvent(r.Context(), event)
+	accountID, err := app.tokens.RetrieveAccountIDFromRequest(r.Context(), r)
+	if err != nil {
+		api.Error(w, fmt.Errorf(baseErr, err), http.StatusBadRequest)
+		return
+	}
+
+	if accountID != event.OwnerID {
+		api.Error(w, fmt.Errorf(baseErr, "didn't authorized"), http.StatusBadRequest)
+		return
+	}
+
+	event, err = app.createEvent(r.Context(), event)
 	if err != nil {
 		api.Error(w, err, http.StatusBadRequest)
 		return
@@ -67,7 +81,7 @@ func (app *app) createHandler(w http.ResponseWriter, r *http.Request) {
 	api.Response(w, event)
 }
 
-func (app *app) updateHandler(w http.ResponseWriter, r *http.Request) {
+func (app *App) updateHandler(w http.ResponseWriter, r *http.Request) {
 	var event Event
 	if err := json.NewDecoder(r.Body).Decode(&event); err != nil {
 		api.Error(w, err, http.StatusBadRequest)
@@ -94,7 +108,7 @@ func (app *app) updateHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
-func (app *app) deleteHandler(w http.ResponseWriter, r *http.Request) {
+func (app *App) deleteHandler(w http.ResponseWriter, r *http.Request) {
 	filter, err := api.NewRetrieveFilter(r)
 	if err != nil {
 		api.Error(w, err, http.StatusBadRequest)

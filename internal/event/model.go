@@ -14,10 +14,10 @@ const createQuery = `
 	RETURNING id, created, updated
 `
 
-func (app *app) createEvent(ctx context.Context, e Event) (Event, error) {
+func (app *App) createEvent(ctx context.Context, e Event) (Event, error) {
 	baseErr := "createEvent fails: %v"
 
-	err := app.resources.Db.QueryRow(
+	err := app.assets.Db.QueryRow(
 		ctx,
 		createQuery,
 		e.Name,
@@ -30,7 +30,7 @@ func (app *app) createEvent(ctx context.Context, e Event) (Event, error) {
 	}
 
 	for i, timeline := range e.Timelines {
-		err := app.resources.Db.QueryRow(
+		err := app.assets.Db.QueryRow(
 			ctx,
 			"INSERT INTO timelines (event_id, start, \"end\", place) VALUES ($1, $2, $3, $4) RETURNING id",
 			e.ID,
@@ -50,10 +50,10 @@ const updateQuery = `
 	UPDATE events SET name = $1, updated = NOW(), is_hidden = $3, description = $4 WHERE id = $2
 `
 
-func (app *app) updateEvent(ctx context.Context, e Event) error {
+func (app *App) updateEvent(ctx context.Context, e Event) error {
 	baseErr := "event.Update fails: %v"
 
-	_, err := app.resources.Db.Exec(ctx, updateQuery, e.Name, e.ID, e.IsHidden, e.Description)
+	_, err := app.assets.Db.Exec(ctx, updateQuery, e.Name, e.ID, e.IsHidden, e.Description)
 	if err != nil {
 		return fmt.Errorf(baseErr, err)
 	}
@@ -64,9 +64,9 @@ const retrieveQuery = `
 	SELECT id, name, owner_id, created, updated FROM events WHERE id = $1
 `
 
-func (app *app) retrieveEvent(ctx context.Context, f api.RetrieveFilter) (e Event, err error) {
+func (app *App) retrieveEvent(ctx context.Context, f api.RetrieveFilter) (e Event, err error) {
 	defErr := "modelRetrieve fails: %v"
-	err = app.resources.Db.QueryRow(ctx, retrieveQuery, f.ID).Scan(e.ID, e.Name, e.OwnerID, e.Created, e.Updated)
+	err = app.assets.Db.QueryRow(ctx, retrieveQuery, f.ID).Scan(e.ID, e.Name, e.OwnerID, e.Created, e.Updated)
 	if err != nil {
 		return e, fmt.Errorf(defErr, err)
 	}
@@ -77,9 +77,9 @@ const deleteQuery = `
 	DELETE FROM events WHERE id = $1
 `
 
-func (app *app) deleteEvent(ctx context.Context, f api.RetrieveFilter) error {
+func (app *App) deleteEvent(ctx context.Context, f api.RetrieveFilter) error {
 	defErr := "modelDelete fails: %v"
-	_, err := app.resources.Db.Exec(ctx, deleteQuery, f.ID)
+	_, err := app.assets.Db.Exec(ctx, deleteQuery, f.ID)
 	if err != nil {
 		return fmt.Errorf(defErr, err)
 	}
@@ -94,9 +94,9 @@ const selectTimelinesQuery = `
 	SELECT id, start, "end", place, event_id FROM timelines WHERE event_id = ANY($1)
 `
 
-func (app *app) eventList(ctx context.Context, _ Filter) ([]Event, error) {
+func (app *App) eventList(ctx context.Context, _ Filter) ([]Event, error) {
 	baseErr := "event.listHandler fails: %v"
-	rows, err := app.resources.Db.Query(ctx, selectQuery)
+	rows, err := app.assets.Db.Query(ctx, selectQuery)
 	if err != nil {
 		return nil, fmt.Errorf(baseErr, err)
 	}
@@ -129,7 +129,7 @@ func (app *app) eventList(ctx context.Context, _ Filter) ([]Event, error) {
 		})
 	}
 
-	timelineRows, err := app.resources.Db.Query(ctx, selectTimelinesQuery, eventIDs)
+	timelineRows, err := app.assets.Db.Query(ctx, selectTimelinesQuery, eventIDs)
 	if err != nil {
 		return nil, fmt.Errorf(baseErr, err)
 	}

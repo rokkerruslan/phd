@@ -3,30 +3,36 @@ package event
 import (
 	"github.com/go-chi/chi"
 	"github.com/jackc/pgx/v4/pgxpool"
+	"ph/internal/tokens"
 )
 
 type (
-	Resources struct {
+	Assets struct {
 		Db *pgxpool.Pool
 	}
 	Opts struct{}
 )
 
-type app struct {
-	resources Resources
-	opts      Opts
+type App struct {
+	assets Assets
+	opts   Opts
+
+	tokens *tokens.App
 }
 
-func Setup(resources Resources, opts Opts) chi.Router {
-	a := app{
-		resources: resources,
-		opts:      opts,
+func Setup(assets Assets, opts Opts) chi.Router {
+	app := App{
+		assets: assets,
+		opts:   opts,
+		tokens: tokens.NewApp(tokens.Assets{
+			Db: assets.Db,
+		}),
 	}
 	r := chi.NewRouter()
-	r.Get("/", a.listHandler)
-	r.Get("/{id}", a.retrieveHandler)
-	r.Post("/", a.createHandler)
-	r.Put("/{id}", a.updateHandler)
-	r.Delete("/{id}", a.deleteHandler)
+	r.Get("/", app.listHandler)
+	r.Get("/{id}", app.retrieveHandler)
+	r.Post("/", app.createHandler)
+	r.Put("/{id}", app.updateHandler)
+	r.Delete("/{id}", app.deleteHandler)
 	return r
 }

@@ -42,7 +42,7 @@ func Run() {
 	// We mount all our sub-applications for root
 	// router. Consistency isn't important.
 	r.Mount("/events", event.Setup(
-		event.Resources{
+		event.Assets{
 			Db: pool,
 		},
 		event.Opts{},
