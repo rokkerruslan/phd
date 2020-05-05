@@ -380,7 +380,7 @@ paths:
                 Data:
                   type: string
       responses:
-        202:
+        200:
           description: "Image upload completion"
           content:
             application/json:
