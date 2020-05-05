@@ -215,7 +215,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '/components/schemas/Event'
+                $ref: '#/components/schemas/Event'
   /events/{id}:
     put:
       tags:
@@ -501,11 +501,9 @@ components:
           type: string
           format: date-time
         IsPublic:
-          type: string
-          nullable: true
+          type: boolean
         IsHidden:
-          type: string
-          nullable: true
+          type: boolean
         Timelines:
           type: array
           items:
