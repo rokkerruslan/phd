@@ -212,6 +212,10 @@ paths:
       responses:
         200:
           description: "Completion of the event"
+          content:
+            application/json:
+              schema:
+                $ref: '/components/schemas/Event'
   /events/{id}:
     put:
       tags:
@@ -464,9 +468,70 @@ components:
           format: date-time
         Updated:
           type: string
-          format: date-time
+          format: date-time  
       example:
         ID: 1
         Name: "Rokker Ruslan"
         Email: "rokkerruslan@protonmail.com"
-        
+    Event:
+      type: object
+      required: 
+        - ID
+        - Name
+        - Description
+        - OwnerID
+        - Created
+        - Updated 
+        - IsPublic
+        - IsHidden 
+        - Timelines
+      properties:
+        ID:
+          type: integer
+        Name:
+          type: string
+        Description:
+          type: string
+        OwnerID:
+          type: integer
+        Created:
+          type: string
+          format: date-time
+        Updated:
+          type: string
+          format: date-time
+        IsPublic:
+          type: string
+          nullable: true
+        IsHidden:
+          type: string
+          nullable: true
+        Timelines:
+          type: array
+          items:
+            type: object
+            properties:
+              ID:
+                type: integer
+              Start:
+                type: string
+                format: date-time
+              End:
+                type: string
+                format: date-time
+              Place:
+                type: string
+      example:
+        ID: 18
+        Name: "123"
+        Description: "happy New Year!!!"
+        OwnerID: 40
+        Created: "2020-05-05T18:59:08.434825Z"
+        Updated: "2020-05-05T18:59:08.434825Z"
+        IsPublic: false
+        IsHidden: false
+        Timelines:
+          ID: 1
+          Start: "2006-01-02T17:05:05Z"
+          End: "2006-01-02T18:06:05Z"
+          Place: "Saint Petersburg"
