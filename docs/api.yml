@@ -381,7 +381,22 @@ paths:
                   type: string
       responses:
         202:
-          description: image upload completion
+          description: "Image upload completion"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ID:
+                    type: integer
+                  EventID:
+                    type: integer
+                  AuthorID:
+                    type: integer
+                  Title:
+                    type: string
+                  Hash:
+                    type: string
     get:
       tags:
         - Images
