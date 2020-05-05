@@ -27,6 +27,14 @@ type ImageUploadRequest struct {
 	hash string
 }
 
+type ImageRetrieve struct {
+	ID       int
+	EventID  int
+	AuthorID int
+	Title    string
+	Hash     string
+}
+
 func (r *ImageUploadRequest) Validate() error {
 	var e []string
 

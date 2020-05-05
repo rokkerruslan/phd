@@ -68,10 +68,11 @@ func (app *App) uploadHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := app.createImage(r.Context(), data); err != nil {
+	image, err := app.createImage(r.Context(), data)
+	if err != nil {
 		api.Error(w, fmt.Errorf(baseErr, err), http.StatusInternalServerError)
 		return
 	}
 
-	w.WriteHeader(http.StatusAccepted)
+	api.Response(w, image)
 }

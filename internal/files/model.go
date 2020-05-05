@@ -10,23 +10,35 @@ import (
 	"github.com/jackc/pgx/v4"
 )
 
-func (app *App) createImage(ctx context.Context, r ImageUploadRequest) error {
+func (app *App) createImage(ctx context.Context, r ImageUploadRequest) (ImageRetrieve, error) {
 	baseErr := "createImage fails: %v"
 
-	var id int
+	q := `
+		INSERT INTO images (title, author_id, event_id, hash, created, updated)
+			VALUES ($1, $2, $3, $4, NOW(), NOW())
+		RETURNING id
+	`
+
 	row := app.assets.Db.QueryRow(
 		ctx,
-		"INSERT INTO images (title, author_id, event_id, hash, created, updated) VALUES ($1, $2, $3, $4, NOW(), NOW()) RETURNING id",
+		q,
 		r.Title,
 		r.AuthorID,
 		r.EventID,
 		r.hash,
 	)
-	if err := row.Scan(&id); err != nil {
-		return fmt.Errorf(baseErr, err)
+
+	var image ImageRetrieve
+	image.EventID = r.EventID
+	image.AuthorID = r.AuthorID
+	image.Title = r.Title
+	image.Hash = r.hash
+
+	if err := row.Scan(&image.ID); err != nil {
+		return image, fmt.Errorf(baseErr, err)
 	}
 
-	return nil
+	return image, nil
 }
 
 type listFilter struct {
