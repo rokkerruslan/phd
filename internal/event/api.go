@@ -27,7 +27,7 @@ func (app *app) listHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_ = json.NewEncoder(w).Encode(events)
+	api.Response(w, events)
 }
 
 func (app *app) retrieveHandler(w http.ResponseWriter, r *http.Request) {
@@ -58,10 +58,13 @@ func (app *app) createHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := app.CreateEvent(r.Context(), event); err != nil {
+	event, err := app.createEvent(r.Context(), event)
+	if err != nil {
 		api.Error(w, err, http.StatusBadRequest)
 		return
 	}
+
+	api.Response(w, event)
 }
 
 func (app *app) updateHandler(w http.ResponseWriter, r *http.Request) {

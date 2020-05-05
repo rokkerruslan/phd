@@ -9,14 +9,41 @@ import (
 )
 
 const createQuery = `
-	INSERT INTO events (name, description, owner_id, created, updated, is_public) VALUES($1, $2, $3, NOW(), NOW(), $4)
+	INSERT INTO events (name, description, owner_id, created, updated, is_public) 
+		VALUES($1, $2, $3, NOW(), NOW(), $4)
+	RETURNING id, created, updated
 `
 
-func (app *app) CreateEvent(ctx context.Context, e Event) error {
-	if _, err := app.resources.Db.Exec(ctx, createQuery, e.Name, e.Description, e.OwnerID, e.IsPublic); err != nil {
-		return err
+func (app *app) createEvent(ctx context.Context, e Event) (Event, error) {
+	baseErr := "createEvent fails: %v"
+
+	err := app.resources.Db.QueryRow(
+		ctx,
+		createQuery,
+		e.Name,
+		e.Description,
+		e.OwnerID,
+		e.IsPublic,
+	).Scan(&e.ID, &e.Created, &e.Updated)
+	if err != nil {
+		return e, fmt.Errorf(baseErr, err)
 	}
-	return nil
+
+	for i, timeline := range e.Timelines {
+		err := app.resources.Db.QueryRow(
+			ctx,
+			"INSERT INTO timelines (event_id, start, \"end\", place) VALUES ($1, $2, $3, $4) RETURNING id",
+			e.ID,
+			timeline.Start,
+			timeline.End,
+			timeline.Place,
+		).Scan(&e.Timelines[i].ID)
+		if err != nil {
+			return e, fmt.Errorf(baseErr, err)
+		}
+	}
+
+	return e, nil
 }
 
 const updateQuery = `
