@@ -200,6 +200,15 @@ paths:
                   type: array
                   items:
                     type: object
+                    properties:
+                      Start:
+                        type: string
+                        format: date-time
+                      End:
+                        type: string
+                        format: date-time
+                      Place:
+                        type: string
       responses:
         200:
           description: "Completion of the event"
@@ -460,3 +469,4 @@ components:
         ID: 1
         Name: "Rokker Ruslan"
         Email: "rokkerruslan@protonmail.com"
+        
