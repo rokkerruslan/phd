@@ -5,9 +5,10 @@ import (
 	"log"
 	"os"
 
+	"ph/internal/tokens"
+
 	"github.com/go-chi/chi"
 	"github.com/jackc/pgx/v4/pgxpool"
-	"ph/internal/tokens"
 )
 
 const (
@@ -16,7 +17,8 @@ const (
 
 type (
 	Assets struct {
-		Db *pgxpool.Pool
+		Db     *pgxpool.Pool
+		Tokens *tokens.App
 	}
 	Opts struct{}
 )
@@ -24,16 +26,12 @@ type (
 type App struct {
 	assets Assets
 	opts   Opts
-	tokens *tokens.App
 }
 
 func Setup(assets Assets, opts Opts) chi.Router {
 	a := App{
 		assets: assets,
 		opts:   opts,
-		tokens: tokens.NewApp(tokens.Assets{
-			assets.Db,
-		}),
 	}
 
 	if err := os.Mkdir(FilesDirName, os.ModePerm); err != nil {

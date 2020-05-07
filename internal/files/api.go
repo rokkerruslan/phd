@@ -40,7 +40,7 @@ func (app *App) uploadHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	accountID, err := app.tokens.RetrieveAccountIDFromRequest(r.Context(), r)
+	accountID, err := app.assets.Tokens.RetrieveAccountIDFromRequest(r.Context(), r)
 	if err != nil {
 		api.Error(w, fmt.Errorf(baseErr, err), http.StatusBadRequest)
 		return

@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
@@ -19,15 +20,20 @@ type (
 	Assets struct {
 		Db *pgxpool.Pool
 	}
+	Opts struct {
+		TokenTTL time.Duration
+	}
 )
 
 type App struct {
 	Assets
+	Opts
 }
 
-func NewApp(assets Assets) *App {
+func NewApp(assets Assets, opts Opts) *App {
 	return &App{
 		Assets: assets,
+		Opts:   opts,
 	}
 }
 

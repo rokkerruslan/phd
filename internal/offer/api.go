@@ -23,7 +23,7 @@ func (app *App) createHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	accountID, err := app.tokens.RetrieveAccountIDFromRequest(r.Context(), r)
+	accountID, err := app.assets.Tokens.RetrieveAccountIDFromRequest(r.Context(), r)
 	if err != nil {
 		api.Error(w, fmt.Errorf(baseErr, err), http.StatusBadRequest)
 		return
@@ -38,8 +38,8 @@ func (app *App) createHandler(w http.ResponseWriter, r *http.Request) {
 	if err := app.assets.Db.
 		QueryRow(r.Context(), "SELECT owner_id FROM events WHERE id = $1", offer.EventID).
 		Scan(&eventOwnerID); err != nil {
-			api.Error(w, fmt.Errorf(baseErr, err), http.StatusInternalServerError)
-			return
+		api.Error(w, fmt.Errorf(baseErr, err), http.StatusInternalServerError)
+		return
 	}
 
 	if eventOwnerID == accountID {
@@ -74,7 +74,7 @@ func (app *App) updateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	accountID, err := app.tokens.RetrieveAccountIDFromRequest(r.Context(), r)
+	accountID, err := app.assets.Tokens.RetrieveAccountIDFromRequest(r.Context(), r)
 	if err != nil {
 		api.Error(w, fmt.Errorf(baseErr, err), http.StatusBadRequest)
 		return
@@ -110,7 +110,7 @@ func (app *App) deleteHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	accountID, err := app.tokens.RetrieveAccountIDFromRequest(r.Context(), r)
+	accountID, err := app.assets.Tokens.RetrieveAccountIDFromRequest(r.Context(), r)
 	if err != nil {
 		api.Error(w, fmt.Errorf(baseErr, err), http.StatusBadRequest)
 		return
