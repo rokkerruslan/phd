@@ -6,14 +6,15 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/go-chi/chi"
-	"github.com/go-chi/cors"
-	"github.com/go-chi/chi/middleware"
-	"github.com/jackc/pgx/v4/pgxpool"
 	"ph/internal/accounts"
 	"ph/internal/event"
 	"ph/internal/files"
 	"ph/internal/offer"
+
+	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/middleware"
+	"github.com/go-chi/cors"
+	"github.com/jackc/pgx/v4/pgxpool"
 )
 
 // Run - entry point for internal package
@@ -25,7 +26,7 @@ func Run() {
 		AllowedOrigins: []string{"*"},
 		AllowedMethods: []string{http.MethodGet, http.MethodPost, http.MethodPut, http.MethodDelete},
 		AllowedHeaders: []string{"X-Auth-Token"},
-		Debug: true,
+		Debug:          true,
 	}))
 
 	opts, err := newOptions()
@@ -54,7 +55,7 @@ func Run() {
 		offer.Opts{},
 	))
 	r.Mount("/accounts", accounts.Setup(
-		accounts.Resources{
+		accounts.Assets{
 			Db: pool,
 		},
 		accounts.Opts{

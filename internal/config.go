@@ -6,6 +6,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 )
 
 // options contains all available configs
@@ -18,6 +19,7 @@ type options struct {
 	globalSalt           []byte
 	bcryptWorkFactor     int
 	minLenForNewPassword int
+	tokenTTL             time.Duration
 }
 
 func newOptions() (opts options, err error) {
@@ -47,6 +49,10 @@ func newOptions() (opts options, err error) {
 	opts.minLenForNewPassword, err = strconv.Atoi(passwordLen)
 	if err != nil {
 		return opts, fmt.Errorf(baseErr, fmt.Sprintf("minLenForNewPassword read fails: %v", err))
+	}
+	opts.tokenTTL, err = time.ParseDuration(os.Getenv("TOKEN_TTL"))
+	if err != nil {
+		return opts, fmt.Errorf(baseErr, fmt.Sprintf("TOKEN_TTL read fails: %v", err))
 	}
 
 	if len(missed) != 0 {
