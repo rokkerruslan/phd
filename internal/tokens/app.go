@@ -92,8 +92,10 @@ func (app *App) DropToken(ctx context.Context, token string) {
 func (app *App) retrieveAccountID(ctx context.Context, token string) (id int, err error) {
 	baseErr := "tokens.retrieveAccountID fails: %w"
 
-	// TODO: check time
-	if err = app.Db.QueryRow(ctx, "SELECT account_id FROM tokens WHERE token = $1", token).Scan(&id); err != nil {
+	if err = app.Db.QueryRow(
+		ctx,
+		"SELECT account_id FROM tokens WHERE token = $1 AND created > $2",
+		token, time.Now().Add(-app.TokenTTL)).Scan(&id); err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			err = fmt.Errorf(baseErr, ErrDoesNotExist)
 		} else {
