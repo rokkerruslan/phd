@@ -10,6 +10,7 @@ import (
 	"ph/internal/event"
 	"ph/internal/files"
 	"ph/internal/offer"
+	"ph/internal/tokens"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
@@ -40,23 +41,35 @@ func Run() {
 		log.Fatal(err)
 	}
 
+	tokenApp := tokens.NewApp(
+		tokens.Assets{
+			Db: pool,
+		},
+		tokens.Opts{
+			TokenTTL: opts.tokenTTL,
+		},
+	)
+
 	// We mount all our sub-applications for root
 	// router. Consistency isn't important.
 	r.Mount("/events", event.Setup(
 		event.Assets{
-			Db: pool,
+			Db:     pool,
+			Tokens: tokenApp,
 		},
 		event.Opts{},
 	))
 	r.Mount("/offers", offer.Setup(
 		offer.Assets{
-			Db: pool,
+			Db:     pool,
+			Tokens: tokenApp,
 		},
 		offer.Opts{},
 	))
 	r.Mount("/accounts", accounts.Setup(
 		accounts.Assets{
-			Db: pool,
+			Db:     pool,
+			Tokens: tokenApp,
 		},
 		accounts.Opts{
 			GlobalSalt:           opts.globalSalt,
@@ -66,7 +79,8 @@ func Run() {
 	))
 	r.Mount("/files", files.Setup(
 		files.Assets{
-			Db: pool,
+			Db:     pool,
+			Tokens: tokenApp,
 		},
 		files.Opts{},
 	))

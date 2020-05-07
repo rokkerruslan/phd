@@ -42,7 +42,7 @@ func (app *App) createImage(ctx context.Context, r ImageUploadRequest) (ImageRet
 }
 
 type listFilter struct {
-	eventID int
+	eventID  int
 	authorID int
 }
 

@@ -7,16 +7,17 @@ import (
 	"net/http"
 	"strings"
 
-	"golang.org/x/crypto/bcrypt"
 	"ph/internal/api"
 	"ph/internal/tokens"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 // TODO: check id from path
 func (app *App) retrieveHandler(w http.ResponseWriter, r *http.Request) {
 	baseErr := "retrieveHandler fails: %v"
 
-	id, err := app.tokens.RetrieveAccountIDFromRequest(r.Context(), r)
+	id, err := app.assets.Tokens.RetrieveAccountIDFromRequest(r.Context(), r)
 	if err != nil {
 		switch {
 		case errors.Is(err, tokens.ErrDoesNotExist):
@@ -41,7 +42,7 @@ func (app *App) retrieveHandler(w http.ResponseWriter, r *http.Request) {
 func (app *App) deleteHandler(w http.ResponseWriter, r *http.Request) {
 	baseErr := "deleteHandler fails: %v"
 
-	id, err := app.tokens.RetrieveAccountIDFromRequest(r.Context(), r)
+	id, err := app.assets.Tokens.RetrieveAccountIDFromRequest(r.Context(), r)
 	if err != nil {
 		switch {
 		case errors.Is(err, tokens.ErrDoesNotExist):
@@ -91,7 +92,7 @@ func (app *App) signInHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Authenticate user
-	token, err := app.tokens.Create(r.Context(), a.ID)
+	token, err := app.assets.Tokens.Create(r.Context(), a.ID)
 	if err != nil {
 		api.Error(w, fmt.Errorf(baseErr, err), http.StatusInternalServerError)
 		return
@@ -169,7 +170,7 @@ func (app *App) signUpHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Authenticate
-	token, err := app.tokens.Create(r.Context(), a.ID)
+	token, err := app.assets.Tokens.Create(r.Context(), a.ID)
 	if err != nil {
 		api.Error(w, fmt.Errorf(baseErr, err), http.StatusInternalServerError)
 		return
@@ -190,7 +191,7 @@ func (app *App) signOutHandler(w http.ResponseWriter, r *http.Request) {
 			fmt.Sprintf("%s` isn't set", api.AuthTokenHeaderName)), http.StatusForbidden)
 		return
 	}
-	app.tokens.DropToken(r.Context(), token)
+	app.assets.Tokens.DropToken(r.Context(), token)
 
 	w.WriteHeader(http.StatusNoContent)
 }

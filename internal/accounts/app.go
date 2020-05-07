@@ -9,7 +9,8 @@ import (
 
 type (
 	Assets struct {
-		Db *pgxpool.Pool
+		Db     *pgxpool.Pool
+		Tokens *tokens.App
 	}
 	Opts struct {
 		GlobalSalt           []byte
@@ -21,8 +22,6 @@ type (
 type App struct {
 	assets Assets
 	opts   Opts
-
-	tokens *tokens.App
 }
 
 // Setup - initialize accounts App.
@@ -30,9 +29,6 @@ func Setup(assets Assets, opts Opts) chi.Router {
 	app := App{
 		assets: assets,
 		opts:   opts,
-		tokens: tokens.NewApp(tokens.Assets{
-			Db: assets.Db,
-		}),
 	}
 	r := chi.NewRouter()
 	r.Get("/{id}", app.retrieveHandler)
