@@ -1,13 +1,14 @@
 package accounts
 
 import (
+	"ph/internal/tokens"
+
 	"github.com/go-chi/chi"
 	"github.com/jackc/pgx/v4/pgxpool"
-	"ph/internal/tokens"
 )
 
 type (
-	Resources struct {
+	Assets struct {
 		Db *pgxpool.Pool
 	}
 	Opts struct {
@@ -18,19 +19,19 @@ type (
 )
 
 type App struct {
-	resources Resources
-	opts      Opts
+	assets Assets
+	opts   Opts
 
 	tokens *tokens.App
 }
 
 // Setup - initialize accounts App.
-func Setup(resources Resources, opts Opts) chi.Router {
+func Setup(assets Assets, opts Opts) chi.Router {
 	app := App{
-		resources: resources,
-		opts:      opts,
+		assets: assets,
+		opts:   opts,
 		tokens: tokens.NewApp(tokens.Assets{
-			Db: resources.Db,
+			Db: assets.Db,
 		}),
 	}
 	r := chi.NewRouter()
