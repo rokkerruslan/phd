@@ -9,46 +9,6 @@ APP_NAME=ph
 
 DAEMON_NAME=${APP_NAME}d
 
-loc() {
-    ENV_FILE_LOCAL=".env"
-
-    if [ ! -f "$ENV_FILE_LOCAL" ]; then
-        echo "Can't operate with local environment, file $ENV_FILE_LOCAL does"
-        echo "not exist. Please copy example file and fill the variable values."
-        echo "$ cp .env.example $ENV_FILE_LOCAL"
-        exit 1
-    fi
-
-    ENV_LOCAL=$(cat $ENV_FILE_LOCAL | grep '^[a-zA-Z]' | xargs)
-
-    case $1 in
-    t | test)
-        tests
-        ;;
-    b | build)
-        build
-        ;;
-    f | fmt)
-        fmt
-        ;;
-    e | env)
-        showEnv
-        ;;
-    s | start | "")
-        start
-        ;;
-    m | mi | migrate)
-        migrate
-        ;;
-    u | update)
-        update
-        ;;
-    *)
-        echo command "$1" does not exist, check help
-        ;;
-    esac
-}
-
 tests() {
     go test ./internal/...
 }
@@ -76,7 +36,7 @@ start() {
 
 migrate() {
     # shellcheck disable=SC2086
-    env $ENV_LOCAL ./dist/mi
+    env $ENV_LOCAL ./dist/mi up
 }
 
 update() {
@@ -95,25 +55,22 @@ USAGE=$(
 app - entry point for control
 
 USAGE
-    ./app command sub-command
+    ./app command
 
 COMMANDS
 
-    local       deal with local environment.
-
-    SUBCOMMANDS
-
-        env         show local environment variables
-        fmt         format code (go fmt and goreturns)
-        test        run tests
-        start       start daemon
-        update      update all deps (minor/patch) and vendor it
+    env         show local environment variables
+    fmt         format code (go fmt and goreturns)
+    test        run tests
+    start       start
+    migrate     apply migrations
+    update      update all deps (minor/patch) and vendor it
 
     help        print this docs
 
 EXAMPLES
 
-    $ ./app local test  # starts tests on local machine
+    $ ./app test  # starts tests on local machine
 END
 )
 
@@ -124,9 +81,39 @@ if [ ! -d ".git" ]; then
     exit 1
 fi
 
+ENV_FILE_LOCAL=".env"
+
+if [ ! -f "$ENV_FILE_LOCAL" ]; then
+    echo "Can't operate with local environment, file $ENV_FILE_LOCAL does"
+    echo "not exist. Please copy example file and fill the variable values."
+    echo "$ cp .env.example $ENV_FILE_LOCAL"
+    exit 1
+fi
+
+ENV_LOCAL=$(cat $ENV_FILE_LOCAL | grep '^[a-zA-Z]' | xargs)
+
+
 case $1 in
-l | local)
-    loc "$2"
+t | test)
+    tests
+    ;;
+b | build)
+    build
+    ;;
+f | fmt)
+    fmt
+    ;;
+e | env)
+    showEnv
+    ;;
+s | start)
+    start
+    ;;
+m | mi | migrate)
+    migrate
+    ;;
+u | update)
+    update
     ;;
 h | help | "")
     echo "$USAGE"
