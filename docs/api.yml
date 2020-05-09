@@ -172,7 +172,7 @@ paths:
                 properties:
                   Error:
                     type: string
-  /events:
+  /events/:
     post:
       tags:
         - Events
@@ -212,6 +212,17 @@ paths:
       responses:
         200:
           description: "Completion of the event"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Event'
+    get:
+      tags:
+        - Events
+      description: "List events"
+      responses:
+        200:
+          description: "Сreating a list of user events"
           content:
             application/json:
               schema:
