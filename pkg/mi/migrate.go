@@ -14,6 +14,7 @@ import (
 func Migrate() {
 	r := NewRegistry()
 	r.InitConnection()
+	r.CheckMigrationTable("public", "migrations")
 	r.Sort()
 	r.Apply()
 	r.Commit()
@@ -25,6 +26,35 @@ func (r *Registry) InitConnection() {
 		log.Fatal(err)
 	}
 	r.conn = conn
+}
+
+var existQuery = `
+SELECT EXISTS (
+	SELECT FROM information_schema.tables
+	WHERE  table_schema = $1
+	AND    table_name   = $2
+);
+`
+
+var createMigrationTableQuery = `
+CREATE TABLE migrations (
+	id serial PRIMARY KEY,
+	created timestamp without time zone,
+	name text,
+	number integer
+);
+`
+
+func (r *Registry) CheckMigrationTable(schema, table string) {
+	var isExist bool
+	if err := r.conn.QueryRow(context.Background(), existQuery, schema, table).Scan(&isExist); err != nil {
+		log.Fatal(err)
+	}
+	if !isExist {
+		if _, err := r.conn.Exec(context.Background(), createMigrationTableQuery); err != nil {
+			log.Fatal(err)
+		}
+	}
 }
 
 func (r *Registry) Sort() {
@@ -64,7 +94,7 @@ type MLine struct {
 }
 
 func (r *Registry) Filter() {
-	rows, err := r.conn.Query(context.Background(), "SELECT id, created, name, number FROM infra.migrations")
+	rows, err := r.conn.Query(context.Background(), "SELECT id, created, name, number FROM public.migrations")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -97,7 +127,7 @@ func (r *Registry) Commit() {
 	for _, m := range r.Migrations {
 		_, err := r.conn.Exec(
 			context.Background(),
-			"INSERT INTO infra.migrations (created, name, number) VALUES (NOW(), $1, $2)",
+			"INSERT INTO public.migrations (created, name, number) VALUES (NOW(), $1, $2)",
 			m.Name,
 			m.Line.Number,
 		)

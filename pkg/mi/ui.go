@@ -18,6 +18,8 @@ func App() {
 		return
 	}
 
+	log.SetFlags(log.LstdFlags | log.Llongfile)
+
 	command := args[0]
 
 	switch command {
