@@ -9,7 +9,7 @@ import (
 	"ph/internal/accounts"
 	"ph/internal/events"
 	"ph/internal/files"
-	"ph/internal/offer"
+	"ph/internal/offers"
 	"ph/internal/tokens"
 
 	"github.com/go-chi/chi"
@@ -59,12 +59,12 @@ func Run() {
 		},
 		events.Opts{},
 	))
-	r.Mount("/offers", offer.Setup(
-		offer.Assets{
+	r.Mount("/offers", offers.Setup(
+		offers.Assets{
 			Db:     pool,
 			Tokens: tokenApp,
 		},
-		offer.Opts{},
+		offers.Opts{},
 	))
 	r.Mount("/accounts", accounts.Setup(
 		accounts.Assets{
