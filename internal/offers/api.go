@@ -1,4 +1,4 @@
-package offer
+package offers
 
 import (
 	"encoding/json"
