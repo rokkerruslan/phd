@@ -95,11 +95,19 @@ const selectTimelinesQuery = `
 	SELECT id, start, "end", place, event_id FROM timelines WHERE event_id = ANY($1)
 `
 
-func (app *App) eventList(ctx context.Context, _ filter) ([]Event, error) {
+func (app *App) eventList(ctx context.Context, f api.AccountAndEventFilter) ([]Event, error) {
 	baseErr := "event.listHandler fails: %v"
-	rows, err := app.assets.Db.Query(ctx, selectQuery)
-	if err != nil {
-		return nil, fmt.Errorf(baseErr, err)
+
+	var err error
+	var rows pgx.Rows
+	if f.AccountID != 0 {
+		rows, err = app.assets.Db.Query(
+			ctx,
+			"SELECT id, name, description, owner_id, created, updated, is_public, is_hidden FROM events WHERE owner_id = $1",
+			f.AccountID,
+		)
+	} else {
+		return []Event{}, fmt.Errorf(baseErr, "filter is empty")
 	}
 	defer rows.Close()
 
@@ -112,7 +120,7 @@ func (app *App) eventList(ctx context.Context, _ filter) ([]Event, error) {
 }
 
 func (app *App) constructEventList(ctx context.Context, rows pgx.Rows) ([]Event, error) {
-	var events []Event // TODO: with make?
+	events := []Event{}
 	var eventIDs []int
 	for rows.Next() {
 		var e Event

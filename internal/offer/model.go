@@ -92,7 +92,7 @@ func (app *App) deleteOffer(ctx context.Context, f api.RetrieveFilter) error {
 	return nil
 }
 
-func (app *App) offerList(ctx context.Context, f ListFilter) ([]Offer, error) {
+func (app *App) offerList(ctx context.Context, f api.AccountAndEventFilter) ([]Offer, error) {
 	baseErr := "accounts.offerList fails: %v"
 
 	var err error
