@@ -140,7 +140,7 @@ func (app *App) deleteHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *App) list(w http.ResponseWriter, r *http.Request) {
-	filter, err := NewListFilterFromQuery(r.URL.Query())
+	filter, err := api.NewAccountAndEventFilter(r.URL.Query())
 	if err != nil {
 		api.Error(w, err, http.StatusBadRequest)
 		return

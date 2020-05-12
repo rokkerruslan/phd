@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"net/url"
 	"strconv"
 
 	"github.com/go-chi/chi"
@@ -12,17 +11,16 @@ import (
 	"ph/internal/api"
 )
 
-type filter struct {
-}
-
-func newFilterFromQuery(_ url.Values) filter {
-	return filter{}
-}
-
 func (app *App) listHandler(w http.ResponseWriter, r *http.Request) {
-	filter := newFilterFromQuery(r.URL.Query())
+	baseErr := "events.listHandler fails: %v"
 
-	events, err := app.eventList(r.Context(), filter)
+	f, err := api.NewAccountAndEventFilter(r.URL.Query())
+	if err != nil {
+		api.Error(w, fmt.Errorf(baseErr, err), http.StatusBadRequest)
+		return
+	}
+
+	events, err := app.eventList(r.Context(), f)
 	if err != nil {
 		api.Error(w, err, http.StatusInternalServerError)
 		return
