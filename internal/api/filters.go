@@ -12,6 +12,7 @@ type RetrieveFilter struct {
 	ID int
 }
 
+// TODO: Just a number? Without additional struct?
 func NewRetrieveFilter(r *http.Request) (f RetrieveFilter, err error) {
 	baseErr := "NewRetrieveFilter fails: %v"
 	raw := chi.URLParam(r, "id")

@@ -15,3 +15,10 @@ func Error(w http.ResponseWriter, err error, statusCode int) {
 	w.WriteHeader(statusCode)
 	_ = json.NewEncoder(w).Encode(errorResponse{Error: err.Error()})
 }
+
+// dispatchByError must switch over error type and set
+// corresponding http status code.
+// TODO: after impl make public
+func dispatchByError() {
+
+}

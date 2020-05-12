@@ -50,19 +50,21 @@ func (app *App) listSuggestedHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *App) retrieveHandler(w http.ResponseWriter, r *http.Request) {
+	baseErr := "events.retrieveHandler fails: %v"
+
 	filter, err := api.NewRetrieveFilter(r)
 	if err != nil {
-		api.Error(w, err, http.StatusBadRequest)
+		api.Error(w, fmt.Errorf(baseErr, err), http.StatusBadRequest)
 		return
 	}
 
 	event, err := app.retrieveEvent(r.Context(), filter)
 	if err != nil {
-		api.Error(w, err, http.StatusBadRequest)
+		api.Error(w, fmt.Errorf(baseErr, err), http.StatusBadRequest)
 		return
 	}
 
-	_ = json.NewEncoder(w).Encode(event)
+	api.Response(w, event)
 }
 
 func (app *App) createHandler(w http.ResponseWriter, r *http.Request) {
