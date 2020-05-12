@@ -5,6 +5,8 @@ import (
 	"fmt"
 
 	"ph/internal/api"
+
+	"github.com/jackc/pgx/v4"
 )
 
 const createQuery = `
@@ -101,12 +103,21 @@ func (app *App) eventList(ctx context.Context, _ filter) ([]Event, error) {
 	}
 	defer rows.Close()
 
-	var events []Event
+	events, err := app.constructEventList(ctx, rows)
+	if err != nil {
+		return nil, fmt.Errorf(baseErr, err)
+	}
+
+	return events, nil
+}
+
+func (app *App) constructEventList(ctx context.Context, rows pgx.Rows) ([]Event, error) {
+	var events []Event // TODO: with make?
 	var eventIDs []int
 	for rows.Next() {
 		var e Event
 		if err := rows.Scan(&e.ID, &e.Name, &e.Description, &e.OwnerID, &e.Created, &e.Updated, &e.IsPublic, &e.IsHidden); err != nil {
-			return nil, fmt.Errorf(baseErr, err)
+			return nil, err
 		}
 		eventIDs = append(eventIDs, e.ID)
 		events = append(events, e)
@@ -114,14 +125,14 @@ func (app *App) eventList(ctx context.Context, _ filter) ([]Event, error) {
 
 	timelineRows, err := app.assets.Db.Query(ctx, selectTimelinesQuery, eventIDs)
 	if err != nil {
-		return nil, fmt.Errorf(baseErr, err)
+		return nil, err
 	}
 	timelines := make(map[int][]Timeline)
 	for timelineRows.Next() {
 		var t Timeline
 		var eventID int
 		if err := timelineRows.Scan(&t.ID, &t.Start, &t.End, &t.Place, &eventID); err != nil {
-			return nil, fmt.Errorf(baseErr, err)
+			return nil, err
 		}
 		timelines[eventID] = append(timelines[eventID], t)
 	}
