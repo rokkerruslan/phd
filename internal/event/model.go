@@ -3,13 +3,12 @@ package event
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"ph/internal/api"
 )
 
 const createQuery = `
-	INSERT INTO events (name, description, owner_id, created, updated, is_public) 
+	INSERT INTO events (name, description, owner_id, created, updated, is_public)
 		VALUES($1, $2, $3, NOW(), NOW(), $4)
 	RETURNING id, created, updated
 `
@@ -94,7 +93,7 @@ const selectTimelinesQuery = `
 	SELECT id, start, "end", place, event_id FROM timelines WHERE event_id = ANY($1)
 `
 
-func (app *App) eventList(ctx context.Context, _ Filter) ([]Event, error) {
+func (app *App) eventList(ctx context.Context, _ filter) ([]Event, error) {
 	baseErr := "event.listHandler fails: %v"
 	rows, err := app.assets.Db.Query(ctx, selectQuery)
 	if err != nil {
@@ -105,28 +104,12 @@ func (app *App) eventList(ctx context.Context, _ Filter) ([]Event, error) {
 	var events []Event
 	var eventIDs []int
 	for rows.Next() {
-		var id int
-		var name string
-		var description string
-		var ownerID int
-		var created time.Time
-		var updated time.Time
-		var isPublic bool
-		var isHidden bool
-		if err := rows.Scan(&id, &name, &description, &ownerID, &created, &updated, &isPublic, &isHidden); err != nil {
+		var e Event
+		if err := rows.Scan(&e.ID, &e.Name, &e.Description, &e.OwnerID, &e.Created, &e.Updated, &e.IsPublic, &e.IsHidden); err != nil {
 			return nil, fmt.Errorf(baseErr, err)
 		}
-		eventIDs = append(eventIDs, id)
-		events = append(events, Event{
-			ID:          id,
-			Name:        name,
-			Description: description,
-			OwnerID:     ownerID,
-			Created:     created,
-			Updated:     updated,
-			IsPublic:    isPublic,
-			IsHidden:    isHidden,
-		})
+		eventIDs = append(eventIDs, e.ID)
+		events = append(events, e)
 	}
 
 	timelineRows, err := app.assets.Db.Query(ctx, selectTimelinesQuery, eventIDs)
@@ -135,20 +118,12 @@ func (app *App) eventList(ctx context.Context, _ Filter) ([]Event, error) {
 	}
 	timelines := make(map[int][]Timeline)
 	for timelineRows.Next() {
-		var id int
-		var start time.Time
-		var end time.Time
-		var place string
+		var t Timeline
 		var eventID int
-		if err := timelineRows.Scan(&id, &start, &end, &place, &eventID); err != nil {
+		if err := timelineRows.Scan(&t.ID, &t.Start, &t.End, &t.Place, &eventID); err != nil {
 			return nil, fmt.Errorf(baseErr, err)
 		}
-		timelines[eventID] = append(timelines[eventID], Timeline{
-			ID:    id,
-			Start: start,
-			End:   end,
-			Place: place,
-		})
+		timelines[eventID] = append(timelines[eventID], t)
 	}
 
 	for i, event := range events {

@@ -12,15 +12,15 @@ import (
 	"ph/internal/api"
 )
 
-type Filter struct {
+type filter struct {
 }
 
-func NewFilterFromQuery(_ url.Values) Filter {
-	return Filter{}
+func newFilterFromQuery(_ url.Values) filter {
+	return filter{}
 }
 
 func (app *App) listHandler(w http.ResponseWriter, r *http.Request) {
-	filter := NewFilterFromQuery(r.URL.Query())
+	filter := newFilterFromQuery(r.URL.Query())
 
 	events, err := app.eventList(r.Context(), filter)
 	if err != nil {
@@ -29,6 +29,18 @@ func (app *App) listHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	api.Response(w, events)
+}
+
+func (app *App) listSuggestedHandler(w http.ResponseWriter, r *http.Request) {
+	baseErr := "events.listSuggestedHandler fails: %v"
+
+	accountID, err := app.assets.Tokens.RetrieveAccountIDFromRequest(r.Context(), r)
+	if err != nil {
+		api.Error(w, fmt.Errorf(baseErr, err), http.StatusBadRequest)
+		return
+	}
+
+	api.Response(w, struct{ Ok int }{Ok: accountID})
 }
 
 func (app *App) retrieveHandler(w http.ResponseWriter, r *http.Request) {

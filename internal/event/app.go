@@ -27,6 +27,7 @@ func Setup(assets Assets, opts Opts) chi.Router {
 	}
 	r := chi.NewRouter()
 	r.Get("/", app.listHandler)
+	r.Get("/suggested", app.listSuggestedHandler)
 	r.Get("/{id}", app.retrieveHandler)
 	r.Post("/", app.createHandler)
 	r.Put("/{id}", app.updateHandler)
