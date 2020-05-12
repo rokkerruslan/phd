@@ -56,7 +56,7 @@ func (app *App) retrieveHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	event, err := app.retrieveEvent(r.Context(), filter)
+	event, err := app.eventRetrieve(r.Context(), filter)
 	if err != nil {
 		api.Error(w, fmt.Errorf(baseErr, err), http.StatusBadRequest)
 		return
@@ -90,7 +90,7 @@ func (app *App) createHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	event, err = app.createEvent(r.Context(), event)
+	event, err = app.eventCreate(r.Context(), event)
 	if err != nil {
 		api.Error(w, err, http.StatusBadRequest)
 		return
@@ -118,7 +118,7 @@ func (app *App) updateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := app.updateEvent(r.Context(), event); err != nil {
+	if err := app.eventUpdate(r.Context(), event); err != nil {
 		api.Error(w, err, http.StatusBadRequest)
 		return
 	}
@@ -133,7 +133,7 @@ func (app *App) deleteHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := app.deleteEvent(r.Context(), filter); err != nil {
+	if err := app.eventDelete(r.Context(), filter.ID); err != nil {
 		api.Error(w, err, http.StatusBadRequest)
 		return
 	}
