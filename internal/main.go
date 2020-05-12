@@ -7,7 +7,7 @@ import (
 	"net/http"
 
 	"ph/internal/accounts"
-	"ph/internal/event"
+	"ph/internal/events"
 	"ph/internal/files"
 	"ph/internal/offer"
 	"ph/internal/tokens"
@@ -52,12 +52,12 @@ func Run() {
 
 	// We mount all our sub-applications for root
 	// router. Consistency isn't important.
-	r.Mount("/events", event.Setup(
-		event.Assets{
+	r.Mount("/events", events.Setup(
+		events.Assets{
 			Db:     pool,
 			Tokens: tokenApp,
 		},
-		event.Opts{},
+		events.Opts{},
 	))
 	r.Mount("/offers", offer.Setup(
 		offer.Assets{

@@ -1,5 +1,5 @@
 // TODO: to another application (geo App)?
-package event
+package events
 
 type Point struct {
 	Lt float64

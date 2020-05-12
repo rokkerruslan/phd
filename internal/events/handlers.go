@@ -1,4 +1,4 @@
-package event
+package events
 
 import (
 	"encoding/json"
@@ -40,7 +40,13 @@ func (app *App) listSuggestedHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	api.Response(w, struct{ Ok int }{Ok: accountID})
+	events, err := app.suggestedEvents(r.Context(), accountID)
+	if err != nil {
+		api.Error(w, fmt.Errorf(baseErr, err), http.StatusBadRequest)
+		return
+	}
+
+	api.Response(w, events)
 }
 
 func (app *App) retrieveHandler(w http.ResponseWriter, r *http.Request) {
