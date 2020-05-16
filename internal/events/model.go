@@ -67,9 +67,9 @@ func (app *App) eventRetrieve(ctx context.Context, f api.RetrieveFilter) (e Even
 
 	if err = app.assets.Db.QueryRow(
 		ctx,
-		"SELECT id, name, owner_id, created, updated FROM events WHERE id = $1",
+		"SELECT id, name, owner_id, created, description, updated FROM events WHERE id = $1",
 		f.ID,
-	).Scan(e.ID, e.Name, e.OwnerID, e.Created, e.Updated); err != nil {
+	).Scan(&e.ID, &e.Name, &e.OwnerID, &e.Created, &e.Description, &e.Updated); err != nil {
 		return e, fmt.Errorf(baseErr, err)
 	}
 	return e, nil
