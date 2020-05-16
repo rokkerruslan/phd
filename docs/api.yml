@@ -172,7 +172,7 @@ paths:
                 properties:
                   Error:
                     type: string
-  /events/:
+  /events:
     post:
       tags:
         - Events
