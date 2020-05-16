@@ -216,6 +216,17 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Event'
+    get:
+      tags:
+        - Events
+      description: "List events"
+      responses:
+        200:
+          description: "Сreating a list of user events"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Event'
   /events/{id}:
     put:
       tags:
@@ -246,6 +257,19 @@ paths:
       responses:
         204:
           description: "Event update completion"
+    get:
+      tags:
+        - Events
+      description: "List of user events"
+      parameters:
+        - $ref: '#/components/parameters/ID'
+      responses:
+        200:
+          description: "Сreating a list of user events"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Event'
   /offers:
     post:
       tags:
