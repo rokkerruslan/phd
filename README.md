@@ -30,6 +30,16 @@ Run application:
 $ ./app start
 ```
 
+## Build on Win
+```shell script
+$ go build -o dist/ ./cmd/phd
+```
+
+## Run on Win
+```shell script
+$ .\dist\phd.exe
+```
+
 ## API documentation
 
 Open API spec [spec](docs/api.yml).
