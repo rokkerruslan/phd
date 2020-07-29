@@ -108,7 +108,6 @@ def test_repeated_create_offer_400():
     assert "fails" in create_offer_response_2.text
 
 
-@pytest.mark.xfail(reason="issue #42")
 def test_create_offer_400():
     """
     Запрещено создавать офер на событие, созданное аккаунтом, который был удален.

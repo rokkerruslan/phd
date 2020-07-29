@@ -180,7 +180,6 @@ def test_update_events_200():
     assert update_event_response.status_code == 200, update_event_response.text
 
 
-@pytest.mark.xfail(reason="issue #41")
 def test_event_info():
     """
     Тест проверяет функцию получения информации об ивенте.

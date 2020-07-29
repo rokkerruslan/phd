@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/jackc/pgx/v4"
+
 	"ph/internal/api"
 )
 
@@ -36,9 +38,13 @@ func (app *App) createHandler(w http.ResponseWriter, r *http.Request) {
 
 	var eventOwnerID int
 	if err := app.assets.Db.
-		QueryRow(r.Context(), "SELECT owner_id FROM events WHERE id = $1", offer.EventID).
+		QueryRow(r.Context(), "SELECT accounts.id FROM accounts JOIN events ON accounts.id = events.owner_id WHERE events.id = $1 AND accounts.is_deleted = FALSE", offer.EventID).
 		Scan(&eventOwnerID); err != nil {
-		api.Error(w, fmt.Errorf(baseErr, err), http.StatusInternalServerError)
+		status := http.StatusInternalServerError
+		if errors.Is(err, pgx.ErrNoRows) {
+			status = http.StatusBadRequest
+		}
+		api.Error(w, fmt.Errorf(baseErr, err), status)
 		return
 	}
 
