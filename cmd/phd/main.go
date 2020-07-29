@@ -1,11 +1,17 @@
 package main
 
 import (
-	"ph/internal"
+	"os"
+
 	"github.com/joho/godotenv"
+	"ph/internal"
 )
 
 func main() {
-	godotenv.Load()
+	file := os.Getenv("ENV")
+	if file == "" {
+		file = ".env"
+	}
+	_ = godotenv.Load(file)
 	internal.Run()
 }

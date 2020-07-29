@@ -1,16 +1,15 @@
 import psycopg2
+import os
 
-HOST = "http://localhost:3000"
+HOST = "http://localhost:3001"
 
 
 def delete_all_db():
     """
     Фунция очистки всех баз данных.
     """
-    connect = psycopg2.connect(dbname="postgres",
-                               user="postgres",
-                               password="postgres",
-                               host='localhost')
+
+    connect = psycopg2.connect(os.environ.get('DATABASE_URL'))
     cursor = connect.cursor()
 
     query = """

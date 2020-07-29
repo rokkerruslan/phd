@@ -102,7 +102,7 @@ def test_sign_out_204():
     x_auth_token = {"X-Auth-Token": sign_up_response.json()["Token"]}
 
     sign_out_response = requests.delete(
-        "http://localhost:3000/accounts/sign-out",
+        f"{HOST}/accounts/sign-out",
         headers=x_auth_token
     )
 
