@@ -240,3 +240,40 @@ def test_list_events():
 
     assert list_events_response.status_code == 200, list_events_response.text
     assert type(list_events_response.json()) == list
+
+
+@pytest.mark.xfail(reason="issue #41")
+def test_check_timlines_not_nil():
+    """
+    Таймлайн ивента не должен быть нулём. Issue #41.
+    """
+
+    sign_up_response = requests.post(
+        f"{HOST}/accounts/sign-up",
+        json=create_valid_account_info()
+    )
+
+    assert sign_up_response.status_code == 200, sign_up_response.text
+
+    account_id = sign_up_response.json()["Account"]["ID"]
+    x_auth_token = {"X-Auth-Token": sign_up_response.json()["Token"]}
+    info = create_valid_event_info()
+    info['OwnerID'] = account_id
+
+    create_event_response = requests.post(
+        f"{HOST}/events",
+        headers=x_auth_token,
+        json=info
+    )
+
+    assert create_event_response.status_code == 200, create_event_response.text
+
+    event_id = create_event_response.json()["ID"]
+    event_info_response = requests.get(f"{HOST}/events/{event_id}")
+
+    assert event_info_response.status_code == 200, event_info_response.text
+
+    event = event_info_response.json()
+    timelines = event["Timelines"]
+
+    assert timelines
