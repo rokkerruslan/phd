@@ -4,57 +4,16 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"os"
 	"sort"
 	"time"
-
-	"github.com/jackc/pgx/v4"
 )
 
-func Migrate(opts Opts) {
-	r := NewRegistry(opts)
-	r.InitConnection()
-	r.CheckMigrationTable("public", "migrations")
+// todo rr: --fake option?
+func (m *Migrator) Migrate(to int, opts Opts) {
+	r := NewRegistry(opts, m.db)
 	r.Sort()
 	r.Apply()
 	r.Commit()
-}
-
-func (r *Registry) InitConnection() {
-	conn, err := pgx.Connect(context.Background(), os.Getenv("DATABASE_URL"))
-	if err != nil {
-		log.Fatal(err)
-	}
-	r.conn = conn
-}
-
-var existQuery = `
-SELECT EXISTS (
-	SELECT FROM information_schema.tables
-	WHERE  table_schema = $1
-	AND    table_name   = $2
-);
-`
-
-var createMigrationTableQuery = `
-CREATE TABLE migrations (
-	id serial PRIMARY KEY,
-	created timestamp without time zone,
-	name text,
-	number integer
-);
-`
-
-func (r *Registry) CheckMigrationTable(schema, table string) {
-	var isExist bool
-	if err := r.conn.QueryRow(context.Background(), existQuery, schema, table).Scan(&isExist); err != nil {
-		log.Fatal(err)
-	}
-	if !isExist {
-		if _, err := r.conn.Exec(context.Background(), createMigrationTableQuery); err != nil {
-			log.Fatal(err)
-		}
-	}
 }
 
 func (r *Registry) Sort() {

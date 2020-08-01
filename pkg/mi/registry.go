@@ -17,8 +17,11 @@ type Registry struct {
 	conn *pgx.Conn
 }
 
-func NewRegistry(opts Opts) *Registry {
-	r := Registry{}
+// todo rr: check inconsistency?
+func NewRegistry(opts Opts, conn *pgx.Conn) *Registry {
+	r := Registry{
+		conn: conn,
+	}
 
 	matches, err := filepath.Glob(opts.MigrationsPattern)
 	if err != nil {

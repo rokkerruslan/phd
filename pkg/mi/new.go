@@ -7,12 +7,12 @@ import (
 	"path/filepath"
 )
 
-func New(name string, opts Opts) {
-	r := NewRegistry(opts)
+func (m *Migrator) New(name string, opts Opts)  {
+	r := NewRegistry(opts, m.db)
 
-	m := r.Migrations[len(r.Migrations)-1]
+	migrations := r.Migrations[len(r.Migrations)-1]
 
-	nextMigrationNumber := m.Line.Number + 1
+	nextMigrationNumber := migrations.Line.Number + 1
 
 	fileName, err := formatMigrationFileName(nextMigrationNumber, name)
 	if err != nil {

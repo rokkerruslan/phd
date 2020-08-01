@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS public.migrations (
 `
 
 func (m *Migrator) Init(ctx context.Context) (error) {
+	// todo rr: check structure?
 	_, err := m.db.Exec(ctx, migrationsTableTemplate)
 	return err
 }
