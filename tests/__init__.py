@@ -53,6 +53,8 @@ def create_valid_event_info():
         "Name": "1",
         "Description": "1",
         "OwnerID": 0,
+        "IsPublic": False,
+        "isHidden": False,
         "Timelines": [
             {
                 "Start": "2006-01-02T17:05:05Z",
