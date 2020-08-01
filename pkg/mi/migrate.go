@@ -1,4 +1,4 @@
-package mi
+package main
 
 import (
 	"context"
@@ -11,8 +11,8 @@ import (
 	"github.com/jackc/pgx/v4"
 )
 
-func Migrate() {
-	r := NewRegistry()
+func Migrate(opts Opts) {
+	r := NewRegistry(opts)
 	r.InitConnection()
 	r.CheckMigrationTable("public", "migrations")
 	r.Sort()

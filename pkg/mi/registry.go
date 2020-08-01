@@ -1,8 +1,7 @@
-package mi
+package main
 
 import (
 	"bufio"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -12,19 +11,16 @@ import (
 	"github.com/jackc/pgx/v4"
 )
 
-const migrationsDir = "./migrations/"
-const migrationPostfix = "*.sql"
-
 type Registry struct {
 	Migrations []Migration
 
 	conn *pgx.Conn
 }
 
-func NewRegistry() *Registry {
+func NewRegistry(opts Opts) *Registry {
 	r := Registry{}
 
-	matches, err := filepath.Glob(fmt.Sprint(migrationsDir, migrationPostfix))
+	matches, err := filepath.Glob(opts.MigrationsPattern)
 	if err != nil {
 		log.Fatal(err)
 	}
