@@ -32,7 +32,7 @@ def test_create_event_200():
     assert create_event_response.status_code == 200, create_event_response.text
 
 
-def test_create_event_400_title_cant_be_empty():
+def test_create_event_400_name_cant_be_empty():
     """
     Тест проверяет функцию создания ивентов с невалидными данными (Отсутствует значение ключа "Name" в теле запроса).
     """
@@ -180,7 +180,7 @@ def test_update_events_200():
     assert update_event_response.status_code == 200, update_event_response.text
 
 
-def test_event_info():
+def test_event_info_200():
     """
     Тест проверяет функцию получения информации об ивенте.
     """
@@ -211,7 +211,7 @@ def test_event_info():
     assert event_info_response.status_code == 200, event_info_response.text
 
 
-def test_list_events():
+def test_list_events_200():
     """
     Тест проверяет функцию получения списка ифентов у одного аккаунта.
     """

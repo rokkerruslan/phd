@@ -208,7 +208,7 @@ def test_delete_account_200():
     assert delete_account_response.status_code == 204, delete_account_response.text
 
 
-def test_sign_in_deleted_account():
+def test_sign_in_400_deleted_account():
     """
     Вход в удаленный аккаунт запрещен.
     """
