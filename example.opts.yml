@@ -1,0 +1,18 @@
+
+# WARNING: ALL FIELDS ARE REQUIRED!
+
+# ip/port pair for binding server socket
+Addr: "3000"
+
+# Postgres DSN
+DatabaseURL: "postgres://postgres:postgres@localhost:5432/postgres?sslmode=disable"
+
+# Used for password hash calculating, no default value. Please set yourself.
+# Example bash command for generating:
+# $ openssl rand -base64 32
+GlobalSalt: ""
+
+# todo rr: passwords?
+MinLenForNewPassword: 10
+
+TokenTTL: "900h"
