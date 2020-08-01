@@ -32,6 +32,7 @@ $ ./app start
 
 ## Build on Win
 ```shell script
+$ set ENV=.env.tests
 $ go build -o dist/ ./cmd/phd
 ```
 

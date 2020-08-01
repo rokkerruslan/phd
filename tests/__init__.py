@@ -1,7 +1,13 @@
 import psycopg2
 import os
+from dotenv import load_dotenv
+from pathlib import Path
 
-HOST = "http://localhost:3001"
+
+env_path = Path(".env.tests")
+load_dotenv(dotenv_path=env_path)
+
+HOST = f"http://localhost{os.environ.get('ADDR')}"
 
 
 def delete_all_db():

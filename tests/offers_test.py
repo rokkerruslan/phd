@@ -7,9 +7,9 @@ def teardown_function():
     delete_all_db()
 
 
-def test_create_offer_on_your_account():
+def test_create_offer_on_your_account_400():
     """
-    Запрещенно создавать офер на собствееный ивент.
+    Запрещено создавать оффер на собственный ивент.
     """
 
     sign_up_response = requests.post(
@@ -50,7 +50,7 @@ def test_create_offer_on_your_account():
 @pytest.mark.xfail(reason="issue #37")
 def test_repeated_create_offer_400():
     """
-    По бизнес-логике запрещено создавать два офера на один ивент.
+    По бизнес-логике запрещено создавать два оффера на один ивент.
     """
 
     sign_up_response = requests.post(
@@ -108,9 +108,9 @@ def test_repeated_create_offer_400():
     assert "fails" in create_offer_response_2.text
 
 
-def test_create_offer_400():
+def test_create_offer_400_account_that_created_the_event_deleted():
     """
-    Запрещено создавать офер на событие, созданное аккаунтом, который был удален.
+    Запрещено создавать оффер на событие, созданное аккаунтом, который был удален.
     """
 
     sign_up_response = requests.post(
@@ -160,6 +160,46 @@ def test_create_offer_400():
         headers=account_2_token,
         json={
             "AccountID": account_id_2,
+            "EventID": event_id
+        }
+    )
+
+    assert create_offer_response.status_code == 400, create_offer_response.text
+
+
+def test_create_offer_400_without_authorization():
+    """
+    Запрещено создавать оффер без авторизации.
+    """
+    sign_up_response = requests.post(
+        f"{HOST}/accounts/sign-up",
+        json=create_valid_account_info()
+    )
+
+    assert sign_up_response.status_code == 200, sign_up_response.text
+
+    account_id = sign_up_response.json()["Account"]["ID"]
+    x_auth_token = {"X-Auth-Token": sign_up_response.json()["Token"]}
+    info = create_valid_event_info()
+    info['OwnerID'] = account_id
+
+    create_events_response = requests.post(
+        f"{HOST}/events",
+        headers=x_auth_token,
+        json=info
+    )
+
+    assert create_events_response.status_code == 200, create_events_response.text
+
+    event_id = create_events_response.json()["ID"]
+
+    info['OwnerID'] = account_id + 1
+
+    create_offer_response = requests.post(
+        f"{HOST}/offers",
+        headers=x_auth_token,
+        json={
+            "AccountID": info["OwnerID"],
             "EventID": event_id
         }
     )
