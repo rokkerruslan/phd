@@ -1,4 +1,4 @@
-package mi
+package main
 
 import (
 	"fmt"
@@ -7,13 +7,8 @@ import (
 	"path/filepath"
 )
 
-const migrationTemplate = `-- mi: %s
-
--- WRITE YOUR MIGRATION HERE
-`
-
-func New(name string) {
-	r := NewRegistry()
+func New(name string, opts Opts) {
+	r := NewRegistry(opts)
 
 	m := r.Migrations[len(r.Migrations)-1]
 
@@ -24,7 +19,7 @@ func New(name string) {
 		log.Fatal(err)
 	}
 
-	f, err := os.Create(filepath.Join(migrationsDir, fileName))
+	f, err := os.Create(filepath.Join(DefaultMigrationsDir, fileName))
 	if err != nil {
 		log.Fatal(err)
 	}
