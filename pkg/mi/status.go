@@ -4,6 +4,6 @@ import (
 	"fmt"
 )
 
-func Status() {
+func (m *Migrator) Status() {
 	fmt.Println("Status")
 }
