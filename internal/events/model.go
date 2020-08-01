@@ -32,7 +32,7 @@ func (app *App) eventCreate(ctx context.Context, e Event) (Event, error) {
 	for i, timeline := range e.Timelines {
 		err := app.assets.Db.QueryRow(
 			ctx,
-			"INSERT INTO timelines (event_id, start, \"end\", place) VALUES ($1, $2, $3, $4) RETURNING id",
+			`INSERT INTO timelines (event_id, start, "end", place) VALUES ($1, $2, $3, $4) RETURNING id`,
 			e.ID,
 			timeline.Start,
 			timeline.End,
@@ -46,20 +46,26 @@ func (app *App) eventCreate(ctx context.Context, e Event) (Event, error) {
 	return e, nil
 }
 
-func (app *App) eventUpdate(ctx context.Context, e Event) error {
+func (app *App) eventUpdate(ctx context.Context, e Event) (Event, error) {
 	baseErr := "eventUpdate fails: %v"
 
-	if _, err := app.assets.Db.Exec(
+	if err := app.assets.Db.QueryRow(
 		ctx,
-		"UPDATE events SET name = $1, updated = NOW(), is_hidden = $3, description = $4 WHERE id = $2",
+		`UPDATE events SET name = $1, updated = NOW(), is_hidden = $3, description = $4 WHERE id = $2 RETURNING created, updated, is_public, is_hidden`,
 		e.Name,
 		e.ID,
 		e.IsHidden,
 		e.Description,
-	); err != nil {
-		return fmt.Errorf(baseErr, err)
+	).Scan(&e.Created, &e.Updated, &e.IsPublic, &e.IsHidden); err != nil {
+		return e, fmt.Errorf(baseErr, err)
 	}
-	return nil
+
+	var err error
+	if e.Timelines, err = app.fetchTimelines(ctx, e.ID); err != nil {
+		return e, fmt.Errorf(baseErr, err)
+	}
+
+	return e, nil
 }
 
 func (app *App) eventRetrieve(ctx context.Context, f api.RetrieveFilter) (e Event, err error) {
@@ -147,4 +153,26 @@ func (app *App) constructEventList(ctx context.Context, rows pgx.Rows) ([]Event,
 	}
 
 	return events, nil
+}
+
+func (app *App) fetchTimelines(ctx context.Context, eventID int) ([]Timeline, error) {
+	timelineRows, err := app.assets.Db.Query(
+		ctx,
+		`SELECT id, start, "end", place, event_id FROM timelines WHERE event_id = $1`,
+		eventID,
+	)
+	if err != nil {
+		return nil, err
+	}
+	var timelines []Timeline
+	for timelineRows.Next() {
+		var t Timeline
+		var eventID int
+		if err := timelineRows.Scan(&t.ID, &t.Start, &t.End, &t.Place, &eventID); err != nil {
+			return nil, err
+		}
+		timelines = append(timelines, t)
+	}
+
+	return timelines, nil
 }

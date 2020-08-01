@@ -12,12 +12,12 @@ $ curl -s localhost:3000/events/ | jq
 
 Create Event
 ```shell script
-$ cat .i/event.json | curl -X POST -d @- -s localhost:3000/events/ | jq
+$ curl -X POST -d @.i/event.json -s localhost:3000/events | jq
 ```
 
 Update Event
 ```shell script
-$ curl -X PUT -d '{"ID":8,"Name":"Event X8","Timelines":[{"Start":"2006-01-02T15:05:05Z","End":"2006-01-02T16:06:05Z"}]}' -s localhost:3000/api/v1/events/ | jq
+curl -X PUT -d @.i/event.json -s localhost:3000/events/2 | jq
 ```
 
 Offer list:
