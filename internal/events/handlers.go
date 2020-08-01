@@ -118,12 +118,11 @@ func (app *App) updateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := app.eventUpdate(r.Context(), event); err != nil {
+	if e, err := app.eventUpdate(r.Context(), event); err != nil {
 		api.Error(w, err, http.StatusBadRequest)
-		return
+	} else {
+		api.Response(w, e)
 	}
-
-	w.WriteHeader(http.StatusNoContent)
 }
 
 func (app *App) deleteHandler(w http.ResponseWriter, r *http.Request) {
