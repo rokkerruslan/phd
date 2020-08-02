@@ -143,7 +143,7 @@ def test_sign_in_400_wrong_password():
     assert sign_up_response.status_code == 200, sign_up_response.text
 
     account = create_valid_account_info()
-    account["Password"] = "2"
+    account["Password"] += "test"
 
     sign_in_response = requests.post(
         f"{HOST}/accounts/sign-in",
@@ -186,7 +186,7 @@ def test_account_info_200():
     assert info_response.status_code == 200, info_response.text
 
 
-def test_delete_account_200():
+def test_delete_account_204():
     """
     Тест проверяет фунцию удаления аккаунта пользователя.
     """
