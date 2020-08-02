@@ -45,14 +45,14 @@ def create_valid_account_info():
     }
 
 
-def create_valid_event_info():
+def create_valid_event_info(account_id):
     """
     Функция создания словаря с валидными данными ивента.
     """
     return {
         "Name": "1",
         "Description": "1",
-        "OwnerID": 0,
+        "OwnerID": account_id,
         "IsPublic": False,
         "isHidden": False,
         "Timelines": [

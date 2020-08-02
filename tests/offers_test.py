@@ -21,8 +21,7 @@ def test_create_offer_on_your_account_400():
 
     account_id = sign_up_response.json()["Account"]["ID"]
     x_auth_token = {"X-Auth-Token": sign_up_response.json()["Token"]}
-    info = create_valid_event_info()
-    info['OwnerID'] = account_id
+    info = create_valid_event_info(account_id)
 
     create_event_response = requests.post(
         f"{HOST}/events",
@@ -122,8 +121,7 @@ def test_create_offer_400_account_that_created_the_event_deleted():
 
     account_id = sign_up_response.json()["Account"]["ID"]
     account_1_token = {"X-Auth-Token": sign_up_response.json()["Token"]}
-    info = create_valid_event_info()
-    info['OwnerID'] = account_id
+    info = create_valid_event_info(account_id)
 
     create_events_response = requests.post(
         f"{HOST}/events",
@@ -180,8 +178,7 @@ def test_create_offer_400_without_authorization():
 
     account_id = sign_up_response.json()["Account"]["ID"]
     x_auth_token = {"X-Auth-Token": sign_up_response.json()["Token"]}
-    info = create_valid_event_info()
-    info['OwnerID'] = account_id
+    info = create_valid_event_info(account_id)
 
     create_events_response = requests.post(
         f"{HOST}/events",
