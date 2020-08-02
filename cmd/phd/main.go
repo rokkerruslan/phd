@@ -1,17 +1,19 @@
 package main
 
 import (
+	"fmt"
 	"os"
 
-	"github.com/joho/godotenv"
 	"ph/internal"
 )
 
 func main() {
-	file := os.Getenv("ENV")
-	if file == "" {
-		file = ".env"
+	args := os.Args[1:]
+
+	if len(args) != 1 {
+		fmt.Println("usage: phd config-file.yaml")
+		os.Exit(1)
 	}
-	_ = godotenv.Load(file)
-	internal.Run()
+
+	internal.Run(args[0])
 }

@@ -19,7 +19,7 @@ import (
 )
 
 // Run - entry point for internal package
-func Run() {
+func Run(configFilename string) {
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 
@@ -30,13 +30,15 @@ func Run() {
 		Debug:          true,
 	}))
 
-	opts, err := newOptions()
+	opts, err := FromFile(configFilename)
 	if err != nil {
 		log.Fatal(err)
 	}
 
+	fmt.Printf("OPTS: %+v\n", opts)
+
 	ctx := context.Background()
-	pool, err := pgxpool.Connect(ctx, opts.databaseURL)
+	pool, err := pgxpool.Connect(ctx, opts.DatabaseURL)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -46,7 +48,7 @@ func Run() {
 			Db: pool,
 		},
 		tokens.Opts{
-			TokenTTL: opts.tokenTTL,
+			TokenTTL: opts.TokenTTL,
 		},
 	)
 
@@ -72,9 +74,9 @@ func Run() {
 			Tokens: tokenApp,
 		},
 		accounts.Opts{
-			GlobalSalt:           opts.globalSalt,
-			BcryptWorkFactor:     opts.bcryptWorkFactor,
-			MinLenForNewPassword: opts.minLenForNewPassword,
+			GlobalSalt:           []byte(opts.GlobalSalt),
+			BcryptWorkFactor:     opts.BcryptWorkFactor,
+			MinLenForNewPassword: opts.MinLenForNewPassword,
 		},
 	))
 	r.Mount("/files", files.Setup(
@@ -85,8 +87,8 @@ func Run() {
 		files.Opts{},
 	))
 
-	log.Println(fmt.Sprintf("daemon bind socket on %s", opts.addr))
-	if err := http.ListenAndServe(opts.addr, r); err != nil {
+	log.Println(fmt.Sprintf("daemon bind socket on %s", opts.Addr))
+	if err := http.ListenAndServe(opts.Addr, r); err != nil {
 		log.Fatal(err)
 	}
 }

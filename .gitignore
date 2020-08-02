@@ -5,3 +5,4 @@
 .vscode
 __*
 .pytest_cache
+/local.opts.yml
