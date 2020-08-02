@@ -1,8 +1,10 @@
+# todo rr: drop
 /dist
+
 /.env
 /images
 .idea
 .vscode
 __*
 .pytest_cache
-/local.opts.yml
+/opts.local.yml

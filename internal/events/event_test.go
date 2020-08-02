@@ -7,9 +7,10 @@ import (
 
 func TestEvent_Validate_Positive(t *testing.T) {
 	event := Event{
-		Name:      "Event Positive",
-		OwnerID:   1,
-		Timelines: []Timeline{newValidTimeline()},
+		Name:        "Event Positive",
+		Description: "Description",
+		OwnerID:     1,
+		Timelines:   []Timeline{newValidTimeline()},
 	}
 	got := validateForCreate(event)
 

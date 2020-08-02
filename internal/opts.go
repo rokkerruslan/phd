@@ -10,8 +10,6 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-// todo rr: drop config and rename this file
-
 // Opts contains all available configs
 // for application. All values getting from
 // env. For details read .env.example file.
