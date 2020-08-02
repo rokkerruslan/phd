@@ -62,3 +62,6 @@ golang.org/x/text/width
 # golang.org/x/xerrors v0.0.0-20191204190536-9bdfabe68543
 golang.org/x/xerrors
 golang.org/x/xerrors/internal
+# gopkg.in/yaml.v2 v2.2.2
+## explicit
+gopkg.in/yaml.v2

@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-// options contains all available configs
+// Opts contains all available configs
 // for application. All values getting from
 // env. For details read .env.example file.
 type options struct {
@@ -41,7 +41,6 @@ func newOptions() (opts options, err error) {
 		return opts, fmt.Errorf(baseErr, "GLOBAL_SALT length MUST be grates or equal 32")
 	}
 	opts.globalSalt = []byte(globalSalt)
-	opts.bcryptWorkFactor = 10
 	passwordLen, ok := os.LookupEnv("MIN_LEN_FOR_NEW_PASSWORD")
 	if !ok {
 		missed = append(missed, "MIN_LEN_FOR_NEW_PASSWORD")
