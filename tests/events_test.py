@@ -428,12 +428,10 @@ def test_update_events_400_not_authorized():
 
     update_event_response = requests.put(
         f"{HOST}/events/{event_id}",
-        headers=x_auth_token,
         json=info
     )
 
     assert update_event_response.status_code == 400, update_event_response.text
-    assert update_event_response.headers == x_auth_token
 
 
 @pytest.mark.xfail
