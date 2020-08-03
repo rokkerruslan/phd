@@ -57,8 +57,8 @@ def create_valid_event_info(account_id):
         "isHidden": False,
         "Timelines": [
             {
-                "Start": "2006-01-02T17:05:05Z",
-                "End": "2006-01-02T18:06:05Z",
+                "Start": "2019-01-02T17:05:05Z",
+                "End": "2019-01-02T18:06:05Z",
                 "Place": "Saint Petersburg"
             }
         ]
