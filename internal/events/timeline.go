@@ -8,6 +8,7 @@ import (
 
 const (
 	TimelineStartOffset = time.Hour + time.Minute
+	EventOffset = time.Hour
 )
 
 type Timeline struct {
@@ -31,6 +32,10 @@ func (t *Timeline) Validate() error {
 	}
 	if t.Place == "" {
 		errors = append(errors, "`Place` is empty")
+	}
+
+	if t.Start.Before(time.Now().Add(EventOffset)) {
+		errors = append(errors, "`Start` too early")
 	}
 
 	if len(errors) == 0 {
