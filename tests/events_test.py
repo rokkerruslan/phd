@@ -1,7 +1,6 @@
 import pytest
 import requests
-from datetime import datetime
-from tests import delete_all_db, create_valid_account_info, create_valid_event_info, HOST
+from tests import delete_all_db, create_valid_account_info, create_valid_event_info, create_invalid_event_info, HOST
 
 
 def teardown_function():
@@ -112,9 +111,9 @@ def test_create_event_400_timlines_cant_be_empty():
     assert "Timelines" in create_event_response.text
 
 
-def test_create_event_400_didnt_authorized():
+def test_create_event_400_id_doesnt_match():
     """
-    Тест проверяет функцию создания ивентов не авторизованным пользователем.
+    Запрещено создавать ивент без подтверждения ID пользователя.
     """
     sign_up_response = requests.post(
         f"{HOST}/accounts/sign-up",
@@ -136,6 +135,29 @@ def test_create_event_400_didnt_authorized():
 
     assert create_event_response.status_code == 400, create_event_response.text
     assert "authorized" in create_event_response.text
+
+
+def test_create_event_400_not_authorized():
+    """
+    Тест проверяет функцию создания ивентов не авторизованным пользователем.
+    """
+    sign_up_response = requests.post(
+        f"{HOST}/accounts/sign-up",
+        json=create_valid_account_info()
+    )
+
+    assert sign_up_response.status_code == 200, sign_up_response.text
+
+    account_id = sign_up_response.json()["Account"]["ID"]
+    info = create_valid_event_info(account_id)
+
+    create_event_response = requests.post(
+        f"{HOST}/events",
+        json=info
+    )
+
+    assert create_event_response.status_code == 400, create_event_response.text
+    assert "X-Auth-Token" in create_event_response.text
 
 
 def test_event_info_200():
@@ -226,17 +248,17 @@ def test_check_timlines_not_nil():
     event_id = create_event_response.json()["ID"]
 
     event_info_response = requests.get(f"{HOST}/events/{event_id}")
+    assert event_info_response.status_code == 200, event_info_response.text
 
     event_info = event_info_response.json()
     timlelines = event_info["Timelines"]
 
-    assert event_info_response.status_code == 200, event_info_response.text
     assert timlelines
 
 
 def test_create_events_400_start_after_end():
     """
-
+    Запрещено задавать конец ивента раньше старта
     """
     sign_up_response = requests.post(
         f"{HOST}/accounts/sign-up",
@@ -274,8 +296,7 @@ def test_create_events_400_start_after_end():
 @pytest.mark.xfail(reason="issue #57")
 def test_create_events_400_timeline_is_not_in_the_past():
     """
-    Тест проверяет возниконовение ошибки при создании ивента с таймлайном который находится в прошедшем
-    промежутке времени.
+    Тест проверяет возниконовение ошибки при создании ивента с таймлайном который находится в прошедшем времени.
     """
     sign_up_response = requests.post(
         f"{HOST}/accounts/sign-up",
@@ -286,27 +307,21 @@ def test_create_events_400_timeline_is_not_in_the_past():
 
     account_id = sign_up_response.json()["Account"]["ID"]
     x_auth_token = {"X-Auth-Token": sign_up_response.json()["Token"]}
-    info = create_valid_event_info(account_id)
 
     create_event_response = requests.post(
         f"{HOST}/events",
         headers=x_auth_token,
-        json=info
+        json=create_invalid_event_info(account_id)
     )
-    event = create_event_response.json()
-
-    created = datetime.strptime(event["Created"], "%Y-%m-%dT%H:%M:%S.%fZ")
-    start = datetime.strptime(event["Timelines"][0]["Start"], "%Y-%m-%dT%H:%M:%SZ")
-    end = datetime.strptime(event["Timelines"][0]["End"], "%Y-%m-%dT%H:%M:%SZ")
 
     assert create_event_response.status_code == 400, create_event_response.text
-    assert created > start and end
+    assert "Empty" in create_event_response.text
 
 
-@pytest.mark.xfail()
+@pytest.mark.xfail(reason="issue #58")
 def test_create_events_400_intersection_of_timelines():
     """
-    Тест проверяет возниконовение ошибки при пересечении временнх промежутков.
+    Тест проверяет возниконовение ошибки при пересечении временных промежутков.
     """
     sign_up_response = requests.post(
         f"{HOST}/accounts/sign-up",
@@ -320,8 +335,8 @@ def test_create_events_400_intersection_of_timelines():
     event = create_valid_event_info(account_id)
     event["Timelines"].append(
         {
-            "Start": "2018-01-02T17:05:05Z",
-            "End": "2018-01-02T18:06:05Z",
+            "Start": "2021-01-02T17:05:05Z",
+            "End": "2021-01-02T18:06:05Z",
             "Place": "Saint Petersburg"
         }
     )
@@ -332,12 +347,5 @@ def test_create_events_400_intersection_of_timelines():
         json=event
     )
 
-    create_event = create_event_response.json()
-
-    start_1 = datetime.strptime(create_event["Timelines"][0]["Start"], "%Y-%m-%dT%H:%M:%SZ")
-    end_1 = datetime.strptime(create_event["Timelines"][0]["End"], "%Y-%m-%dT%H:%M:%SZ")
-    start_2 = datetime.strptime(create_event["Timelines"][1]["Start"], "%Y-%m-%dT%H:%M:%SZ")
-    end_2 = datetime.strptime(create_event["Timelines"][1]["End"], "%Y-%m-%dT%H:%M:%SZ")
-
     assert create_event_response.status_code == 400, create_event_response.text
-    assert start_1 and end_1 > end_2 or start_1 and end_1 < start_2
+    assert "crossing" in create_event_response.text

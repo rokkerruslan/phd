@@ -57,6 +57,26 @@ def create_valid_event_info(account_id):
         "isHidden": False,
         "Timelines": [
             {
+                "Start": "2021-01-02T17:05:05Z",
+                "End": "2021-01-02T18:06:05Z",
+                "Place": "Saint Petersburg"
+            }
+        ]
+    }
+
+
+def create_invalid_event_info(account_id):
+    """
+    Функция создания словаря с валидными данными ивента.
+    """
+    return {
+        "Name": "1",
+        "Description": "1",
+        "OwnerID": account_id,
+        "IsPublic": False,
+        "isHidden": False,
+        "Timelines": [
+            {
                 "Start": "2019-01-02T17:05:05Z",
                 "End": "2019-01-02T18:06:05Z",
                 "Place": "Saint Petersburg"
