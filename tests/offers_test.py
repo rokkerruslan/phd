@@ -165,9 +165,9 @@ def test_create_offer_400_account_that_created_the_event_deleted():
     assert create_offer_response.status_code == 400, create_offer_response.text
 
 
-def test_create_offer_400_without_authorization():
+def test_create_offer_400_id_doesnt_match():
     """
-    Запрещено создавать оффер без авторизации.
+    Запрещено создавать оффер без подтверждения ID пользователя.
     """
     sign_up_response = requests.post(
         f"{HOST}/accounts/sign-up",
@@ -202,3 +202,4 @@ def test_create_offer_400_without_authorization():
     )
 
     assert create_offer_response.status_code == 400, create_offer_response.text
+    assert "this account" in create_offer_response.text

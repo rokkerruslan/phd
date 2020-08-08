@@ -1,6 +1,5 @@
 import pytest
 import requests
-from datetime import datetime
 from tests import delete_all_db, create_valid_account_info, create_valid_event_info, HOST
 
 
@@ -195,6 +194,7 @@ def test_update_events_400_not_authorized():
     )
 
     assert update_event_response.status_code == 400, update_event_response.text
+    assert "X-Auth-Token" in create_event_response.text
 
 
 @pytest.mark.xfail(reason="issue #54")
@@ -350,8 +350,8 @@ def test_update_events_timelines():
     event_id = create_event_response.json()["ID"]
 
     event = create_valid_event_info(account_id)
-    event["Timelines"][0]["Start"] = "2021-08-02T13:43:09.535504Z"
-    event["Timelines"][0]["End"] = "2021-08-03T13:43:09.535504Z"
+    event["Timelines"][0]["Start"] = "2022-08-02T13:43:09.535504Z"
+    event["Timelines"][0]["End"] = "2022-08-03T13:43:09.535504Z"
     event["Timelines"][0]["Place"] = "Moscow"
 
     update_event_response = requests.put(
@@ -363,9 +363,9 @@ def test_update_events_timelines():
     assert update_event_response.status_code == 200, update_event_response.text
 
     event_info_response = requests.get(f"{HOST}/events/{event_id}")
-    event_info = event_info_response.json()
-
     assert event_info_response.status_code == 200, event_info_response.text
+
+    event_info = event_info_response.json()
     assert event_info["Timelines"] == event["Timelines"]
 
 
@@ -432,11 +432,13 @@ def test_update_events_del_one_timelines():
     account_id = sign_up_response.json()["Account"]["ID"]
     x_auth_token = {"X-Auth-Token": sign_up_response.json()["Token"]}
     event = create_valid_event_info(account_id)
-    event["Timelines"].append({
-        "Start": "2021-01-02T17:05:05Z",
-        "End": "2021-01-02T18:06:05Z",
-        "Place": "Saint Petersburg"
-    })
+    event["Timelines"].append(
+        {
+            "Start": "2021-01-02T17:05:05Z",
+            "End": "2021-01-02T18:06:05Z",
+            "Place": "Saint Petersburg"
+        }
+    )
 
     create_event_response = requests.post(
         f"{HOST}/events",
@@ -454,68 +456,8 @@ def test_update_events_del_one_timelines():
         headers=x_auth_token,
         json=event
     )
+    assert update_event_response.status_code == 200, update_event_response.text
 
     event_info = update_event_response.json()
 
-    assert update_event_response.status_code == 200, update_event_response.text
     assert len(event_info["Timelines"]) == 1
-
-
-@pytest.mark.xfail(reason="issue #57")
-def test_update_events_timeline_is_not_in_the_past():
-    """
-    Тест проверяет возниконовение ошибки при обновлении ивента с таймлайном, который находится в уже прошедшем
-    промежутке времени.
-    """
-    sign_up_response = requests.post(
-        f"{HOST}/accounts/sign-up",
-        json=create_valid_account_info()
-    )
-
-    assert sign_up_response.status_code == 200, sign_up_response.text
-
-    account_id = sign_up_response.json()["Account"]["ID"]
-    x_auth_token = {"X-Auth-Token": sign_up_response.json()["Token"]}
-    info = create_valid_event_info(account_id)
-
-    create_event_response = requests.post(
-        f"{HOST}/events",
-        headers=x_auth_token,
-        json=info
-    )
-
-    assert create_event_response.status_code == 200, create_event_response.text
-
-    event_id = create_event_response.json()["ID"]
-    event_info = create_event_response.json()
-
-    updated = datetime.strptime(event_info["Updated"], "%Y-%m-%dT%H:%M:%S.%fZ")
-
-    update_event_response = requests.put(
-        f"{HOST}/events/{event_id}",
-        headers=x_auth_token,
-        json=
-        {
-            "Name": "1",
-            "Description": "1",
-            "OwnerID": account_id,
-            "IsPublic": False,
-            "isHidden": False,
-            "Timelines":
-            [
-                {
-                    "Start": "2006-01-02T17:05:05Z",
-                    "End": "2006-01-02T18:06:05Z",
-                    "Place": "Saint Petersburg"
-                }
-            ]
-        }
-    )
-
-    update_event_info = update_event_response.json()
-
-    start = datetime.strptime(update_event_info["Timelines"][0]["Start"], "%Y-%m-%dT%H:%M:%SZ")
-    end = datetime.strptime(update_event_info["Timelines"][0]["End"], "%Y-%m-%dT%H:%M:%SZ")
-
-    assert update_event_response.status_code == 400, update_event_response.text
-    assert updated < start and end
