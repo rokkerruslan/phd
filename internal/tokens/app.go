@@ -107,10 +107,12 @@ func (app *App) retrieveAccountID(ctx context.Context, token string) (id int, er
 	return id, nil
 }
 
+var AuthHeaderError = fmt.Errorf("`%s` isn't set", api.AuthTokenHeaderName)
+
 func fromRequest(r *http.Request) (string, error) {
 	token := r.Header.Get(api.AuthTokenHeaderName)
 	if token == "" {
-		return token, fmt.Errorf("`%s` isn't set", api.AuthTokenHeaderName)
+		return "", AuthHeaderError
 	}
 	return token, nil
 }
