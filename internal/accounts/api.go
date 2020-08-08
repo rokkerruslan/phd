@@ -3,9 +3,8 @@ package accounts
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
+	"log"
 	"net/http"
-	"strings"
 
 	"ph/internal/api"
 	"ph/internal/tokens"
@@ -19,19 +18,23 @@ func (app *App) retrieveHandler(w http.ResponseWriter, r *http.Request) {
 
 	id, err := app.assets.Tokens.RetrieveAccountIDFromRequest(r.Context(), r)
 	if err != nil {
+		log.Printf(baseErr, err)
 		switch {
+		case errors.Is(err, tokens.AuthHeaderError):
+			api.Error2(w, api.AuthHeaderError)
 		case errors.Is(err, tokens.ErrDoesNotExist):
-			api.Error(w, fmt.Errorf(baseErr, err), http.StatusBadRequest)
-			return
+			api.Error2(w, api.NotExistError)
 		default:
-			api.Error(w, fmt.Errorf(baseErr, err), http.StatusInternalServerError)
-			return
+			api.Error2(w, api.DatabaseError)
 		}
+		return
 	}
 
+	// todo (rr): we need one query for retrieve account info
 	account, err := app.RetrieveByID(r.Context(), id)
 	if err != nil {
-		api.Error(w, fmt.Errorf(baseErr, err), http.StatusInternalServerError)
+		log.Printf(baseErr, err)
+		api.Error2(w, api.DatabaseError)
 		return
 	}
 
@@ -44,25 +47,25 @@ func (app *App) deleteHandler(w http.ResponseWriter, r *http.Request) {
 
 	id, err := app.assets.Tokens.RetrieveAccountIDFromRequest(r.Context(), r)
 	if err != nil {
+		log.Printf(baseErr, err)
 		switch {
+		case errors.Is(err, tokens.AuthHeaderError):
+			api.Error2(w, api.AuthHeaderError)
 		case errors.Is(err, tokens.ErrDoesNotExist):
-			api.Error(w, fmt.Errorf(baseErr, err), http.StatusBadRequest)
-			return
+			api.Error2(w, api.NotExistError)
 		default:
-			api.Error(w, fmt.Errorf(baseErr, err), http.StatusInternalServerError)
-			return
+			api.Error2(w, api.DatabaseError)
 		}
+		return
 	}
 
 	if err := app.deleteAccount(r.Context(), id); err != nil {
-		api.Error(w, fmt.Errorf(baseErr, err), http.StatusInternalServerError)
+		api.Error2(w, api.DatabaseError)
 		return
 	}
 
 	w.WriteHeader(http.StatusNoContent)
 }
-
-// Auth
 
 type signInRequest struct {
 	Email    string
@@ -75,26 +78,35 @@ func (app *App) signInHandler(w http.ResponseWriter, r *http.Request) {
 
 	var signData signInRequest
 	if err := json.NewDecoder(r.Body).Decode(&signData); err != nil {
-		api.Error(w, fmt.Errorf(baseErr, err), http.StatusBadRequest)
+		log.Printf(baseErr, err)
+		api.Error2(w, api.InvalidJsonError)
 		return
 	}
 
 	// TODO: hash password anyway
 	a, err := app.RetrieveByEmail(r.Context(), signData.Email)
 	if err != nil {
-		api.Error(w, fmt.Errorf(baseErr, err), http.StatusBadRequest)
+		log.Printf(baseErr, err)
+		switch {
+		case errors.Is(err, ErrAccountDoesNotExist):
+			api.Error2(w, api.NotExistError)
+		default:
+			api.Error2(w, api.DatabaseError)
+		}
 		return
 	}
 
 	if err := a.CheckPassword(signData.Password, app.opts.GlobalSalt); err != nil {
-		api.Error(w, fmt.Errorf(baseErr, err), http.StatusBadRequest)
+		log.Printf(baseErr, err)
+		api.Error2(w, api.NotExistError)
 		return
 	}
 
 	// Authenticate user
 	token, err := app.assets.Tokens.Create(r.Context(), a.ID)
 	if err != nil {
-		api.Error(w, fmt.Errorf(baseErr, err), http.StatusInternalServerError)
+		log.Printf(baseErr, err)
+		api.Error2(w, api.DatabaseError)
 		return
 	}
 
@@ -110,26 +122,6 @@ type signUpRequest struct {
 	Password string
 }
 
-func (r *signUpRequest) Validate(passwordMinLen int) error {
-	var e []string
-
-	if r.Name == "" {
-		e = append(e, "`Name` is empty")
-	}
-	if r.Email == "" {
-		e = append(e, "`Email` is empty")
-	}
-	if len(r.Password) < passwordMinLen {
-		e = append(e, "`Password` length check fails")
-	}
-
-	if len(e) != 0 {
-		return fmt.Errorf("signUpRequest.Validate fails: %v", strings.Join(e, ", "))
-	}
-
-	return nil
-}
-
 type signUpResponse struct {
 	Token   string
 	Account Account
@@ -142,37 +134,41 @@ func (app *App) signUpHandler(w http.ResponseWriter, r *http.Request) {
 
 	var signData signUpRequest
 	if err := json.NewDecoder(r.Body).Decode(&signData); err != nil {
-		api.Error(w, fmt.Errorf(baseErr, err), http.StatusBadRequest)
+		log.Printf(baseErr, err)
+		api.Error2(w, api.InvalidJsonError)
 		return
 	}
 
 	if err := signData.Validate(app.opts.MinLenForNewPassword); err != nil {
-		api.Error(w, fmt.Errorf(baseErr, err), http.StatusBadRequest)
+		log.Printf(baseErr, err)
+		api.Error2(w, api.PasswordLenError)
 		return
 	}
 
 	hash, err := bcrypt.GenerateFromPassword(
 		append([]byte(signData.Password), app.opts.GlobalSalt...), app.opts.BcryptWorkFactor)
 	if err != nil {
-		api.Error(w, fmt.Errorf(baseErr, err), http.StatusInternalServerError)
+		log.Printf(baseErr, err)
+		api.Error2(w, api.TemporaryError)
 		return
 	}
 
 	a := NewAccount(signData.Name, signData.Email, string(hash))
 
 	if a, err = app.createAccount(r.Context(), a); err != nil {
-		status := http.StatusInternalServerError
 		if errors.Is(err, ErrAlreadyExists) {
-			status = http.StatusBadRequest
+			api.Error2(w, api.AccountAlreadyExist)
+		} else {
+			api.Error2(w, api.DatabaseError)
 		}
-		api.Error(w, fmt.Errorf(baseErr, err), status)
 		return
 	}
 
 	// Authenticate
 	token, err := app.assets.Tokens.Create(r.Context(), a.ID)
 	if err != nil {
-		api.Error(w, fmt.Errorf(baseErr, err), http.StatusInternalServerError)
+		log.Printf(baseErr, err)
+		api.Error2(w, api.DatabaseError)
 		return
 	}
 
@@ -187,8 +183,8 @@ func (app *App) signOutHandler(w http.ResponseWriter, r *http.Request) {
 
 	token := r.Header.Get(api.AuthTokenHeaderName)
 	if token == "" {
-		api.Error(w, fmt.Errorf(baseErr,
-			fmt.Sprintf("%s` isn't set", api.AuthTokenHeaderName)), http.StatusForbidden)
+		log.Printf(baseErr, "token does not exist")
+		api.Error2(w, api.AuthHeaderError)
 		return
 	}
 	app.assets.Tokens.DropToken(r.Context(), token)
