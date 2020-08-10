@@ -352,6 +352,7 @@ def test_create_events_400_intersection_of_timelines():
     assert "crossing" in create_event_response.text
 
 
+@pytest.mark.xfail
 def test_create_event_400_timeline_is_not_in_the_present():
     """
     Таймлайн в ивенте разрешается устанавливать на 1 час позже чем время создания ивента. Тест проверяет
