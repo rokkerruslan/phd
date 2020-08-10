@@ -9,6 +9,8 @@ load_dotenv(dotenv_path=env_path)
 
 HOST = f"http://localhost{os.environ.get('ADDR')}"
 
+format_time = "%Y-%m-%dT%H:%M:%SZ"
+
 
 def delete_all_db():
     """
