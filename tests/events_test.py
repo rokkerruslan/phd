@@ -1,6 +1,8 @@
 import pytest
 import requests
-from tests import delete_all_db, create_valid_account_info, create_valid_event_info, create_invalid_event_info, HOST
+from datetime import datetime, timedelta
+from tests import delete_all_db, create_valid_account_info, create_valid_event_info, create_invalid_event_info, HOST, \
+    format_time
 
 
 def teardown_function():
@@ -293,7 +295,6 @@ def test_create_events_400_start_after_end():
     assert "Start" in create_event_response.text
 
 
-@pytest.mark.xfail(reason="issue #57")
 def test_create_events_400_timeline_is_not_in_the_past():
     """
     Тест проверяет возниконовение ошибки при создании ивента с таймлайном который находится в прошедшем времени.
@@ -315,7 +316,7 @@ def test_create_events_400_timeline_is_not_in_the_past():
     )
 
     assert create_event_response.status_code == 400, create_event_response.text
-    assert "Empty" in create_event_response.text
+    assert "early" in create_event_response.text
 
 
 @pytest.mark.xfail(reason="issue #58")
@@ -349,3 +350,45 @@ def test_create_events_400_intersection_of_timelines():
 
     assert create_event_response.status_code == 400, create_event_response.text
     assert "crossing" in create_event_response.text
+
+
+def test_create_event_400_timeline_is_not_in_the_present():
+    """
+    Таймлайн в ивенте разрешается устанавливать на 1 час позже чем время создания ивента. Тест проверяет
+    возниконовение ошибки при создании ивента с таймлайном до этого часа.
+    """
+    sign_up_response = requests.post(
+        f"{HOST}/accounts/sign-up",
+        json=create_valid_account_info()
+    )
+
+    assert sign_up_response.status_code == 200, sign_up_response.text
+
+    account_id = sign_up_response.json()["Account"]["ID"]
+    x_auth_token = {"X-Auth-Token": sign_up_response.json()["Token"]}
+
+    info = create_valid_event_info(account_id)
+    forbidden_time = datetime.now() + timedelta(minutes=55)
+
+    info["Timelines"][0]["Start"] = forbidden_time.strftime(format_time)
+
+    create_event_response_1 = requests.post(
+        f"{HOST}/events",
+        headers=x_auth_token,
+        json=info
+    )
+
+    assert create_event_response_1.status_code == 400, create_event_response_1.text
+    assert "early" in create_event_response_1.text
+
+    forbidden_time = datetime.now() + timedelta(minutes=65)
+
+    info["Timelines"][0]["Start"] = forbidden_time.strftime(format_time)
+
+    create_event_response_2 = requests.post(
+        f"{HOST}/events",
+        headers=x_auth_token,
+        json=info
+    )
+
+    assert create_event_response_2.status_code == 200, create_event_response_2.text
