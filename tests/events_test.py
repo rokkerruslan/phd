@@ -5,9 +5,8 @@ from tests import delete_all_db, create_valid_account_info, create_valid_event_i
     format_time
 
 
-def teardown_function():
+def pytest_sessionfinish():
     delete_all_db()
-
 
 def test_create_event_200():
     """
@@ -353,7 +352,7 @@ def test_create_events_400_intersection_of_timelines():
 
 
 @pytest.mark.xfail
-def test_create_event_400_timeline_is_not_in_the_present():
+def test_create_event_timeline_is_not_in_the_present():
     """
     Таймлайн в ивенте разрешается устанавливать на 1 час позже чем время создания ивента. Тест проверяет
     возниконовение ошибки при создании ивента с таймлайном до этого часа.
@@ -381,10 +380,6 @@ def test_create_event_400_timeline_is_not_in_the_present():
 
     assert create_event_response_1.status_code == 400, create_event_response_1.text
     assert "early" in create_event_response_1.text
-
-    forbidden_time = datetime.now() + timedelta(minutes=65)
-
-    info["Timelines"][0]["Start"] = forbidden_time.strftime(format_time)
 
     create_event_response_2 = requests.post(
         f"{HOST}/events",
