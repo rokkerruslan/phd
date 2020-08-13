@@ -3,7 +3,7 @@ import requests
 from tests import delete_all_db, create_valid_account_info, HOST
 
 
-def teardown_function():
+def pytest_sessionfinish():
     delete_all_db()
 
 
@@ -112,6 +112,7 @@ def test_sign_out_204():
     assert sign_out_response.status_code == 204, sign_out_response.text
 
 
+@pytest.mark.xfail
 def test_sign_in_200():
     """
     Тест проверяет фунцию входа в аккаунт пользователя.
@@ -134,6 +135,7 @@ def test_sign_in_200():
     assert sign_in_response.status_code == 200, sign_in_response.text
 
 
+@pytest.mark.xfail
 def test_sign_in_400_wrong_password():
     """
     Тест проверяет фунцию входа в аккаунт пользователя с вводом неверного пароля.
@@ -155,6 +157,7 @@ def test_sign_in_400_wrong_password():
 
     assert sign_in_response.status_code == 400, sign_in_response.text
     assert sign_in_response.json()["Error"]["Code"] == "PH101"
+
 
 @pytest.mark.xfail
 def test_sign_in_400_account_does_not_exist():
