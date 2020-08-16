@@ -105,8 +105,11 @@ func (app *App) eventList(ctx context.Context, f api.AccountAndEventFilter) ([]E
 			"SELECT id, name, description, owner_id, created, updated, is_public, is_hidden FROM events WHERE owner_id = $1",
 			f.AccountID,
 		)
+		if err != nil {
+			return nil, fmt.Errorf(baseErr, err)
+		}
 	} else {
-		return []Event{}, fmt.Errorf(baseErr, "filter is empty")
+		return nil, fmt.Errorf(baseErr, "filter is empty")
 	}
 	defer rows.Close()
 
