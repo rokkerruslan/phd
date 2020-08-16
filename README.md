@@ -1,5 +1,7 @@
 ### Photographer
 
+[![Actions Status](https://github.com/rokkerruslan/phd/workflows/Go/badge.svg)](https://github.com/rokkerruslan/phd/actions)
+
 Backend for photographer search application.
 
 ### Quickstart
