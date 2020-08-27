@@ -2,31 +2,31 @@ name: Python application
 
 on:
   push:
-    branches: [ master, rokkerdenis/add-python-app.yaml ]
+    branches: [ master ]
   pull_request:
     branches: [ master ]
 
 jobs:
-#  build:
-#    runs-on: ubuntu-latest
-#    steps:
-#      - uses: actions/checkout@v2
-#
-#      - name: build in docker
-#        run: docker build -t phd .
-#
-#      - name: login to dockerhub
-#        run: docker login -u ${{ secrets.dockerHubLogin }} -p ${{ secrets.dockerHubPassword }}
-#
-#      - name: add tag
-#        run: docker tag phd:latest rokkerdenis/phd:latest
-#
-#      - name: push to dockerhub
-#        run: docker push rokkerdenis/phd
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: build in docker
+        run: docker build -t phd .
+
+      - name: login to dockerhub
+        run: docker login -u ${{ secrets.dockerHubLogin }} -p ${{ secrets.dockerHubPassword }}
+
+      - name: add tag
+        run: docker tag phd:latest rokkerdenis/phd:latest
+
+      - name: push to dockerhub
+        run: docker push rokkerdenis/phd
 
   tests:
     runs-on: ubuntu-latest
-#    needs: build
+    needs: build
     services:
       postgres:
         image: postgres

@@ -6,36 +6,31 @@ Backend for photographer search application.
 
 ### Quickstart
 
-For start applicatino you need `Docker` and `Go compiler` applications.
+For start application you need `Docker` and `Go compiler` applications.
 
+Build image
+```shell script
+$ docker build --tag phd .
+```
 Setup database:
 ```shell script
 $ docker run --detach \
              --name phdb \
              --publish 5432:5432 \
+             --env POSTGRES_PASSWORD=postgres \
              --volume phdb:/var/lib/postgresql/data \
              postgres:12
 ```
+Setup migration:
+```
+to do
+```
 
-Build application and tools:
+
+## Build on Docker
 ```shell script
-$ ./app build
-```
-
-Setup table structure:
-```
-$ ./app migrate
-```
-
-Run application:
-```
-$ ./app start
-```
-
-## Build on Win
-```shell script
-$ set ENV=.env.tests
-$ go build -o dist/ ./cmd/phd
+docker build -t phd .
+run --env-file .env phd
 ```
 
 ## Run on Win

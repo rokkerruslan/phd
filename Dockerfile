@@ -4,8 +4,8 @@ WORKDIR /app
 
 COPY . .
 
-RUN go build -o ./dist ./cmd/phd
+RUN go build ./cmd/phd
 
-RUN ls -lah /app/dist
+RUN ls -lah /app
 
-CMD /app/dist/phd
+CMD /app/phd
