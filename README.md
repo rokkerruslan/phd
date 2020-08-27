@@ -33,11 +33,6 @@ docker build -t phd .
 run --env-file .env phd
 ```
 
-## Run on Win
-```shell script
-$ .\dist\phd.exe
-```
-
 ## API documentation
 
 Open API spec [spec](docs/api.yml).

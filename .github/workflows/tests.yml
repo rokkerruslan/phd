@@ -7,7 +7,7 @@ on:
     branches: [ master ]
 
 jobs:
-  build:
+  build_phd:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -23,6 +23,20 @@ jobs:
 
       - name: push to dockerhub
         run: docker push rokkerdenis/phd
+
+  build_mi:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: build in docker
+        run: docker build -t mi -f ./cmd/mi/dockerfile .
+
+      - name: login to dockerhub
+        run: docker login -u ${{ secrets.dockerHubLogin }} -p ${{ secrets.dockerHubPassword }}
+
+      - name: add tag
+        run: docker tag mi:latest rokkerdenis/mi:latest
 
   tests:
     runs-on: ubuntu-latest
