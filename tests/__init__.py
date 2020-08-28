@@ -13,6 +13,14 @@ load_dotenv(dotenv_path=env_path)
 
 HOST = f"http://localhost{os.environ.get('ADDR')}"
 
+print()
+print("=====================")
+print("= ENV ===============")
+print("= ADDR:", os.environ.get("ADDR"))
+print("= DATABASE_URL:", os.environ.get("DATABASE_URL"))
+print("=====================")
+print()
+
 format_time = "%Y-%m-%dT%H:%M:%SZ"
 
 
