@@ -18,8 +18,8 @@ def test_create_event_200():
 
     account_id = sign_up_response.json()["Account"]["ID"]
     x_auth_token = {"X-Auth-Token": sign_up_response.json()["Token"]}
-
     info = create_valid_event_info(account_id)
+
     create_event_response = requests.post(
         f"{HOST}/events",
         headers=x_auth_token,
