@@ -71,12 +71,8 @@ jobs:
       env:
         DATABASE_URL: postgres://postgres:postgres@localhost:5432/postgres?sslmode=disable
       run: ./bin/mi up
-    - name: Logsss
+    - name: Logs
       run: docker logs "${{ job.services.web.id }}"
-
-    - name: asdfasdf
-      run: |
-        sleep 2
     - name: Set up Python 3.8
       uses: actions/setup-python@v2
       with:
