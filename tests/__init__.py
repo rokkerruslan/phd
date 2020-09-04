@@ -4,6 +4,7 @@ from pathlib import Path
 from mimesis import Person
 from mimesis import Text
 from datetime import datetime, timedelta
+import requests
 
 person = Person("ru")
 text = Text("ru")
