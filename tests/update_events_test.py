@@ -1,10 +1,7 @@
 import pytest
 import requests
-from tests import delete_all_db, create_valid_account_info, create_valid_event_info, HOST, format_time
+from tests import create_valid_account_info, create_valid_event_info, HOST
 
-
-def pytest_sessionfinish():
-    delete_all_db()
 
 def test_update_events_200():
     """

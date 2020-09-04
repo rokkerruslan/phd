@@ -1,10 +1,6 @@
 import pytest
 import requests
-from tests import delete_all_db, create_valid_account_info, HOST
-
-
-def pytest_sessionfinish():
-    delete_all_db()
+from tests import create_valid_account_info, HOST
 
 
 def test_sign_up_200():

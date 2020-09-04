@@ -1,4 +1,3 @@
-import psycopg2
 import os
 from dotenv import load_dotenv
 from pathlib import Path
@@ -13,39 +12,7 @@ load_dotenv(dotenv_path=env_path)
 
 HOST = f"http://localhost{os.environ.get('ADDR')}"
 
-print()
-print("=====================")
-print("= ENV ===============")
-print("= ADDR:", os.environ.get("ADDR"))
-print("= DATABASE_URL:", os.environ.get("DATABASE_URL"))
-print("=====================")
-print()
-
 format_time = "%Y-%m-%dT%H:%M:%SZ"
-
-
-def delete_all_db():
-    """
-    Фунция очистки всех баз данных.
-    """
-
-    connect = psycopg2.connect(os.environ.get('DATABASE_URL'))
-    cursor = connect.cursor()
-
-    query = """
-        delete from tokens;
-        delete from offers;
-        delete from images;
-        delete from timelines;
-        delete from events;
-        delete from accounts;
-    """
-
-    cursor.execute(query)
-
-    connect.commit()
-    cursor.close()
-    connect.close()
 
 
 def create_valid_account_info():
