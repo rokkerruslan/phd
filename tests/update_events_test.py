@@ -1,16 +1,13 @@
 import pytest
 import requests
-from tests import create_valid_account_info, create_valid_event_info, HOST
+from tests import create_valid_account_info, create_valid_event_info, HOST, sign_up
 
 
 def test_update_events_200():
     """
     Тест проверяет функцию обновления данных ивента с валидными данными.
     """
-    sign_up_response = requests.post(
-        f"{HOST}/accounts/sign-up",
-        json=create_valid_account_info()
-    )
+    sign_up_response = sign_up()
 
     assert sign_up_response.status_code == 200, sign_up_response.text
 
@@ -44,10 +41,7 @@ def test_update_events_400_name_is_empty():
     """
     Тест проверяет возникновение ошибки при обновлении ивента без ввода имени ивента.
     """
-    sign_up_response = requests.post(
-        f"{HOST}/accounts/sign-up",
-        json=create_valid_account_info()
-    )
+    sign_up_response = sign_up()
 
     assert sign_up_response.status_code == 200, sign_up_response.text
 
@@ -83,10 +77,7 @@ def test_update_events_400_description_is_empty():
     """
     Тест проверяет возникновение ошибки при обновлении ивента без ввода описания ивента.
     """
-    sign_up_response = requests.post(
-        f"{HOST}/accounts/sign-up",
-        json=create_valid_account_info()
-    )
+    sign_up_response = sign_up()
 
     assert sign_up_response.status_code == 200, sign_up_response.text
 
@@ -123,10 +114,7 @@ def test_update_events_400_timelines_is_empty():
     """
     Тест проверяет возникновение ошибки при обновлении ивента без ввода таймлайна ивента. issue #52
     """
-    sign_up_response = requests.post(
-        f"{HOST}/accounts/sign-up",
-        json=create_valid_account_info()
-    )
+    sign_up_response = sign_up()
 
     assert sign_up_response.status_code == 200, sign_up_response.text
 
@@ -163,10 +151,7 @@ def test_update_events_400_not_authorized():
     """
     Запрещено обновлять ивент без авторизации. issues 53
     """
-    sign_up_response = requests.post(
-        f"{HOST}/accounts/sign-up",
-        json=create_valid_account_info()
-    )
+    sign_up_response = sign_up()
 
     assert sign_up_response.status_code == 200, sign_up_response.text
 
@@ -198,10 +183,7 @@ def test_update_events_400_id_doesnt_match():
     """
     Запрещено обновлять ивент без подверждения ID пользователя. issues 54
     """
-    sign_up_response = requests.post(
-        f"{HOST}/accounts/sign-up",
-        json=create_valid_account_info()
-    )
+    sign_up_response = sign_up()
 
     assert sign_up_response.status_code == 200, sign_up_response.text
 
@@ -235,10 +217,7 @@ def test_update_events_owner_id_not_nil():
     """
     ID аккаунта не может ровняться нулю.
     """
-    sign_up_response = requests.post(
-        f"{HOST}/accounts/sign-up",
-        json=create_valid_account_info()
-    )
+    sign_up_response = sign_up()
 
     assert sign_up_response.status_code == 200, sign_up_response.text
 
@@ -274,10 +253,7 @@ def test_update_events_info():
     """
     Тест проверяет обновление информации ивента. issue #56
     """
-    sign_up_response = requests.post(
-        f"{HOST}/accounts/sign-up",
-        json=create_valid_account_info()
-    )
+    sign_up_response = sign_up()
 
     assert sign_up_response.status_code == 200, sign_up_response.text
 
@@ -324,10 +300,7 @@ def test_update_events_timelines():
     """
     Тест проверяет обновление данных в таймлайне ивента.
     """
-    sign_up_response = requests.post(
-        f"{HOST}/accounts/sign-up",
-        json=create_valid_account_info()
-    )
+    sign_up_response = sign_up()
 
     assert sign_up_response.status_code == 200, sign_up_response.text
 
@@ -370,10 +343,7 @@ def test_update_events_added_two_timelines():
     """
     Тест проверяет добавление дополнительного таймлана в ивент.
     """
-    sign_up_response = requests.post(
-        f"{HOST}/accounts/sign-up",
-        json=create_valid_account_info()
-    )
+    sign_up_response = sign_up()
 
     assert sign_up_response.status_code == 200, sign_up_response.text
 
@@ -418,10 +388,7 @@ def test_update_events_del_one_timelines():
     """
     Тест проверяет удаление одного из таймлайнов ивента.
     """
-    sign_up_response = requests.post(
-        f"{HOST}/accounts/sign-up",
-        json=create_valid_account_info()
-    )
+    sign_up_response = sign_up()
 
     assert sign_up_response.status_code == 200, sign_up_response.text
 

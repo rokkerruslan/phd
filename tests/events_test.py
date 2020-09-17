@@ -1,19 +1,14 @@
 import pytest
 import requests
 from datetime import datetime, timedelta
-from tests import create_valid_account_info, create_valid_event_info, create_invalid_event_info, HOST, \
-    format_time
+from tests import create_valid_event_info, create_invalid_event_info, HOST, format_time, sign_up
 
 
 def test_create_event_200():
     """
     Тест проверяет функцию создания ивентов с валидными данными.
     """
-    sign_up_response = requests.post(
-        f"{HOST}/accounts/sign-up",
-        json=create_valid_account_info()
-    )
-
+    sign_up_response = sign_up()
     assert sign_up_response.status_code == 200, sign_up_response.text
 
     account_id = sign_up_response.json()["Account"]["ID"]
@@ -33,10 +28,7 @@ def test_create_event_400_name_cant_be_empty():
     """
     Тест проверяет функцию создания ивентов с невалидными данными (Отсутствует значение ключа "Name" в теле запроса).
     """
-    sign_up_response = requests.post(
-        f"{HOST}/accounts/sign-up",
-        json=create_valid_account_info()
-    )
+    sign_up_response = sign_up()
 
     assert sign_up_response.status_code == 200, sign_up_response.text
 
@@ -60,10 +52,7 @@ def test_create_event_400_description_cant_be_empty():
     Тест проверяет функцию создания ивентов с невалидными данными (Отсутствует значение ключа "Description" в теле
     запроса).
     """
-    sign_up_response = requests.post(
-        f"{HOST}/accounts/sign-up",
-        json=create_valid_account_info()
-    )
+    sign_up_response = sign_up()
 
     assert sign_up_response.status_code == 200, sign_up_response.text
 
@@ -87,10 +76,7 @@ def test_create_event_400_timlines_cant_be_empty():
     Тест проверяет функцию создания ивентов с невалидными данными (Отсутствует значение ключа "Timelines" в теле
     запроса).
     """
-    sign_up_response = requests.post(
-        f"{HOST}/accounts/sign-up",
-        json=create_valid_account_info()
-    )
+    sign_up_response = sign_up()
 
     assert sign_up_response.status_code == 200, sign_up_response.text
 
@@ -113,10 +99,7 @@ def test_create_event_400_id_doesnt_match():
     """
     Запрещено создавать ивент без подтверждения ID пользователя.
     """
-    sign_up_response = requests.post(
-        f"{HOST}/accounts/sign-up",
-        json=create_valid_account_info()
-    )
+    sign_up_response = sign_up()
 
     assert sign_up_response.status_code == 200, sign_up_response.text
 
@@ -139,10 +122,7 @@ def test_create_event_400_not_authorized():
     """
     Тест проверяет функцию создания ивентов не авторизованным пользователем.
     """
-    sign_up_response = requests.post(
-        f"{HOST}/accounts/sign-up",
-        json=create_valid_account_info()
-    )
+    sign_up_response = sign_up()
 
     assert sign_up_response.status_code == 200, sign_up_response.text
 
@@ -163,10 +143,7 @@ def test_event_info_200():
     Тест проверяет функцию получения информации об ивенте.
     """
 
-    sign_up_response = requests.post(
-        f"{HOST}/accounts/sign-up",
-        json=create_valid_account_info()
-    )
+    sign_up_response = sign_up()
 
     assert sign_up_response.status_code == 200, sign_up_response.text
 
@@ -193,10 +170,7 @@ def test_list_events_200():
     Тест проверяет функцию получения списка ифентов у одного аккаунта.
     """
 
-    sign_up_response = requests.post(
-        f"{HOST}/accounts/sign-up",
-        json=create_valid_account_info()
-    )
+    sign_up_response = sign_up()
 
     assert sign_up_response.status_code == 200, sign_up_response.text
 
@@ -224,10 +198,7 @@ def test_check_timlines_not_nil():
     Таймлайн ивента не должен быть нулём. Issue #41.
     """
 
-    sign_up_response = requests.post(
-        f"{HOST}/accounts/sign-up",
-        json=create_valid_account_info()
-    )
+    sign_up_response = sign_up()
 
     assert sign_up_response.status_code == 200, sign_up_response.text
 
@@ -258,10 +229,7 @@ def test_create_events_400_start_after_end():
     """
     Запрещено задавать конец ивента раньше старта
     """
-    sign_up_response = requests.post(
-        f"{HOST}/accounts/sign-up",
-        json=create_valid_account_info()
-    )
+    sign_up_response = sign_up()
 
     assert sign_up_response.status_code == 200, sign_up_response.text
 
@@ -295,10 +263,7 @@ def test_create_events_400_timeline_is_not_in_the_past():
     """
     Тест проверяет возниконовение ошибки при создании ивента с таймлайном который находится в прошедшем времени.
     """
-    sign_up_response = requests.post(
-        f"{HOST}/accounts/sign-up",
-        json=create_valid_account_info()
-    )
+    sign_up_response = sign_up()
 
     assert sign_up_response.status_code == 200, sign_up_response.text
 
@@ -320,10 +285,7 @@ def test_create_events_400_intersection_of_timelines():
     """
     Тест проверяет возниконовение ошибки при пересечении временных промежутков.
     """
-    sign_up_response = requests.post(
-        f"{HOST}/accounts/sign-up",
-        json=create_valid_account_info()
-    )
+    sign_up_response = sign_up()
 
     assert sign_up_response.status_code == 200, sign_up_response.text
 
@@ -354,10 +316,7 @@ def test_create_event_timeline_is_not_in_the_present():
     Таймлайн в ивенте разрешается устанавливать на 1 час позже чем время создания ивента. Тест проверяет
     возниконовение ошибки при создании ивента с таймлайном до этого часа.
     """
-    sign_up_response = requests.post(
-        f"{HOST}/accounts/sign-up",
-        json=create_valid_account_info()
-    )
+    sign_up_response = sign_up()
 
     assert sign_up_response.status_code == 200, sign_up_response.text
 

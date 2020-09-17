@@ -6,6 +6,7 @@ from mimesis import Text
 from datetime import datetime, timedelta
 import requests
 
+
 person = Person("ru")
 text = Text("ru")
 env_path = Path(".env.tests")
@@ -14,6 +15,15 @@ load_dotenv(dotenv_path=env_path)
 HOST = f"http://localhost{os.environ.get('ADDR')}"
 
 format_time = "%Y-%m-%dT%H:%M:%SZ"
+
+
+def sign_up():
+    sign_up_response = requests.post(
+        f"{HOST}/accounts/sign-up",
+        json=create_valid_account_info()
+    )
+
+    return sign_up_response
 
 
 def create_valid_account_info():
