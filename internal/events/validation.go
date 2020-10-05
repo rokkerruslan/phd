@@ -2,6 +2,7 @@ package events
 
 import (
 	"fmt"
+	"sort"
 	"strings"
 )
 
@@ -40,12 +41,36 @@ func (e *Event) baseValidation() []string {
 	}
 	if e.Timelines == nil || len(e.Timelines) == 0 {
 		errors = append(errors, "`Timelines` can't be empty")
-	}
-	for _, timeline := range e.Timelines {
-		if tError := timeline.Validate(); tError != nil {
-			errors = append(errors, tError.Error())
+	} else {
+		for _, timeline := range e.Timelines {
+			if tError := timeline.Validate(); tError != nil {
+				errors = append(errors, tError.Error())
+			}
+		}
+		if !validateTimelinesCrossing(e.Timelines) {
+			errors = append(errors, "errors crossing time intervals")
 		}
 	}
 
 	return errors
+}
+
+func validateTimelinesCrossing(timelines []Timeline) bool {
+	switch len(timelines) {
+	case 0, 1:
+		return true
+	}
+
+	sort.Slice(timelines, func(i, j int) bool {
+		return timelines[i].Start.Before(timelines[j].Start)
+	})
+	prev := timelines[0]
+	for _, next := range timelines[1:] {
+		if prev.End.After(next.Start) {
+			return false
+		}
+
+		prev = next
+	}
+	return true
 }
