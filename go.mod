@@ -10,5 +10,5 @@ require (
 	github.com/jackc/pgx/v4 v4.6.0
 	github.com/jackc/puddle v1.1.1 // indirect
 	github.com/joho/godotenv v1.3.0
-	golang.org/x/crypto v0.0.0-20200406173513-056763e48d71
+	golang.org/x/crypto v0.1.0
 )
